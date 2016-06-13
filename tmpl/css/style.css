@@ -1,0 +1,43 @@
+body {
+    line-height: 1.6em; /* fix for thai font*/
+}
+
+
+html, body {
+    height: 100%;
+}
+
+.container-fluid{
+	min-height: 100%;
+}
+
+.panel-body {
+ height: 320px; 
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+::-webkit-scrollbar-track {
+    background-color: #CAE4FA;
+    border-left: 1px solid #ccc;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #428bca;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: #1D74BF;
+}
+
+
+pre{
+  height:160px;
+  overflow:auto;
+  width:100%;
+}
+
+.string { color: green; }
+.number { color: darkorange; }
+.boolean { color: blue; }
+.null { color: magenta; }
+.key { color: red; }

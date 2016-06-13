@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>MMock Console</title>
+
+	<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+	<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+	<script type="text/JavaScript" src="js/script.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script type="text/JavaScript">
+	$( document ).ready(function() {
+		  var ws = new WebSocket("ws://{{.Ip}}:{{.Port}}/echo");
+		  ws.onmessage = function(e) {
+		  	  var message = JSON.parse(event.data);
+		  	  logRequest(message);		      
+		  };
+	});
+		</script>
+</head>
+
+
+<body>
+	<!-- Stack the columns on mobile by making one full-width and the other half-width -->
+	<div class="container-fluid content" style="padding: 15px;">
+		<div class="row">
+			<div class="col-md-12 col-lg-12 console">
+				<div class="panel panel-primary" >
+					<div class="panel-heading">
+						<h3 class="panel-title">MMock Console</h3>
+					</div>
+					<div class="panel-body" style="overflow:auto">
+						
+							<ul class="list-group" id="groupConsole">
+								
+							</ul>
+						
+					</div>
+					<div class="panel-footer">
+						<label style="padding-top: 1%;">
+							<input type="checkbox" id="chkAutoScroll" checked="true" > Auto scroll
+						</label>
+						<button type="button" class="btn btn-primary" tabindex="0" id="btnClearLog" style="float:right;">
+						<span class="glyphicon glyphicon-remove-sign"></span> Clear Console</button>
+					</div>
+				</div>
+			</div>	
+		</div>
+		<div class="row">
+			<div class="alert alert-info" style="display:none" id="alertMessenge">Welcome.</div>
+		</div>
+		<div class="row" >
+			<div class="col-md-12 col-lg-12 status">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">HTTP Details</h3>
+					</div>
+					<div class="panel-body">
+
+						<div id="tirecap" style="display:none" class="alert alert-success" >
+						  <strong><span id="tistatus"> </span></strong> <span id="tirequest"> </span>
+						</div>
+						
+						<ul class="nav nav-tabs">
+						  <li class="active" ><a href="#tabrequest" data-toggle="tab">Request</a></li>
+						  <li><a href="#tabresponse" data-toggle="tab">Response</a></li>
+						  <li><a href="#tablog" data-toggle="tab">Log</a></li>
+						</ul>
+
+
+						<div class="tab-content">
+						  <div id="tabrequest" class="tab-pane fade in active">
+						    <pre id="hdrequest"></pre>
+						  </div>
+						  <div id="tabresponse" class="tab-pane fade">
+						    <pre id="hdresponse"></pre>
+						  </div>
+						  <div id="tablog" class="tab-pane fade">
+						    <pre id="hdlog"></pre>
+						  </div >
+						</div>
+						
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+
+
+</body>
+</html>

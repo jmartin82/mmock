@@ -1,0 +1,24 @@
+{
+	"request": {
+		"method": "GET",
+		"path": "/hello*",
+		"queryStringParameters": {
+			"name": ["world"]
+		},
+		"headers": {},
+		"cookies": {
+			"visit" : "true"
+		},
+		"body": ""
+	},
+	"response": {
+		"statusCode": 200,
+		"headers": {
+			"Content-Type":["application/json"]
+		},
+		"body": "Hello AGAIN! my name is {{fake.FirstName}}!"
+	},
+	"control":{
+		"priority":1
+	}
+}
