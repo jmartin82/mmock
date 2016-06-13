@@ -2,9 +2,9 @@ package translate
 
 import (
 	"fmt"
+	"github.com/jmartin82/mmock/definition"
 	"io"
 	"io/ioutil"
-	"mmock/definition"
 	"net/http"
 	"strings"
 )

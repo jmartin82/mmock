@@ -1,9 +1,9 @@
 package parse
 
 import (
+	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/parse/fakedata"
 	"log"
-	"mmock/definition"
-	"mmock/parse/fakedata"
 	"reflect"
 	"regexp"
 	"strings"

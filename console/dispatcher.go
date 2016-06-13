@@ -2,10 +2,10 @@ package console
 
 import (
 	"fmt"
+	"github.com/jmartin82/mmock/definition"
 	"golang.org/x/net/websocket"
 	"html/template"
 	"log"
-	"mmock/definition"
 	"net/http"
 )
 

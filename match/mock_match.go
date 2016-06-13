@@ -2,8 +2,8 @@ package match
 
 import (
 	"errors"
+	"github.com/jmartin82/mmock/definition"
 	"github.com/ryanuber/go-glob"
-	"mmock/definition"
 )
 
 var (

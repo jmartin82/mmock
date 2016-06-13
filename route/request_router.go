@@ -2,9 +2,9 @@ package route
 
 import (
 	"errors"
+	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/match"
 	"log"
-	"mmock/definition"
-	"mmock/match"
 	"sync"
 )
 
