@@ -17,7 +17,9 @@ type Dispatcher struct {
 }
 
 func (this *Dispatcher) consoleHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tmpl/index.html")
+	tmpl, _ := Asset("tmpl/index.html")
+	fmt.Println(string(tmpl))
+	t, _ := template.New("Console").Parse(string(tmpl))
 	t.Execute(w, &this)
 }
 
