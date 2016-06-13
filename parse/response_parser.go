@@ -1,7 +1,7 @@
 package parse
 
 import (
-	"mmock/definition"
+	"github.com/jmartin82/mmock/definition"
 )
 
 type ResponseParser interface {

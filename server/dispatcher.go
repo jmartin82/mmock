@@ -2,12 +2,12 @@ package server
 
 import (
 	"fmt"
+	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/parse"
+	"github.com/jmartin82/mmock/route"
+	"github.com/jmartin82/mmock/translate"
 	"log"
 	"math/rand"
-	"mmock/definition"
-	"mmock/parse"
-	"mmock/route"
-	"mmock/translate"
 	"net/http"
 	"strconv"
 	"time"

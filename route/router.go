@@ -1,7 +1,7 @@
 package route
 
 import (
-	"mmock/definition"
+	"github.com/jmartin82/mmock/definition"
 )
 
 type Router interface {

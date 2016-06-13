@@ -1,7 +1,7 @@
 package translate
 
 import (
-	"mmock/definition"
+	"github.com/jmartin82/mmock/definition"
 	"net/http"
 )
 

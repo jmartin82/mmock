@@ -1,7 +1,7 @@
 package match
 
 import (
-	"mmock/definition"
+	"github.com/jmartin82/mmock/definition"
 )
 
 type Matcher interface {
