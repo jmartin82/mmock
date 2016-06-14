@@ -2,6 +2,7 @@ package console
 
 import (
 	"fmt"
+	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/jmartin82/mmock/definition"
 	"golang.org/x/net/websocket"
 	"html/template"
@@ -17,7 +18,8 @@ type Dispatcher struct {
 }
 
 func (this *Dispatcher) consoleHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tmpl/index.html")
+	tmpl, _ := Asset("tmpl/index.html")
+	t, _ := template.New("Console").Parse(string(tmpl))
 	t.Execute(w, &this)
 }
 
@@ -58,8 +60,8 @@ func (this *Dispatcher) logFanOut() {
 func (this *Dispatcher) Start() {
 	this.clients = []*websocket.Conn{}
 	http.Handle("/echo", websocket.Handler(this.echoHandler))
-	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("tmpl/js"))))
-	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("tmpl/css"))))
+	http.Handle("/js/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "tmpl"}))
+	http.Handle("/css/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "tmpl"}))
 	http.HandleFunc("/", this.consoleHandler)
 
 	go this.logFanOut()

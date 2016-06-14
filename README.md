@@ -37,16 +37,15 @@ Either:
 Run it from Docker using the provided ```Dockerfile```
 
 ```
-#!sh
-
-docker run -d -p 8082:8082 -p 8083:8083 mmock/mmock
+go get github.com/jmartin82/mmock
+docker build -t mmock/mmock .
+docker run -v YOUR_ABS_PATH:/config -p 8082:8082 -p 8083:8083  mmock/mmock
 ```
 
 
 Or run mmock locally from the command line. 
-```
-#!sh
 
+```
 go get github.com/jmartin82/mmock
 mmock -h
 
@@ -56,8 +55,6 @@ To configure Mmock, use command line flags described in help.
 
 
 ```
-#!sh
-
     Usage of ./mmock:
       -cconsole-port int
           Console server Port (default 8083)
@@ -177,7 +174,6 @@ Fake data:
  - fake.Model
  - fake.Month
  - fake.Year
- - fake.MonthShort
  - fake.Paragraph
  - fake.Paragraphs
  - fake.Phone
