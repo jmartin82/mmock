@@ -2,7 +2,6 @@ FROM golang:1.4
 
 RUN go get github.com/jmartin82/mmock
 
-RUN ln -s /go/src/github.com/jmartin82/mmock/tmpl /go/bin/tmpl
 RUN mkdir /config
 VOLUME /config
 
