@@ -19,6 +19,7 @@ Built with Go - Mmock runs without installation on multiple platforms.
 * Easy mock definition via JSON
 * Variables in response (fake or request data)
 * Glob matching ( /a/b/* )
+* Match request by method, URL params, headers, cookies and bodies.
 * Mock definitions hot replace (edit your mocks without restart)
 * Web interface to view requests data (method,path,headers,cookies,body,etc..)
 * Fine grain log info in web interface
@@ -29,6 +30,28 @@ Built with Go - Mmock runs without installation on multiple platforms.
 * Lightweight and portable
 * No installation required
 
+### Example
+
+![Video of Mmock](/docs/example.gif "Mmock example")
+
+Mock definition file example:
+
+```
+{
+	"request": {
+		"method": "GET",
+		"path": "/hello/*"
+	},
+	"response": {
+		"statusCode": 200,
+		"headers": {
+			"Content-Type":["application/json"]
+		},
+		"body": "{\"hello\": \"{{request.query.name}}, my name is {{fake.FirstName}}\"}"
+	}
+}
+
+```
 
 ### Getting started
 
@@ -75,8 +98,6 @@ To configure Mmock, use command line flags described in help.
 Mock definition:
 
 ```
-#!json
-
 {
 	"request": {
 		"method": "GET|POST|PUT|PATCH|...",
@@ -116,27 +137,27 @@ Mock definition:
 
 This mock definition section represents the expected input data. I the request data match with mock request section, the server will response the mock response data.  
 
-* method: Request http method. **Mandatory**
-* path: Resource identifier. It allows * pattern. **Mandatory**
-* queryStringParameters: Array of query strings. It allows more than one value for the same key.
-* headers: Array of headers. It allows more than one value for the same key.
-* cookies: Array of cookies.
-* body: Body string. It allows * pattern.
+* *method*: Request http method. **Mandatory**
+* *path*: Resource identifier. It allows * pattern. **Mandatory**
+* *queryStringParameters*: Array of query strings. It allows more than one value for the same key.
+* *headers*: Array of headers. It allows more than one value for the same key.
+* *cookies*: Array of cookies.
+* *body*: Body string. It allows * pattern.
 
 To do a match with queryStringParameters, headers, cookies. All defined keys in mock will be present with the exact value.
 
 #### Response
 
-* statusCode: Request http method.
-* headers: Array of headers. It allows more than one value for the same key and vars.
-* cookies: Array of cookies. It allows vars.
-* body: Body string. It allows vars.
+* *statusCode*: Request http method.
+* *headers*: Array of headers. It allows more than one value for the same key and vars.
+* *cookies*: Array of cookies. It allows vars.
+* *body*: Body string. It allows vars.
 
 #### Control
 
-* delay: Delay the response in seconds. Simulate bad connection or bad server performance.
-* crazy: Return random server errors (5xx) in some request. Simulate server problems.
-* priority: Set the priority to avoid match in less restrictive mocks.
+* *delay*: Delay the response in seconds. Simulate bad connection or bad server performance.
+* *crazy*: Return random server errors (5xx) in some request. Simulate server problems.
+* *priority*: Set the priority to avoid match in less restrictive mocks.
 
 ### Variable tags
 
@@ -192,35 +213,12 @@ Fake data:
  - fake.Zip
 
 
-### Example
-
-![Video of Mmock](/docs/example.gif "Mmock example")
-
-
-```
-#!json
-
-{
-	"request": {
-		"method": "GET",
-		"path": "/hello/*"
-	},
-	"response": {
-		"statusCode": 200,
-		"headers": {
-			"Content-Type":["application/json"]
-		},
-		"body": "{\"hello\": \"{{request.query.name}}, my name is {{fake.FirstName}}\"}"
-	}
-}
-
-```
 ### Benchmark
 
 Basic benchmark with ab (Apache HTTP server benchmarking tool)
 
+Intel(R) Pentium(R) CPU 2127U @ 1.90GHz
 350 Concurrent
-
 20000 Request
 
 ```
