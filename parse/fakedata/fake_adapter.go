@@ -1,136 +1,220 @@
 package fakedata
 
 import (
-	"github.com/icrowley/fake"
 	"strconv"
+
+	"github.com/icrowley/fake"
 )
 
 type FakeAdapter struct {
 }
 
-func (this FakeAdapter) Brand() string {
+//Brand return a random Brand
+func (fa FakeAdapter) Brand() string {
 	return fake.Brand()
 }
-func (this FakeAdapter) Character() string {
+
+//Character return a random Character
+func (fa FakeAdapter) Character() string {
 	return fake.Character()
 }
-func (this FakeAdapter) Characters() string {
+
+//Characters return a random Characters
+func (fa FakeAdapter) Characters() string {
 	return fake.Characters()
 }
-func (this FakeAdapter) City() string {
+
+//City return a random City
+func (fa FakeAdapter) City() string {
 	return fake.City()
 }
-func (this FakeAdapter) Color() string {
+
+//Color return a random Color
+func (fa FakeAdapter) Color() string {
 	return fake.Color()
 }
-func (this FakeAdapter) Company() string {
+
+//Company return a random Company
+func (fa FakeAdapter) Company() string {
 	return fake.Company()
 }
-func (this FakeAdapter) Continent() string {
+
+//Continent return a random Continent
+func (fa FakeAdapter) Continent() string {
 	return fake.Continent()
 }
-func (this FakeAdapter) Country() string {
+
+//Country return a random Country
+func (fa FakeAdapter) Country() string {
 	return fake.Country()
 }
-func (this FakeAdapter) CreditCardVisa() string {
+
+//CreditCardVisa return a random CreditCardVisa
+func (fa FakeAdapter) CreditCardVisa() string {
 	return fake.CreditCardNum("Visa")
 }
-func (this FakeAdapter) CreditCardMasterCard() string {
+
+//CreditCardMasterCard return a random CreditCardMasterCard
+func (fa FakeAdapter) CreditCardMasterCard() string {
 	return fake.CreditCardNum("MasterCard")
 }
-func (this FakeAdapter) CreditCardAmericanExpress() string {
+
+//CreditCardAmericanExpress return a random CreditCardAmericanExpress
+func (fa FakeAdapter) CreditCardAmericanExpress() string {
 	return fake.CreditCardNum("American Express")
 }
-func (this FakeAdapter) Currency() string {
+
+//Currency return a random Currency
+func (fa FakeAdapter) Currency() string {
 	return fake.Currency()
 }
-func (this FakeAdapter) CurrencyCode() string {
+
+//CurrencyCode return a random CurrencyCode
+func (fa FakeAdapter) CurrencyCode() string {
 	return fake.CurrencyCode()
 }
-func (this FakeAdapter) Digits() string {
+
+//Digits return a random Digits
+func (fa FakeAdapter) Digits() string {
 	return fake.Digits()
 }
-func (this FakeAdapter) EmailAddress() string {
+
+//EmailAddress return a random EmailAddress
+func (fa FakeAdapter) EmailAddress() string {
 	return fake.EmailAddress()
 }
-func (this FakeAdapter) FirstName() string {
+
+//FirstName return a random FirstName
+func (fa FakeAdapter) FirstName() string {
 	return fake.FirstName()
 }
-func (this FakeAdapter) FullName() string {
+
+//FullName return a random FullName
+func (fa FakeAdapter) FullName() string {
 	return fake.FullName()
 }
-func (this FakeAdapter) LastName() string {
+
+//LastName return a random LastName
+func (fa FakeAdapter) LastName() string {
 	return fake.LastName()
 }
-func (this FakeAdapter) Gender() string {
+
+//Gender return a random Gender
+func (fa FakeAdapter) Gender() string {
 	return fake.Gender()
 }
-func (this FakeAdapter) IPv4() string {
+
+//IPv4 return a random IPv4
+func (fa FakeAdapter) IPv4() string {
 	return fake.IPv4()
 }
-func (this FakeAdapter) Language() string {
+
+//Language return a random Language
+func (fa FakeAdapter) Language() string {
 	return fake.Language()
 }
-func (this FakeAdapter) Model() string {
+
+//Model return a random Model
+func (fa FakeAdapter) Model() string {
 	return fake.Model()
 }
-func (this FakeAdapter) Paragraph() string {
+
+//Paragraph return a random Paragraph
+func (fa FakeAdapter) Paragraph() string {
 	return fake.Paragraph()
 }
-func (this FakeAdapter) Paragraphs() string {
+
+//Paragraphs return a random Paragraphs
+func (fa FakeAdapter) Paragraphs() string {
 	return fake.Paragraphs()
 }
-func (this FakeAdapter) Phone() string {
+
+//Phone return a random Phone
+func (fa FakeAdapter) Phone() string {
 	return fake.Phone()
 }
-func (this FakeAdapter) Product() string {
+
+//Product return a random Product
+func (fa FakeAdapter) Product() string {
 	return fake.Product()
 }
-func (this FakeAdapter) Sentence() string {
+
+//Sentence return a random Sentence
+func (fa FakeAdapter) Sentence() string {
 	return fake.Sentence()
 }
-func (this FakeAdapter) Sentences() string {
+
+//Sentences return a random Sentences
+func (fa FakeAdapter) Sentences() string {
 	return fake.Sentences()
 }
-func (this FakeAdapter) SimplePassword() string {
+
+//SimplePassword return a random SimplePassword
+func (fa FakeAdapter) SimplePassword() string {
 	return fake.SimplePassword()
 }
-func (this FakeAdapter) State() string {
+
+//State return a random State
+func (fa FakeAdapter) State() string {
 	return fake.State()
 }
-func (this FakeAdapter) StateAbbrev() string {
+
+//StateAbbrev return a random StateAbbrev
+func (fa FakeAdapter) StateAbbrev() string {
 	return fake.StateAbbrev()
 }
-func (this FakeAdapter) Street() string {
+
+//Street return a random Street
+func (fa FakeAdapter) Street() string {
 	return fake.Street()
 }
-func (this FakeAdapter) StreetAddress() string {
+
+//StreetAddress return a random StreetAddress
+func (fa FakeAdapter) StreetAddress() string {
 	return fake.StreetAddress()
 }
-func (this FakeAdapter) UserName() string {
+
+//UserName return a random UserName
+func (fa FakeAdapter) UserName() string {
 	return fake.UserName()
 }
-func (this FakeAdapter) Day() string {
+
+//Day return a random Day
+func (fa FakeAdapter) Day() string {
 	return strconv.Itoa(fake.Day())
 }
-func (this FakeAdapter) Month() string {
+
+//Month return a random Month
+func (fa FakeAdapter) Month() string {
 	return fake.Month()
 }
-func (this FakeAdapter) Year() string {
+
+//Year return a random Year
+func (fa FakeAdapter) Year() string {
 	return strconv.Itoa(fake.Year(1980, 2020))
 }
-func (this FakeAdapter) MonthShort() string {
+
+//MonthShort return a random MonthShort
+func (fa FakeAdapter) MonthShort() string {
 	return fake.MonthShort()
 }
-func (this FakeAdapter) WeekDay() string {
+
+//WeekDay return a random WeekDay
+func (fa FakeAdapter) WeekDay() string {
 	return fake.WeekDay()
 }
-func (this FakeAdapter) Word() string {
+
+//Word return a random Word
+func (fa FakeAdapter) Word() string {
 	return fake.Word()
 }
-func (this FakeAdapter) Words() string {
+
+//Words return a random Words
+func (fa FakeAdapter) Words() string {
 	return fake.Words()
 }
-func (this FakeAdapter) Zip() string {
+
+//Zip return a random Zip
+func (fa FakeAdapter) Zip() string {
 	return fake.Zip()
 }

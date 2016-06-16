@@ -2,17 +2,18 @@ package translate
 
 import (
 	"fmt"
-	"github.com/jmartin82/mmock/definition"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/jmartin82/mmock/definition"
 )
 
 type HTTPTranslator struct {
 }
 
-func (this HTTPTranslator) BuildRequestDefinitionFromHTTP(req *http.Request) definition.Request {
+func (t HTTPTranslator) BuildRequestDefinitionFromHTTP(req *http.Request) definition.Request {
 
 	res := definition.Request{}
 	res.Method = req.Method
@@ -39,7 +40,7 @@ func (this HTTPTranslator) BuildRequestDefinitionFromHTTP(req *http.Request) def
 	return res
 }
 
-func (this HTTPTranslator) WriteHTTPResponseFromDefinition(fr *definition.Response, w http.ResponseWriter) {
+func (t HTTPTranslator) WriteHTTPResponseFromDefinition(fr *definition.Response, w http.ResponseWriter) {
 
 	for header, values := range fr.Headers {
 		for _, value := range values {

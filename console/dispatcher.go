@@ -2,12 +2,13 @@ package console
 
 import (
 	"fmt"
-	"github.com/elazarl/go-bindata-assetfs"
-	"github.com/jmartin82/mmock/definition"
-	"golang.org/x/net/websocket"
 	"html/template"
 	"log"
 	"net/http"
+
+	"github.com/elazarl/go-bindata-assetfs"
+	"github.com/jmartin82/mmock/definition"
+	"golang.org/x/net/websocket"
 )
 
 type Dispatcher struct {
@@ -17,56 +18,56 @@ type Dispatcher struct {
 	clients []*websocket.Conn
 }
 
-func (this *Dispatcher) consoleHandler(w http.ResponseWriter, r *http.Request) {
+func (di *Dispatcher) consoleHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, _ := Asset("tmpl/index.html")
 	t, _ := template.New("Console").Parse(string(tmpl))
-	t.Execute(w, &this)
+	t.Execute(w, &di)
 }
 
-func (this *Dispatcher) removeClient(i int) {
-	copy(this.clients[i:], this.clients[i+1:])
-	this.clients[len(this.clients)-1] = nil
-	this.clients = this.clients[:len(this.clients)-1]
+func (di *Dispatcher) removeClient(i int) {
+	copy(di.clients[i:], di.clients[i+1:])
+	di.clients[len(di.clients)-1] = nil
+	di.clients = di.clients[:len(di.clients)-1]
 }
 
-func (this *Dispatcher) addClient(ws *websocket.Conn) {
-	this.clients = append(this.clients, ws)
+func (di *Dispatcher) addClient(ws *websocket.Conn) {
+	di.clients = append(di.clients, ws)
 }
 
-func (this *Dispatcher) echoHandler(ws *websocket.Conn) {
+func (di *Dispatcher) echoHandler(ws *websocket.Conn) {
 	defer func() {
 		ws.Close()
 	}()
 
-	this.addClient(ws)
+	di.addClient(ws)
 
 	//block
 	var message string
 	websocket.Message.Receive(ws, &message)
 }
 
-func (this *Dispatcher) logFanOut() {
-	for match := range this.Mlog {
-		for i, c := range this.clients {
+func (di *Dispatcher) logFanOut() {
+	for match := range di.Mlog {
+		for i, c := range di.clients {
 			if c != nil {
 				if err := websocket.JSON.Send(c, match); err != nil {
-					this.removeClient(i)
+					di.removeClient(i)
 				}
 			}
 		}
 	}
 }
 
-func (this *Dispatcher) Start() {
-	this.clients = []*websocket.Conn{}
-	http.Handle("/echo", websocket.Handler(this.echoHandler))
+func (di *Dispatcher) Start() {
+	di.clients = []*websocket.Conn{}
+	http.Handle("/echo", websocket.Handler(di.echoHandler))
 	http.Handle("/js/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "tmpl"}))
 	http.Handle("/css/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "tmpl"}))
-	http.HandleFunc("/", this.consoleHandler)
+	http.HandleFunc("/", di.consoleHandler)
 
-	go this.logFanOut()
+	go di.logFanOut()
 
-	addr := fmt.Sprintf("%s:%d", this.Ip, this.Port)
+	addr := fmt.Sprintf("%s:%d", di.Ip, di.Port)
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatalf("ListenAndServe: " + err.Error())

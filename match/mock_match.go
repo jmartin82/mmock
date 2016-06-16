@@ -2,6 +2,7 @@ package match
 
 import (
 	"errors"
+
 	"github.com/jmartin82/mmock/definition"
 	"github.com/ryanuber/go-glob"
 )
@@ -18,7 +19,7 @@ var (
 type MockMatch struct {
 }
 
-func (this MockMatch) matchKeyAndValues(reqMap definition.Values, mockMap definition.Values) bool {
+func (mm MockMatch) matchKeyAndValues(reqMap definition.Values, mockMap definition.Values) bool {
 	if len(mockMap) > len(reqMap) {
 		return false
 	}
@@ -43,7 +44,7 @@ func (this MockMatch) matchKeyAndValues(reqMap definition.Values, mockMap defini
 	return true
 }
 
-func (this MockMatch) matchKeyAndValue(reqMap definition.Cookies, mockMap definition.Cookies) bool {
+func (mm MockMatch) matchKeyAndValue(reqMap definition.Cookies, mockMap definition.Cookies) bool {
 	if len(mockMap) > len(reqMap) {
 		return false
 	}
@@ -55,7 +56,7 @@ func (this MockMatch) matchKeyAndValue(reqMap definition.Cookies, mockMap defini
 	return true
 }
 
-func (this MockMatch) Match(req *definition.Request, mock *definition.Request) (bool, error) {
+func (mm MockMatch) Match(req *definition.Request, mock *definition.Request) (bool, error) {
 
 	if req.Method != mock.Method {
 		return false, ErrMethodNotMatch
@@ -65,15 +66,15 @@ func (this MockMatch) Match(req *definition.Request, mock *definition.Request) (
 		return false, ErrPathNotMatch
 	}
 
-	if !this.matchKeyAndValues(req.QueryStringParameters, mock.QueryStringParameters) {
+	if !mm.matchKeyAndValues(req.QueryStringParameters, mock.QueryStringParameters) {
 		return false, ErrQueryStringMatch
 	}
 
-	if !this.matchKeyAndValue(req.Cookies, mock.Cookies) {
+	if !mm.matchKeyAndValue(req.Cookies, mock.Cookies) {
 		return false, ErrCookiesNotMatch
 	}
 
-	if !this.matchKeyAndValues(req.Headers, mock.Headers) {
+	if !mm.matchKeyAndValues(req.Headers, mock.Headers) {
 		return false, ErrHeadersNotMatch
 	}
 

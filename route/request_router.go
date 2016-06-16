@@ -2,10 +2,11 @@ package route
 
 import (
 	"errors"
-	"github.com/jmartin82/mmock/definition"
-	"github.com/jmartin82/mmock/match"
 	"log"
 	"sync"
+
+	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/match"
 )
 
 var ErrRouteNotFound = errors.New("Mock route not found")
@@ -17,12 +18,12 @@ type RequestRouter struct {
 	sync.Mutex
 }
 
-func (this *RequestRouter) Route(req *definition.Request) (*definition.Mock, map[string]string) {
+func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, map[string]string) {
 	errors := make(map[string]string)
-	this.Lock()
-	defer this.Unlock()
-	for _, mock := range this.Mocks {
-		m, err := this.Matcher.Match(req, &mock.Request)
+	rr.Lock()
+	defer rr.Unlock()
+	for _, mock := range rr.Mocks {
+		m, err := rr.Matcher.Match(req, &mock.Request)
 		if m {
 			return &mock, nil
 		}
@@ -35,17 +36,17 @@ func (this *RequestRouter) Route(req *definition.Request) (*definition.Mock, map
 
 }
 
-func (this *RequestRouter) SetMockDefinitions(mocks []definition.Mock) {
-	this.Lock()
-	this.Mocks = mocks
-	this.Unlock()
+func (rr *RequestRouter) SetMockDefinitions(mocks []definition.Mock) {
+	rr.Lock()
+	rr.Mocks = mocks
+	rr.Unlock()
 }
 
-func (this *RequestRouter) MockChangeWatch() {
+func (rr *RequestRouter) MockChangeWatch() {
 	go func() {
 		for {
-			mocks := <-this.DUpdates
-			this.SetMockDefinitions(mocks)
+			mocks := <-rr.DUpdates
+			rr.SetMockDefinitions(mocks)
 			log.Println("New mock definitions loaded")
 		}
 

@@ -1,8 +1,9 @@
 package match
 
 import (
-	"github.com/jmartin82/mmock/definition"
 	"testing"
+
+	"github.com/jmartin82/mmock/definition"
 )
 
 func TestMatchMethod(t *testing.T) {

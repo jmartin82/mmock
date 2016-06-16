@@ -1,139 +1,140 @@
 package parse
 
 import (
-	"github.com/jmartin82/mmock/definition"
 	"testing"
+
+	"github.com/jmartin82/mmock/definition"
 )
 
 type DummyDataFaker struct {
 	Dummy string
 }
 
-func (this DummyDataFaker) Brand() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Brand() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Character() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Character() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Characters() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Characters() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) City() string {
-	return this.Dummy
+func (ddf DummyDataFaker) City() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Color() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Color() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Company() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Company() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Continent() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Continent() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Country() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Country() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) CreditCardVisa() string {
-	return this.Dummy
+func (ddf DummyDataFaker) CreditCardVisa() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) CreditCardMasterCard() string {
-	return this.Dummy
+func (ddf DummyDataFaker) CreditCardMasterCard() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) CreditCardAmericanExpress() string {
-	return this.Dummy
+func (ddf DummyDataFaker) CreditCardAmericanExpress() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Currency() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Currency() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) CurrencyCode() string {
-	return this.Dummy
+func (ddf DummyDataFaker) CurrencyCode() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Day() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Day() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Digits() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Digits() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) EmailAddress() string {
-	return this.Dummy
+func (ddf DummyDataFaker) EmailAddress() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) FirstName() string {
-	return this.Dummy
+func (ddf DummyDataFaker) FirstName() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) FullName() string {
-	return this.Dummy
+func (ddf DummyDataFaker) FullName() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) LastName() string {
-	return this.Dummy
+func (ddf DummyDataFaker) LastName() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Gender() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Gender() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) IPv4() string {
-	return this.Dummy
+func (ddf DummyDataFaker) IPv4() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Language() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Language() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Model() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Model() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Month() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Month() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Year() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Year() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) MonthShort() string {
-	return this.Dummy
+func (ddf DummyDataFaker) MonthShort() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Paragraph() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Paragraph() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Paragraphs() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Paragraphs() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Phone() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Phone() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Product() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Product() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Sentence() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Sentence() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Sentences() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Sentences() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) SimplePassword() string {
-	return this.Dummy
+func (ddf DummyDataFaker) SimplePassword() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) State() string {
-	return this.Dummy
+func (ddf DummyDataFaker) State() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) StateAbbrev() string {
-	return this.Dummy
+func (ddf DummyDataFaker) StateAbbrev() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Street() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Street() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) StreetAddress() string {
-	return this.Dummy
+func (ddf DummyDataFaker) StreetAddress() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) UserName() string {
-	return this.Dummy
+func (ddf DummyDataFaker) UserName() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) WeekDay() string {
-	return this.Dummy
+func (ddf DummyDataFaker) WeekDay() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Word() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Word() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Words() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Words() string {
+	return ddf.Dummy
 }
-func (this DummyDataFaker) Zip() string {
-	return this.Dummy
+func (ddf DummyDataFaker) Zip() string {
+	return ddf.Dummy
 }
 
 func TestReplaceTags(t *testing.T) {

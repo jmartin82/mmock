@@ -4,6 +4,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log"
+	"net"
+	"path/filepath"
+	"strings"
+
 	"github.com/jmartin82/mmock/console"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
@@ -12,13 +17,12 @@ import (
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/server"
 	"github.com/jmartin82/mmock/translate"
-	"log"
-	"net"
-	"path/filepath"
-	"strings"
 )
 
+//ErrNotFoundDefaultPath if we can't resolve the current path
 var ErrNotFoundDefaultPath = errors.New("We can't determinate the current path")
+
+//ErrNotFoundAnyMock when we don't found any valid mock definition to load
 var ErrNotFoundAnyMock = errors.New("No valid mock definition found")
 
 func banner() {
@@ -80,15 +84,15 @@ func startConsole(ip string, port int, done chan bool, mLog chan definition.Matc
 
 func main() {
 	banner()
-	outIp := getOutboundIP()
+	outIP := getOutboundIP()
 	path, err := filepath.Abs("./config")
 	if err != nil {
 		panic(ErrNotFoundDefaultPath)
 	}
 
-	sIp := flag.String("server-ip", outIp, "Mock server IP")
+	sIP := flag.String("server-ip", outIP, "Mock server IP")
 	sPort := flag.Int("server-port", 8082, "Mock Server Port")
-	cIp := flag.String("console-ip", outIp, "Console Server IP")
+	cIP := flag.String("console-ip", outIP, "Console Server IP")
 	cPort := flag.Int("cconsole-port", 8083, "Console server Port")
 	cPath := flag.String("config-path", path, "Mocks definition folder")
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
@@ -111,11 +115,11 @@ func main() {
 	router := getRouter(mocks, dUpdates)
 	router.MockChangeWatch()
 
-	go startServer(*cIp, *cPort, done, router, mLog)
-	log.Printf("HTTP Server running at %s:%d\n", *cIp, *cPort)
+	go startServer(*cIP, *cPort, done, router, mLog)
+	log.Printf("HTTP Server running at %s:%d\n", *cIP, *cPort)
 	if *console {
-		go startConsole(*sIp, *sPort, done, mLog)
-		log.Printf("Console running at %s:%d\n", *sIp, *sPort)
+		go startConsole(*sIP, *sPort, done, mLog)
+		log.Printf("Console running at %s:%d\n", *sIP, *sPort)
 	}
 
 	<-done
