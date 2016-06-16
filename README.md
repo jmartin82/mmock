@@ -57,7 +57,7 @@ Mock definition file example:
 
 Either:
 
-Run it from Docker using the provided ```Dockerfile```
+Run it from Docker using the provided ```Dockerfile``` or [from Docker Hub](https://hub.docker.com/r/jordimartin/mmock/)
 
 ```
 go get github.com/jmartin82/mmock
