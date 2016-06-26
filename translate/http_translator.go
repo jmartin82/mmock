@@ -10,9 +10,11 @@ import (
 	"github.com/jmartin82/mmock/definition"
 )
 
+//HTTPTranslator is and adaptor beteewn the http and mock definition.
 type HTTPTranslator struct {
 }
 
+//BuildRequestDefinitionFromHTTP Read the request definition and return a mock request.
 func (t HTTPTranslator) BuildRequestDefinitionFromHTTP(req *http.Request) definition.Request {
 
 	res := definition.Request{}
@@ -40,6 +42,7 @@ func (t HTTPTranslator) BuildRequestDefinitionFromHTTP(req *http.Request) defini
 	return res
 }
 
+//WriteHTTPResponseFromDefinition read a mock response and write a http response.
 func (t HTTPTranslator) WriteHTTPResponseFromDefinition(fr *definition.Response, w http.ResponseWriter) {
 
 	for header, values := range fr.Headers {

@@ -9,8 +9,7 @@ import (
 	"github.com/jmartin82/mmock/match"
 )
 
-var ErrRouteNotFound = errors.New("Mock route not found")
-
+//RequestRouter checks http requesta and try to figure out what is the best mock for each one.
 type RequestRouter struct {
 	Mocks    []definition.Mock
 	Matcher  match.Matcher
@@ -18,6 +17,7 @@ type RequestRouter struct {
 	sync.Mutex
 }
 
+//Route checks the request with all available mock definitions and return the matching mock for it.
 func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, map[string]string) {
 	errors := make(map[string]string)
 	rr.Lock()
@@ -36,12 +36,14 @@ func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, map[s
 
 }
 
+//SetMockDefinitions allows replace the current mock definitions for new ones.
 func (rr *RequestRouter) SetMockDefinitions(mocks []definition.Mock) {
 	rr.Lock()
 	rr.Mocks = mocks
 	rr.Unlock()
 }
 
+//MockChangeWatch monitors the mock configuration dir and loads again all the mocks it something change.
 func (rr *RequestRouter) MockChangeWatch() {
 	go func() {
 		for {

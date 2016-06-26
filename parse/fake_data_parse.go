@@ -10,6 +10,7 @@ import (
 	"github.com/jmartin82/mmock/parse/fakedata"
 )
 
+//FakeDataParse parses the data looking for fake data tags or request data tags
 type FakeDataParse struct {
 	Fake fakedata.DataFaker
 }
@@ -94,6 +95,7 @@ func (fdp FakeDataParse) replaceVars(req *definition.Request, input string) stri
 	})
 }
 
+//Parse subtitutes the current mock response and replace the tags stored inside.
 func (fdp FakeDataParse) Parse(req *definition.Request, res *definition.Response) {
 	for header, values := range res.Headers {
 		for i, value := range values {
