@@ -11,6 +11,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+//Dispatcher is the http console server.
 type Dispatcher struct {
 	Ip      string
 	Port    int
@@ -58,6 +59,7 @@ func (di *Dispatcher) logFanOut() {
 	}
 }
 
+//Start initiates the http console.
 func (di *Dispatcher) Start() {
 	di.clients = []*websocket.Conn{}
 	http.Handle("/echo", websocket.Handler(di.echoHandler))

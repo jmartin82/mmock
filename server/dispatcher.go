@@ -14,6 +14,7 @@ import (
 	"github.com/jmartin82/mmock/translate"
 )
 
+//Dispatcher is the mock http server
 type Dispatcher struct {
 	IP             string
 	Port           int
@@ -35,6 +36,8 @@ func (di Dispatcher) randomStatusCode(currentStatus int) int {
 	return currentStatus
 }
 
+//ServerHTTP is the mock http server request handler.
+//It uses the router to decide the matching mock and translator as adapter between the HTTP impelementation and the mock definition.
 func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	mRequest := di.Translator.BuildRequestDefinitionFromHTTP(req)
 

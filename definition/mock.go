@@ -1,5 +1,6 @@
 package definition
 
+//Mock contains the user mock definition
 type Mock struct {
 	Name     string
 	Request  Request  `json:"request"`
