@@ -22,7 +22,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 		<script type="text/JavaScript">
 	$( document ).ready(function() {
-		  var ws = new WebSocket("ws://" + location.host + ":{{.Port}}");
+		  var ws = new WebSocket("ws://" + location.host + "/echo");
 		  ws.onmessage = function(e) {
 		  	  var message = JSON.parse(event.data);
 		  	  logRequest(message);		      

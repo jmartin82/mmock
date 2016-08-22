@@ -1,12 +1,10 @@
 package route
 
 import (
-	"errors"
-	"log"
-	"sync"
-
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
+	"log"
+	"sync"
 )
 
 //RequestRouter checks http requesta and try to figure out what is the best mock for each one.
