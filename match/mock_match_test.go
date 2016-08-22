@@ -153,7 +153,18 @@ func TestGlobBody(t *testing.T) {
 
 }
 
-func TestMatchIgnoreUnexpectedHeadersAnQuery(t *testing.T) {
+func TestMatchIgnoreMissingBodyDefinition(t *testing.T) {
+	hreq := &definition.Request{}
+	hreq.Body = "HelloWorld"
+	mreq := &definition.Request{}
+	m := MockMatch{}
+
+	if m, err := m.Match(hreq, mreq); !m {
+		t.Error(err)
+	}
+}
+
+func TestMatchIgnoreUnexpectedHeadersAndQuery(t *testing.T) {
 	hreq := &definition.Request{}
 	hreq.Method = "GET"
 	hreq.Path = "/a/b/c"
@@ -169,7 +180,7 @@ func TestMatchIgnoreUnexpectedHeadersAnQuery(t *testing.T) {
 	mreq.Path = "/a/b/c"
 	mval := make(definition.Values)
 	mval["test"] = []string{"test"}
-	mreq.QueryStringParameters = hval
+	mreq.QueryStringParameters = mval
 	mreq.Headers = mval
 
 	m := MockMatch{}

@@ -20,7 +20,9 @@ type MockMatch struct {
 }
 
 func (mm MockMatch) matchKeyAndValues(reqMap definition.Values, mockMap definition.Values) bool {
+
 	if len(mockMap) > len(reqMap) {
+
 		return false
 	}
 
@@ -78,8 +80,8 @@ func (mm MockMatch) Match(req *definition.Request, mock *definition.Request) (bo
 		return false, ErrHeadersNotMatch
 	}
 
-	if !glob.Glob(mock.Body, req.Body) {
-		return false, ErrHeadersNotMatch
+	if len(mock.Body) > 0 && !glob.Glob(mock.Body, req.Body) {
+		return false, ErrBodyNotMatch
 	}
 
 	return true, nil

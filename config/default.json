@@ -1,0 +1,10 @@
+{
+	"request": {
+		"method": "GET",
+		"path": "/"
+	},
+	"response": {
+		"statusCode": 200,
+		"body": "Not configured endpoint (mmock)"
+	}
+}
