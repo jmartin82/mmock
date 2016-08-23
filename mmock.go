@@ -71,8 +71,8 @@ func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.
 }
 
 func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match) {
-	filler := parse.FakeDataParse{fakedata.FakeAdapter{}}
-	dispatcher := server.Dispatcher{ip, port, router, translate.HTTPTranslator{}, filler, mLog}
+	filler := parse.FakeDataParse{Fake: fakedata.FakeAdapter{}}
+	dispatcher := server.Dispatcher{Ip: ip, Port: port, Router: router, Translator: translate.HTTPTranslator{}, ResponseParser: filler, Mlog: mLog}
 	dispatcher.Start()
 	done <- true
 }
@@ -105,7 +105,7 @@ func main() {
 
 	path, _ = filepath.Abs(*cPath)
 	log.Printf("Reading Mock definition from: %s\n", path)
-	definitionReader := definition.FileDefinition{path, dUpdates}
+	definitionReader := definition.FileDefinition{Path: path, Updates: dUpdates}
 	mocks := definitionReader.ReadMocksDefinition()
 	if len(mocks) == 0 {
 		log.Fatalln(ErrNotFoundAnyMock.Error())

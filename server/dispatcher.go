@@ -16,7 +16,7 @@ import (
 
 //Dispatcher is the mock http server
 type Dispatcher struct {
-	IP             string
+	Ip             string
 	Port           int
 	Router         route.Router
 	Translator     translate.MessageTranslator
@@ -73,13 +73,13 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	di.Translator.WriteHTTPResponseFromDefinition(&mock.Response, w)
 
 	//log to console
-	m := definition.Match{mRequest, mock.Response, result}
+	m := definition.Match{Request: mRequest, Response: mock.Response, Result: result}
 	go di.recordMatchData(m)
 }
 
 //Start initialize the HTTP mock server
 func (di Dispatcher) Start() {
-	addr := fmt.Sprintf("%s:%d", di.IP, di.Port)
+	addr := fmt.Sprintf("%s:%d", di.Ip, di.Port)
 
 	err := http.ListenAndServe(addr, &di)
 	if err != nil {

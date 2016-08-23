@@ -16,7 +16,13 @@ function incrementCount() {
 }
 
 function showDetails(id) {
+    setRowSelected(id);
     logDetails(requests[id]);
+}
+
+function setRowSelected(id) {
+   $(".list-group-item").removeClass('selected_row');
+   $("#row-request-"+id).addClass('selected_row');
 }
 
 function getColorByStatus(statusCode) {
@@ -31,12 +37,13 @@ function getColorByStatus(statusCode) {
 }
 
 function logDetails(json) {
+    $("#tirecap").fadeOut(100);
     var request = JSON.stringify(json.request, undefined, 4);
     var response = JSON.stringify(json.response, undefined, 4);
     var log = JSON.stringify(json.result, undefined, 4);
     var status = json.response.statusCode;
-    $("#tirecap").show();
     $("#tirecap").attr('class', 'alert alert-' + getColorByStatus(status));
+    $("#tirecap").fadeIn(100);
     $("#tistatus").html(status);
     $("#tirequest").html(json.request.method + " " + json.request.path);
     $("#hdrequest").html(syntaxHighlight(request));
@@ -51,8 +58,8 @@ function logRequest(json) {
     var datetime = getCurrentTime();
     var fullLog = datetime + " <- " + json.request.method + " " + json.request.path;
     requests[id] = json;
-    $("#groupConsole").append('<li class="list-group-item list-group-item-' + getColorByStatus(status) + '" onclick="showDetails(' + id + ');return false">' + fullLog + '</li>');
-    logDetails(json)
+    $("#groupConsole").append('<li id="row-request-' + id + '" class="list-group-item list-group-item-' + getColorByStatus(status) + '" onclick="showDetails(' + id + ');return false">' + fullLog + '</li>');
+    showDetails(id)
     clearOldLogs();
     scrollLogsDown();
 }

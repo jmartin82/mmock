@@ -36,6 +36,7 @@ pre{
   width:100%;
 }
 
+.selected_row { font-weight: bold;}
 .string { color: green; }
 .number { color: darkorange; }
 .boolean { color: blue; }
