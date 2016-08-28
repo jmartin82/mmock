@@ -1,0 +1,11 @@
+request: 
+  method: GET
+  path: /users/show.json
+response:
+  statusCode: 200
+  headers: 
+    - 
+      Content-Type: 
+        - json
+  body: >
+  "[{\"name\":\"ob1\",\"port_num\":0,\"port_type\":\"network\"}]"

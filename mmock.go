@@ -105,7 +105,10 @@ func main() {
 
 	path, _ = filepath.Abs(*cPath)
 	log.Printf("Reading Mock definition from: %s\n", path)
-	definitionReader := definition.FileDefinition{Path: path, Updates: dUpdates}
+	definitionReader := &definition.FileDefinition{Path: path, Updates: dUpdates}
+	definitionReader.AddConfigReader(definition.JSONReader{})
+	definitionReader.AddConfigReader(definition.YAMLReader{})
+
 	mocks := definitionReader.ReadMocksDefinition()
 	if len(mocks) == 0 {
 		log.Fatalln(ErrNotFoundAnyMock.Error())
