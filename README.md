@@ -16,7 +16,7 @@ Built with Go - Mmock runs without installation on multiple platforms.
 
 ### Features
 
-* Easy mock definition via JSON
+* Easy mock definition via JSON or YAML
 * Variables in response (fake or request data)
 * Glob matching ( /a/b/* )
 * Match request by method, URL params, headers, cookies and bodies.
@@ -80,7 +80,7 @@ To configure Mmock, use command line flags described in help.
 ```
     Usage of ./mmock:
       -cconsole-port int
-          Console server Port (default 8083)
+          Console server Port (default 8082)
       -config-path string
           Mocks definition folder (default "execution_path/config")
       -console
@@ -90,7 +90,7 @@ To configure Mmock, use command line flags described in help.
       -server-ip string
           Mock server IP (default "public_ip")
       -server-port int
-          Mock Server Port (default 8082)
+          Mock Server Port (default 8083)
 ```
 
 ### Mock
