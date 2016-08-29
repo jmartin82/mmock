@@ -91,9 +91,9 @@ func main() {
 	}
 
 	sIP := flag.String("server-ip", outIP, "Mock server IP")
-	sPort := flag.Int("server-port", 8082, "Mock Server Port")
+	sPort := flag.Int("server-port", 8083, "Mock Server Port")
 	cIP := flag.String("console-ip", outIP, "Console Server IP")
-	cPort := flag.Int("cconsole-port", 8083, "Console server Port")
+	cPort := flag.Int("cconsole-port", 8082, "Console server Port")
 	cPath := flag.String("config-path", path, "Mocks definition folder")
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
 	flag.Parse()
@@ -105,7 +105,10 @@ func main() {
 
 	path, _ = filepath.Abs(*cPath)
 	log.Printf("Reading Mock definition from: %s\n", path)
-	definitionReader := definition.FileDefinition{Path: path, Updates: dUpdates}
+	definitionReader := &definition.FileDefinition{Path: path, Updates: dUpdates}
+	definitionReader.AddConfigReader(definition.JSONReader{})
+	definitionReader.AddConfigReader(definition.YAMLReader{})
+
 	mocks := definitionReader.ReadMocksDefinition()
 	if len(mocks) == 0 {
 		log.Fatalln(ErrNotFoundAnyMock.Error())
@@ -115,11 +118,11 @@ func main() {
 	router := getRouter(mocks, dUpdates)
 	router.MockChangeWatch()
 
-	go startServer(*cIP, *cPort, done, router, mLog)
-	log.Printf("HTTP Server running at %s:%d\n", *cIP, *cPort)
+	go startServer(*sIP, *sPort, done, router, mLog)
+	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	if *console {
-		go startConsole(*sIP, *sPort, done, mLog)
-		log.Printf("Console running at %s:%d\n", *sIP, *sPort)
+		go startConsole(*cIP, *cPort, done, mLog)
+		log.Printf("Console running at %s:%d\n", *cIP, *cPort)
 	}
 
 	<-done
