@@ -57,16 +57,21 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	log.Printf("Mock match found: %s\n", strconv.FormatBool(result.Found))
 
-	di.ResponseParser.Parse(&mRequest, &mock.Response)
-
 	if result.Found {
-		if mock.Control.Crazy {
-			log.Printf("Crazy mode enabled")
-			mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)
+		if len(mock.Response.ProxyBaseURL) > 0 {
+
+		} else {
+			di.ResponseParser.Parse(&mRequest, &mock.Response)
+			if mock.Control.Crazy {
+				log.Printf("Running crazy mode")
+				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)
+			}
+			if mock.Control.Delay > 0 {
+				log.Printf("Adding a delay")
+				time.Sleep(time.Duration(mock.Control.Delay) * time.Second)
+			}
 		}
-		if mock.Control.Delay > 0 {
-			time.Sleep(time.Duration(mock.Control.Delay) * time.Second)
-		}
+
 	}
 
 	//translate request
