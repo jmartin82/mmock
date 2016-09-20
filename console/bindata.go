@@ -85,7 +85,7 @@ func tmplCssStyleCss() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "tmpl/css/style.css", size: 652, mode: os.FileMode(420), modTime: time.Unix(1471947254, 0)}
+	info := bindataFileInfo{name: "tmpl/css/style.css", size: 652, mode: os.FileMode(420), modTime: time.Unix(1472417660, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -105,7 +105,7 @@ func tmplIndexHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "tmpl/index.html", size: 3613, mode: os.FileMode(420), modTime: time.Unix(1471875924, 0)}
+	info := bindataFileInfo{name: "tmpl/index.html", size: 3613, mode: os.FileMode(420), modTime: time.Unix(1472417660, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -125,7 +125,7 @@ func tmplJsScriptJs() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "tmpl/js/script.js", size: 3303, mode: os.FileMode(420), modTime: time.Unix(1471959314, 0)}
+	info := bindataFileInfo{name: "tmpl/js/script.js", size: 3303, mode: os.FileMode(420), modTime: time.Unix(1472417660, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

@@ -20,7 +20,5 @@ type Request struct {
 type Response struct {
 	StatusCode int `json:"statusCode"`
 	headers
-	ProxyBaseURL                  string `json:"proxyBaseURL"`
-	AdditionalProxyRequestHeaders Values `json:"additionalProxyRequestHeaders"`
-	Body                          string `json:"body"`
+	Body string `json:"body"`
 }

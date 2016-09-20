@@ -1,0 +1,9 @@
+{
+	"request": {
+		"method": "GET",
+		"path": "/proxy/example"
+	},
+	"control": {
+        "proxyBaseURL":"http://www.mocky.io/v2/57e1b4d1110000b90556f51c"
+	}
+}
