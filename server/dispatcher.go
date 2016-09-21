@@ -62,7 +62,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if result.Found {
 		if len(mock.Control.ProxyBaseURL) > 0 {
 			pr := proxy.Proxy{URL: mock.Control.ProxyBaseURL}
-			response = pr.MakeRequest(mock.Request, mock.Control.AdditionalProxyRequestHeaders)
+			response = pr.MakeRequest(mock.Request)
 		} else {
 			di.ResponseParser.Parse(&mRequest, &mock.Response)
 			if mock.Control.Crazy {

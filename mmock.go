@@ -67,7 +67,9 @@ func getOutboundIP() string {
 
 func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.RequestRouter {
 	log.Printf("Loding router with %d definitions\n", len(mocks))
-	return &route.RequestRouter{Mocks: mocks, Matcher: match.MockMatch{}, DUpdates: dUpdates}
+	router := route.NewRouter(mocks, match.MockMatch{}, dUpdates)
+	router.MockChangeWatch()
+	return router
 }
 
 func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match) {
@@ -80,6 +82,22 @@ func startConsole(ip string, port int, done chan bool, mLog chan definition.Matc
 	dispatcher := console.Dispatcher{Ip: ip, Port: port, Mlog: mLog}
 	dispatcher.Start()
 	done <- true
+}
+
+func getMocks(path string, updateCh chan []definition.Mock) []definition.Mock {
+	log.Printf("Reading Mock definition from: %s\n", path)
+
+	definitionReader := definition.NewFileDefinition(path, updateCh)
+
+	definitionReader.AddConfigReader(definition.JSONReader{})
+	definitionReader.AddConfigReader(definition.YAMLReader{})
+
+	mocks := definitionReader.ReadMocksDefinition()
+	if len(mocks) == 0 {
+		log.Fatalln(ErrNotFoundAnyMock.Error())
+	}
+	definitionReader.WatchDir()
+	return mocks
 }
 
 func main() {
@@ -104,19 +122,8 @@ func main() {
 	done := make(chan bool)
 
 	path, _ = filepath.Abs(*cPath)
-	log.Printf("Reading Mock definition from: %s\n", path)
-	definitionReader := &definition.FileDefinition{Path: path, Updates: dUpdates}
-	definitionReader.AddConfigReader(definition.JSONReader{})
-	definitionReader.AddConfigReader(definition.YAMLReader{})
-
-	mocks := definitionReader.ReadMocksDefinition()
-	if len(mocks) == 0 {
-		log.Fatalln(ErrNotFoundAnyMock.Error())
-	}
-	definitionReader.WatchDir()
-
+	mocks := getMocks(path, dUpdates)
 	router := getRouter(mocks, dUpdates)
-	router.MockChangeWatch()
 
 	go startServer(*sIP, *sPort, done, router, mLog)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)

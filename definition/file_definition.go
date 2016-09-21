@@ -15,6 +15,14 @@ import (
 
 var ErrNotFoundPath = errors.New("Configuration path not found")
 
+func NewFileDefinition(path string, updatesCh chan []Mock) *FileDefinition {
+	return &FileDefinition{
+		Path:          path,
+		Updates:       updatesCh,
+		ConfigReaders: []ConfigReader{},
+	}
+}
+
 type FileDefinition struct {
 	Path          string
 	Updates       chan []Mock

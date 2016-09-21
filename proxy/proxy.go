@@ -14,7 +14,7 @@ type Proxy struct {
 	URL string
 }
 
-func (pr *Proxy) MakeRequest(request definition.Request, extraHeaders definition.Values) definition.Response {
+func (pr *Proxy) MakeRequest(request definition.Request) definition.Response {
 
 	log.Println("Proxy to URL:>", pr.URL)
 
@@ -24,13 +24,6 @@ func (pr *Proxy) MakeRequest(request definition.Request, extraHeaders definition
 			req.Header.Add(h, value)
 		}
 	}
-
-	for h, values := range extraHeaders {
-		for _, value := range values {
-			req.Header.Add(h, value)
-		}
-	}
-
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
