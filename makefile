@@ -1,6 +1,8 @@
 .PHONY: build doc fmt lint dev test vet godep install bench bindata
 
 PKG_NAME=$(shell basename `pwd`)
+NS = jordimartin
+VERSION ?= latest
 
 install:
 	go get -t -v ./...
@@ -41,4 +43,6 @@ vet:
 godep:
 	godep save ./...all: run
 
-
+release:
+	docker build -t $(NS)/$(PKG_NAME):$(VERSION) .
+	docker push $(NS)/$(PKG_NAME):$(VERSION)
