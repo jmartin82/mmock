@@ -6,8 +6,9 @@ type Mock struct {
 	Request  Request  `json:"request"`
 	Response Response `json:"response"`
 	Control  struct {
-		Priority int  `json:"priority"`
-		Delay    int  `json:"delay"`
-		Crazy    bool `json:"crazy"`
+		Priority     int    `json:"priority"`
+		Delay        int    `json:"delay"`
+		Crazy        bool   `json:"crazy"`
+		ProxyBaseURL string `json:"proxyBaseURL"`
 	} `json:"control"`
 }

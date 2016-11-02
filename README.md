@@ -22,6 +22,7 @@ Built with Go - Mmock runs without installation on multiple platforms.
 * Match request by method, URL params, headers, cookies and bodies.
 * Mock definitions hot replace (edit your mocks without restart)
 * Web interface to view requests data (method,path,headers,cookies,body,etc..)
+* Proxy mode
 * Fine grain log info in web interface
 * Real-time updates using WebSockets
 * Priority matching
@@ -52,6 +53,24 @@ Mock definition file example:
 }
 
 ```
+Or
+
+
+```
+---
+request:
+  method: GET
+  path: "/hello/*"
+response:
+  statusCode: 200
+  headers:
+    Content-Type:
+    - application/json
+  body: '{"hello": "{{request.query.name}}, my name is {{fake.FirstName}}"}'
+
+```
+
+
 
 ### Getting started
 
@@ -125,6 +144,7 @@ Mock definition:
 		"body": "Response body"
 	},
 	"control": {
+		"proxyBaseURL": "string (original URL endpoint)
 		"delay": "int (response delay in seconds)",
 		"crazy": "bool (return random 5xx)",
 		"priority": "int (matching priority)"
@@ -155,6 +175,7 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 
 #### Control
 
+* *proxyBaseURL*: If this parameter is present, it sends the request data to the BaseURL and resend the response to de client. Useful if you don't want mock a the whole service. NOTE: It's not necessary fill the response field in this case.
 * *delay*: Delay the response in seconds. Simulate bad connection or bad server performance.
 * *crazy*: Return random server errors (5xx) in some request. Simulate server problems.
 * *priority*: Set the priority to avoid match in less restrictive mocks.

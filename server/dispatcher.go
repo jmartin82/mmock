@@ -10,6 +10,7 @@ import (
 
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/parse"
+	"github.com/jmartin82/mmock/proxy"
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/translate"
 )
@@ -39,6 +40,7 @@ func (di Dispatcher) randomStatusCode(currentStatus int) int {
 //ServerHTTP is the mock http server request handler.
 //It uses the router to decide the matching mock and translator as adapter between the HTTP impelementation and the mock definition.
 func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	var response definition.Response
 	mRequest := di.Translator.BuildRequestDefinitionFromHTTP(req)
 
 	if mRequest.Path == "/favicon.ico" {
@@ -57,23 +59,30 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	log.Printf("Mock match found: %s\n", strconv.FormatBool(result.Found))
 
-	di.ResponseParser.Parse(&mRequest, &mock.Response)
-
 	if result.Found {
-		if mock.Control.Crazy {
-			log.Printf("Crazy mode enabled")
-			mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)
+		if len(mock.Control.ProxyBaseURL) > 0 {
+			pr := proxy.Proxy{URL: mock.Control.ProxyBaseURL}
+			response = pr.MakeRequest(mock.Request)
+		} else {
+			di.ResponseParser.Parse(&mRequest, &mock.Response)
+			if mock.Control.Crazy {
+				log.Printf("Running crazy mode")
+				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)
+			}
+			if mock.Control.Delay > 0 {
+				log.Printf("Adding a delay")
+				time.Sleep(time.Duration(mock.Control.Delay) * time.Second)
+			}
+			response = mock.Response
 		}
-		if mock.Control.Delay > 0 {
-			time.Sleep(time.Duration(mock.Control.Delay) * time.Second)
-		}
+
 	}
 
 	//translate request
-	di.Translator.WriteHTTPResponseFromDefinition(&mock.Response, w)
+	di.Translator.WriteHTTPResponseFromDefinition(&response, w)
 
 	//log to console
-	m := definition.Match{Request: mRequest, Response: mock.Response, Result: result}
+	m := definition.Match{Request: mRequest, Response: response, Result: result}
 	go di.recordMatchData(m)
 }
 

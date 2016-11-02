@@ -1,11 +1,21 @@
 package route
 
 import (
-	"github.com/jmartin82/mmock/definition"
-	"github.com/jmartin82/mmock/match"
 	"log"
 	"sync"
+
+	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/match"
 )
+
+//NewRouter returns a pointer to new RequestRouter
+func NewRouter(mocks []definition.Mock, matcher match.Matcher, dUpdates chan []definition.Mock) *RequestRouter {
+	return &RequestRouter{
+		Mocks:    mocks,
+		Matcher:  match.MockMatch{},
+		DUpdates: dUpdates,
+	}
+}
 
 //RequestRouter checks http requesta and try to figure out what is the best mock for each one.
 type RequestRouter struct {
