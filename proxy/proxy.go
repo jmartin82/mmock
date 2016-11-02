@@ -14,6 +14,7 @@ type Proxy struct {
 	URL string
 }
 
+// MakeRequest creates a real request to the desired service using data from the original request
 func (pr *Proxy) MakeRequest(request definition.Request) definition.Response {
 
 	log.Println("Proxy to URL:>", pr.URL)

@@ -13,8 +13,10 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
+//ErrNotFoundPath error from missing or configuration path
 var ErrNotFoundPath = errors.New("Configuration path not found")
 
+//NewFileDefinition file definition constructor
 func NewFileDefinition(path string, updatesCh chan []Mock) *FileDefinition {
 	return &FileDefinition{
 		Path:          path,
@@ -23,12 +25,14 @@ func NewFileDefinition(path string, updatesCh chan []Mock) *FileDefinition {
 	}
 }
 
+//FileDefinition this struct contains the path of definition and some config readers
 type FileDefinition struct {
 	Path          string
 	Updates       chan []Mock
 	ConfigReaders []ConfigReader
 }
 
+//PrioritySort mock array sorted by priority
 type PrioritySort []Mock
 
 func (s PrioritySort) Len() int {
@@ -82,6 +86,7 @@ func (fd *FileDefinition) readMock(filename string) (Mock, error) {
 	return m, nil
 }
 
+//WatchDir start the watching process to detect any change on defintions
 func (fd *FileDefinition) WatchDir() {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -115,6 +120,7 @@ func (fd *FileDefinition) AddConfigReader(reader ConfigReader) {
 	fd.ConfigReaders = append(fd.ConfigReaders, reader)
 }
 
+//ReadMocksDefinition reads all definitions and return an array of valid mocks
 func (fd *FileDefinition) ReadMocksDefinition() []Mock {
 
 	if !fd.existsConfigPath(fd.Path) {

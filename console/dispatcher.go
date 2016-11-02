@@ -13,7 +13,7 @@ import (
 
 //Dispatcher is the http console server.
 type Dispatcher struct {
-	Ip      string
+	IP      string
 	Port    int
 	Mlog    chan definition.Match
 	clients []*websocket.Conn
@@ -69,7 +69,7 @@ func (di *Dispatcher) Start() {
 
 	go di.logFanOut()
 
-	addr := fmt.Sprintf("%s:%d", di.Ip, di.Port)
+	addr := fmt.Sprintf("%s:%d", di.IP, di.Port)
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatalf("ListenAndServe: " + err.Error())

@@ -74,12 +74,12 @@ func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.
 
 func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match) {
 	filler := parse.FakeDataParse{Fake: fakedata.FakeAdapter{}}
-	dispatcher := server.Dispatcher{Ip: ip, Port: port, Router: router, Translator: translate.HTTPTranslator{}, ResponseParser: filler, Mlog: mLog}
+	dispatcher := server.Dispatcher{IP: ip, Port: port, Router: router, Translator: translate.HTTPTranslator{}, ResponseParser: filler, Mlog: mLog}
 	dispatcher.Start()
 	done <- true
 }
 func startConsole(ip string, port int, done chan bool, mLog chan definition.Match) {
-	dispatcher := console.Dispatcher{Ip: ip, Port: port, Mlog: mLog}
+	dispatcher := console.Dispatcher{IP: ip, Port: port, Mlog: mLog}
 	dispatcher.Start()
 	done <- true
 }

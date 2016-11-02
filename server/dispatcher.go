@@ -17,7 +17,7 @@ import (
 
 //Dispatcher is the mock http server
 type Dispatcher struct {
-	Ip             string
+	IP             string
 	Port           int
 	Router         route.Router
 	Translator     translate.MessageTranslator
@@ -88,7 +88,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 //Start initialize the HTTP mock server
 func (di Dispatcher) Start() {
-	addr := fmt.Sprintf("%s:%d", di.Ip, di.Port)
+	addr := fmt.Sprintf("%s:%d", di.IP, di.Port)
 
 	err := http.ListenAndServe(addr, &di)
 	if err != nil {
