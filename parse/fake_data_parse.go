@@ -139,22 +139,23 @@ func (fdp FakeDataParse) Parse(req *definition.Request, res *definition.Response
 		res.Cookies[cookie] = fdp.replaceVars(req, value)
 	}
 
-	res.Body = fdp.ParseBody(res.Body, res.BodyAddition, req)
+	res.Body = fdp.ParseBody(res.Body, res.BodyAppend, req)
+
 }
 
-//ParseBody parses body respecting bodyAddition and replacing variables from request
-func (fdp FakeDataParse) ParseBody(body string, bodyAddition string, req *definition.Request) string{
+//ParseBody parses body respecting bodyAppend and replacing variables from request
+func (fdp FakeDataParse) ParseBody(body string, bodyAppend string, req *definition.Request) string{
 	resultBody := fdp.replaceVars(req, body)
-	if(bodyAddition != ""){
-		resultBodyAddition := fdp.replaceVars(req, bodyAddition)
+	if(bodyAppend != ""){
+		resultBodyAppend := fdp.replaceVars(req, bodyAppend)
 
-		if isJSON(resultBody) && isJSON(resultBodyAddition){
-			resultBody = fdp.JoinJSON(resultBody, resultBodyAddition)
-		} else if isJSON(resultBody) && !isJSON(resultBodyAddition){
-			// strip resultBodyAddition as it is not in appropriate format
-			log.Printf("BodyAddition not in JSON format : %s\n", resultBodyAddition)
+		if isJSON(resultBody) && isJSON(resultBodyAppend){
+			resultBody = fdp.JoinJSON(resultBody, resultBodyAppend)
+		} else if isJSON(resultBody) && !isJSON(resultBodyAppend){
+			// strip resultBodyAppend as it is not in appropriate format
+			log.Printf("BodyAppend not in JSON format : %s\n", resultBodyAppend)
 		} else {
-			resultBody += resultBodyAddition
+			resultBody += resultBodyAppend
 		}
 	}
 

@@ -22,20 +22,20 @@ type Response struct {
 	headers
 	Persisted Persisted `json:"persisted"`
 	Body string `json:"body"`
-	BodyAddition string `json:"bodyAddition"`
+	BodyAppend string `json:"BodyAppend"`
 }
 
 type Persisted struct {
-	FileName string `json:"fileName"`
+	Name string `json:"name"`
 	NotFound struct {
 		StatusCode int `json:"statusCode"`
 		Body string `json:"body"`
-		BodyAddition string `json:"bodyAddition"`
+		BodyAppend string `json:"BodyAppend"`
 	} `json:"notFound"`
-	BodyAddition string `json:"bodyAddition"`
+	BodyAppend string `json:"BodyAppend"`
 }
 
 type Persist struct {
-	FileName string `json:"fileName"`
+	Name string `json:"name"`
 	Delete bool `json:"delete"`
 }

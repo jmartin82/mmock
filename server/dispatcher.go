@@ -10,6 +10,7 @@ import (
 
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/parse"
+	"github.com/jmartin82/mmock/persist"
 	"github.com/jmartin82/mmock/proxy"
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/translate"
@@ -22,6 +23,7 @@ type Dispatcher struct {
 	Router         route.Router
 	Translator     translate.MessageTranslator
 	ResponseParser parse.ResponseParser
+	BodyPersister  persist.BodyPersister
 	Mlog           chan definition.Match
 }
 
@@ -65,6 +67,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			response = pr.MakeRequest(mock.Request)
 		} else {
 			di.ResponseParser.Parse(&mRequest, &mock.Response)
+			di.BodyPersister.Persist(&mock.Persist, &mock.Response)
 			if mock.Control.Crazy {
 				log.Printf("Running crazy mode")
 				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)

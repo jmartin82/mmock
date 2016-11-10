@@ -17,6 +17,7 @@ import (
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/server"
 	"github.com/jmartin82/mmock/translate"
+	"github.com/jmartin82/mmock/persist"
 )
 
 //ErrNotFoundDefaultPath if we can't resolve the current path
@@ -74,7 +75,8 @@ func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.
 
 func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match) {
 	filler := parse.FakeDataParse{Fake: fakedata.FakeAdapter{}}
-	dispatcher := server.Dispatcher{IP: ip, Port: port, Router: router, Translator: translate.HTTPTranslator{}, ResponseParser: filler, Mlog: mLog}
+	persister := persist.FileBodyPersister{}
+	dispatcher := server.Dispatcher{IP: ip, Port: port, Router: router, Translator: translate.HTTPTranslator{}, ResponseParser: filler, BodyPersister: persister, Mlog: mLog}
 	dispatcher.Start()
 	done <- true
 }
@@ -113,6 +115,7 @@ func main() {
 	cIP := flag.String("console-ip", outIP, "Console Server IP")
 	cPort := flag.Int("cconsole-port", 8082, "Console server Port")
 	cPath := flag.String("config-path", path, "Mocks definition folder")
+	//cPersistPath := flag.String("config-path", path, "Mocks definition folder")
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
 	flag.Parse()
 

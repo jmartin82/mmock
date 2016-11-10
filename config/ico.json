@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "GET",
+        "path": "/risto"
+    },
+	"response": {
+        "statusCode": 200,
+        "headers": {
+			"Content-Type":["application/json"]
+		},
+		"body": "{ \"FirstName\": \"{{fake.FirstName}}\", \"LastName\": \"{{fake.LastName}}\", \"City\": \"{{fake.City}}\" }"
+    }
+}

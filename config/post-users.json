@@ -10,10 +10,10 @@
 			"Content-Type":["application/json"]
 		},
 		"body": "{{ request.body }}",
-        "bodyAddition": "{ \"id\": {{request.url.users/(?P<Value>\\d+)}} }"
+        "bodyAppend": "{ \"id\": {{request.url.users/(?P<Value>\\d+)}} }"
     },
     "persist" : {
-		"fileName" : "/users/user-{{request.url.users/(?P<Value>\\d+)}}",
+		"name" : "/users/user-{{request.url.users/(?P<Value>\\d+)}}",
         "delete": false
 	}
 }
