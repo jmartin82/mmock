@@ -5,6 +5,9 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"encoding/json"
+
+	"github.com/Jeffail/gabs"
 
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/parse/fakedata"
@@ -13,6 +16,11 @@ import (
 //FakeDataParse parses the data looking for fake data tags or request data tags
 type FakeDataParse struct {
 	Fake fakedata.DataFaker
+}
+
+func isJSON(s string) bool {
+    var js map[string]interface{}
+    return json.Unmarshal([]byte(s), &js) == nil
 }
 
 func (fdp FakeDataParse) getQueryStringParam(req *definition.Request, name string) (string, bool) {
@@ -131,5 +139,35 @@ func (fdp FakeDataParse) Parse(req *definition.Request, res *definition.Response
 		res.Cookies[cookie] = fdp.replaceVars(req, value)
 	}
 
-	res.Body = fdp.replaceVars(req, res.Body)
+	resultBody := fdp.replaceVars(req, res.Body)
+	resultBodyAddition := fdp.replaceVars(req, res.BodyAddition)
+
+	if isJSON(resultBody) && isJSON(resultBodyAddition){
+		res.Body = fdp.JoinJSON(resultBody, resultBodyAddition)
+	} else if isJSON(resultBody) && !isJSON(resultBodyAddition){
+		// strip resultBodyAddition as it is not in appropriate format
+		res.Body = resultBody
+		log.Printf("BodyAddition not in JSON format : %s\n", resultBodyAddition)
+	} else {
+		res.Body = resultBody + resultBodyAddition
+	}
+}
+
+//JoinJSON joins the properties of the passed jsons 
+func (fdp FakeDataParse) JoinJSON(inputs ...string) string {
+	if len(inputs) == 1 {
+		return inputs[0]
+	} 
+
+	result := gabs.New()
+	for _, input := range inputs{
+		jsonParsed, _ := gabs.ParseJSON([]byte(input))
+		children, _ := jsonParsed.S().ChildrenMap()
+
+		for key, child := range children {
+			result.Set(child.Data(), key)
+		}
+	}
+
+	return result.String()
 }
