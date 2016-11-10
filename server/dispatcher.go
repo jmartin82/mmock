@@ -67,7 +67,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			response = pr.MakeRequest(mock.Request)
 		} else {
 			di.ResponseParser.Parse(&mRequest, &mock.Response)
-			di.BodyPersister.Persist(&mock.Persist, &mock.Response)
+			di.BodyPersister.Persist(&mock.Persist, &mRequest, &mock.Response)
 			if mock.Control.Crazy {
 				log.Printf("Running crazy mode")
 				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)

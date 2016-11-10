@@ -13,7 +13,7 @@
         "bodyAppend": "{ \"id\": {{request.url.users/(?P<Value>\\d+)}} }"
     },
     "persist" : {
-		"name" : "/users/user-{{request.url.users/(?P<Value>\\d+)}}",
+		"name" : "/users/user-{{request.url.users/(?P<Value>\\d+)}}.json",
         "delete": false
 	}
 }

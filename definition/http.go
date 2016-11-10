@@ -1,5 +1,7 @@
 package definition
 
+import "regexp"
+
 type Values map[string][]string
 
 type Cookies map[string]string
@@ -38,4 +40,52 @@ type Persisted struct {
 type Persist struct {
 	Name string `json:"name"`
 	Delete bool `json:"delete"`
+}
+
+//GetURLPart getting url part by passing regex pattern and groupName
+func (req Request) GetURLPart(pattern string, groupName string) (string, bool) {
+	r, error := regexp.Compile(pattern)
+	if error != nil{
+		return "", false
+	} 
+
+	match := r.FindStringSubmatch(req.Path)
+	result := make(map[string]string)
+	for i, name := range r.SubexpNames() {
+		if i != 0 {
+			result[name] = match[i]
+		}
+	}
+
+	value, present := result[groupName]
+
+	return value, present
+}
+
+//GetQueryStringParam getting query string parameter value from request
+func (req Request) GetQueryStringParam(name string) (string, bool) {
+
+	if len(req.QueryStringParameters) == 0 {
+		return "", false
+	}
+	value, f := req.QueryStringParameters[name]
+	if !f {
+		return "", false
+	}
+
+	return value[0], true
+}
+
+//GetCookieParam getting cookie param from request
+func (req Request) GetCookieParam(name string) (string, bool) {
+
+	if len(req.Cookies) == 0 {
+		return "", false
+	}
+	value, f := req.Cookies[name]
+	if !f {
+		return "", false
+	}
+
+	return value, true
 }

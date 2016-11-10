@@ -5,7 +5,7 @@ type Mock struct {
 	Name string
 	Request Request `json:"request"`
 	Response Response `json:"response"`
-	Persist Persist `json:"store"`
+	Persist Persist `json:"persist"`
 	Control  struct {
 		Priority     int    `json:"priority"`
 		Delay        int    `json:"delay"`

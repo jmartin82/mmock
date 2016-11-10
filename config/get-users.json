@@ -9,7 +9,7 @@
 			"Content-Type":["application/json"]
 		},
 		"persisted": {
-            "name" : "/users/user-{{request.url.users/(?P<Value>\\d+)}}",
+            "name" : "/users/user-{{request.url.users/(?P<Value>\\d+)}}.json",
             "notFound": {
                 "statusCode": 404,
                 "body": "404: Not Found"
