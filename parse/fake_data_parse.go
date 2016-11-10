@@ -140,16 +140,20 @@ func (fdp FakeDataParse) Parse(req *definition.Request, res *definition.Response
 	}
 
 	resultBody := fdp.replaceVars(req, res.Body)
-	resultBodyAddition := fdp.replaceVars(req, res.BodyAddition)
+	if(res.BodyAddition != ""){
+		resultBodyAddition := fdp.replaceVars(req, res.BodyAddition)
 
-	if isJSON(resultBody) && isJSON(resultBodyAddition){
-		res.Body = fdp.JoinJSON(resultBody, resultBodyAddition)
-	} else if isJSON(resultBody) && !isJSON(resultBodyAddition){
-		// strip resultBodyAddition as it is not in appropriate format
-		res.Body = resultBody
-		log.Printf("BodyAddition not in JSON format : %s\n", resultBodyAddition)
+		if isJSON(resultBody) && isJSON(resultBodyAddition){
+			res.Body = fdp.JoinJSON(resultBody, resultBodyAddition)
+		} else if isJSON(resultBody) && !isJSON(resultBodyAddition){
+			// strip resultBodyAddition as it is not in appropriate format
+			res.Body = resultBody
+			log.Printf("BodyAddition not in JSON format : %s\n", resultBodyAddition)
+		} else {
+			res.Body = resultBody + resultBodyAddition
+		}
 	} else {
-		res.Body = resultBody + resultBodyAddition
+		res.Body = resultBody
 	}
 }
 
