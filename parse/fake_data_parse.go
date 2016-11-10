@@ -139,22 +139,26 @@ func (fdp FakeDataParse) Parse(req *definition.Request, res *definition.Response
 		res.Cookies[cookie] = fdp.replaceVars(req, value)
 	}
 
-	resultBody := fdp.replaceVars(req, res.Body)
-	if(res.BodyAddition != ""){
-		resultBodyAddition := fdp.replaceVars(req, res.BodyAddition)
+	res.Body = fdp.ParseBody(res.Body, res.BodyAddition, req)
+}
+
+//ParseBody parses body respecting bodyAddition and replacing variables from request
+func (fdp FakeDataParse) ParseBody(body string, bodyAddition string, req *definition.Request) string{
+	resultBody := fdp.replaceVars(req, body)
+	if(bodyAddition != ""){
+		resultBodyAddition := fdp.replaceVars(req, bodyAddition)
 
 		if isJSON(resultBody) && isJSON(resultBodyAddition){
-			res.Body = fdp.JoinJSON(resultBody, resultBodyAddition)
+			resultBody = fdp.JoinJSON(resultBody, resultBodyAddition)
 		} else if isJSON(resultBody) && !isJSON(resultBodyAddition){
 			// strip resultBodyAddition as it is not in appropriate format
-			res.Body = resultBody
 			log.Printf("BodyAddition not in JSON format : %s\n", resultBodyAddition)
 		} else {
-			res.Body = resultBody + resultBodyAddition
+			resultBody += resultBodyAddition
 		}
-	} else {
-		res.Body = resultBody
 	}
+
+	return resultBody
 }
 
 //JoinJSON joins the properties of the passed jsons 

@@ -20,24 +20,22 @@ type Request struct {
 type Response struct {
 	StatusCode int `json:"statusCode"`
 	headers
+	Persisted Persisted `json:"persisted"`
 	Body string `json:"body"`
 	BodyAddition string `json:"bodyAddition"`
 }
 
-type File struct {
-	Name    string `json:"name"`
-	Delete  bool   `json:"delete"`
-	Content struct {
-		Name     string
-		Request  Request  `json:"request"`
-		Response Response `json:"response"`
-		Control  Control  `json:"control"`
-	} `json:"content"`
+type Persisted struct {
+	FileName string `json:"fileName"`
+	NotFound struct {
+		StatusCode int `json:"statusCode"`
+		Body string `json:"body"`
+		BodyAddition string `json:"bodyAddition"`
+	} `json:"notFound"`
+	BodyAddition string `json:"bodyAddition"`
 }
 
-type Control struct {
-	Priority     int    `json:"priority"`
-	Delay        int    `json:"delay"`
-	Crazy        bool   `json:"crazy"`
-	ProxyBaseURL string `json:"proxyBaseURL"`
+type Persist struct {
+	FileName string `json:"fileName"`
+	Delete bool `json:"delete"`
 }
