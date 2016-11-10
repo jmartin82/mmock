@@ -41,6 +41,25 @@ func (fdp FakeDataParse) getCookieParam(req *definition.Request, name string) (s
 	return value, true
 }
 
+func (fdp FakeDataParse) getURLPart(req *definition.Request, pattern string) (string, bool) {
+	r, error := regexp.Compile(pattern)
+	if error != nil{
+		return "", false
+	} 
+
+	match := r.FindStringSubmatch(req.Path)
+	result := make(map[string]string)
+	for i, name := range r.SubexpNames() {
+		if i != 0 {
+			result[name] = match[i]
+		}
+	}
+
+	value, present := result["Value"]
+
+	return value, present
+}
+
 func (fdp FakeDataParse) call(data reflect.Value, name string) string {
 	// get a reflect.Value for the method
 	methodVal := data.MethodByName(name)
@@ -73,13 +92,18 @@ func (fdp FakeDataParse) callMethod(name string) (string, bool) {
 }
 
 func (fdp FakeDataParse) replaceVars(req *definition.Request, input string) string {
-	r := regexp.MustCompile(`\{\{\s*([a-zA-Z0-9_\.]+)\s*\}\}`)
+	r := regexp.MustCompile(`\{\{\s*([^\}]+)\s*\}\}`)
 
 	return r.ReplaceAllStringFunc(input, func(raw string) string {
 		found := false
 		s := ""
 		tag := strings.Trim(raw[2:len(raw)-2], " ")
-		if i := strings.Index(tag, "request.query."); i == 0 {
+		if tag == "request.body" {
+			s = req.Body
+			found = true
+		} else if i := strings.Index(tag, "request.url."); i == 0 {
+			s, found = fdp.getURLPart(req, tag[12:])
+		} else if i := strings.Index(tag, "request.query."); i == 0 {
 			s, found = fdp.getQueryStringParam(req, tag[14:])
 		} else if i := strings.Index(tag, "request.cookie."); i == 0 {
 			s, found = fdp.getCookieParam(req, tag[15:])
