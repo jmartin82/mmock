@@ -30,15 +30,19 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
     fileDir := path.Dir(filePath)
 
     err := os.MkdirAll(fileDir, 0644)
-    if err != nil {
-		panic(err)
-	}
+    if fbp.checkForFileWriteError(err, res) == nil{
+        err = ioutil.WriteFile(filePath, fileContent, 0644)
+        fbp.checkForFileWriteError(err, res)
+    }
+}
 
-    err = ioutil.WriteFile(filePath, fileContent, 0644)
-
+func (fbp FileBodyPersister) checkForFileWriteError(err error, res *definition.Response) error {
     if err != nil {
-		panic(err)
+		log.Print(err)
+        res.Body = err.Error()
+        res.StatusCode = 500
 	}
+    return err
 }
 
 //NewFileBodyPersister creates a new FileBodyPersister
