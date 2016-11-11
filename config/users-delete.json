@@ -12,7 +12,7 @@
 		"body": "File Deleted"
     },
     "persist" : {
-		"name" : "/users/user-{{request.url.users/(?P<value>\\d+)}}.json",
+		"name" : "/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
         "delete": true
 	}
 }

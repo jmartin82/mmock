@@ -9,12 +9,12 @@
 			"Content-Type":["application/json"]
 		},
 		"persisted": {
-            "name" : "/users/user-{{request.url.users/(?P<value>\\d+)}}.json",
+            "name" : "/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
             "notFound": {
                 "statusCode": 404,
-                "body": "File /users/user-{{request.url.users/(?P<value>\\d+)}}.json Not Found"
+                "body": "File /users/user-{{request.url./users/(?P<value>\\d+)}}.json Not Found"
             },
-            "bodyAppend": "{ \"id\": {{request.url.users/(?P<value>\\d+)}} }"
+            "bodyAppend": "{ \"id\": {{request.url./users/(?P<value>\\d+)}} }"
         }
     }
 }

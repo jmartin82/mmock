@@ -94,7 +94,7 @@ func TestReplaceUrlRegex(t *testing.T) {
 	res := definition.Response{}
 
 	req.Path = "/users/15"
-	res.Body = "{ \"id\": {{request.url.users/(?P<value>\\d+)}} }"
+	res.Body = "{ \"id\": {{request.url./users/(?P<value>\\d+)}} }"
 
 	faker := FakeDataParse{DummyDataFaker{"AleixMG"}}
 	faker.Parse(&req, &res)
