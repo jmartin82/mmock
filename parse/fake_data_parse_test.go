@@ -6,137 +6,6 @@ import (
 	"github.com/jmartin82/mmock/definition"
 )
 
-type DummyDataFaker struct {
-	Dummy string
-}
-
-func (ddf DummyDataFaker) Brand() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Character() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Characters() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) City() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Color() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Company() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Continent() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Country() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) CreditCardVisa() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) CreditCardMasterCard() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) CreditCardAmericanExpress() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Currency() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) CurrencyCode() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Day() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Digits() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) EmailAddress() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) FirstName() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) FullName() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) LastName() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Gender() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) IPv4() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Language() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Model() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Month() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Year() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) MonthShort() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Paragraph() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Paragraphs() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Phone() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Product() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Sentence() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Sentences() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) SimplePassword() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) State() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) StateAbbrev() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Street() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) StreetAddress() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) UserName() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) WeekDay() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Word() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Words() string {
-	return ddf.Dummy
-}
-func (ddf DummyDataFaker) Zip() string {
-	return ddf.Dummy
-}
-
 func TestReplaceTags(t *testing.T) {
 
 	req := definition.Request{}
@@ -217,5 +86,100 @@ func TestReplaceTagWithSpace(t *testing.T) {
 
 	if res.Body != "Request valParam. Cookie: valCookie. Random: AleixMG" {
 		t.Error("Replaced tags in body not match", res.Body)
+	}
+}
+
+func TestReplaceUrlRegex(t *testing.T) {
+	req := definition.Request{}
+	res := definition.Response{}
+
+	req.Path = "/users/15"
+	res.Body = "{ \"id\": {{request.url.users/(?P<Value>\\d+)}} }"
+
+	faker := FakeDataParse{DummyDataFaker{"AleixMG"}}
+	faker.Parse(&req, &res)
+
+	if res.Body != "{ \"id\": 15 }" {
+		t.Error("Replaced url regex in body not match", res.Body)
+	}
+}
+
+func TestReplaceBodyRegex(t *testing.T) {
+	req := definition.Request{}
+	res := definition.Response{}
+
+	req.Path = "/"
+	req.Body = "/users/15"
+	res.Body = "{ \"id\": {{request.body.users/(?P<Value>\\d+)}} }"
+
+	faker := FakeDataParse{DummyDataFaker{"AleixMG"}}
+	faker.Parse(&req, &res)
+
+	if res.Body != "{ \"id\": 15 }" {
+		t.Error("Replaced body regex in body not match", res.Body)
+	}
+}
+
+func TestBodyAppendNoJson(t *testing.T) {
+	req := definition.Request{}
+	res := definition.Response{}
+
+	req.Path = "/users/15"
+	res.Body = "Test"
+	res.BodyAppend = "Append"
+
+	faker := FakeDataParse{DummyDataFaker{"AleixMG"}}
+	faker.Parse(&req, &res)
+
+	if res.Body != "TestAppend" {
+		t.Error("BodyAppend text not added as expected", res.Body)
+	}
+}
+
+func TestBodyAppendBodyJsonAppendNoJson(t *testing.T) {
+	req := definition.Request{}
+	res := definition.Response{}
+
+	req.Path = "/users/15"
+	res.Body = "{\"body\":1}"
+	res.BodyAppend = "Append"
+
+	faker := FakeDataParse{DummyDataFaker{"AleixMG"}}
+	faker.Parse(&req, &res)
+
+	if res.Body != "{\"body\":1}" {
+		t.Error("BodyAppend should be discarded as the the body is in JSON format, but the BodyAppend not", res.Body)
+	}
+}
+
+func TestBodyAppendBodyJsonAppend(t *testing.T) {
+	req := definition.Request{}
+	res := definition.Response{}
+
+	req.Path = "/users/15"
+	res.Body = "{\"body\":1}"
+	res.BodyAppend = "{\"append\":2}"
+
+	faker := FakeDataParse{DummyDataFaker{"AleixMG"}}
+	faker.Parse(&req, &res)
+
+	if res.Body != "{\"append\":2,\"body\":1}" {
+		t.Error("BodyAppend fields shoud be added to the response body", res.Body)
+	}
+}
+
+func TestBodyAppendBodyJsonAppendOverrideValue(t *testing.T) {
+	req := definition.Request{}
+	res := definition.Response{}
+
+	req.Path = "/users/15"
+	res.Body = "{\"body\":1}"
+	res.BodyAppend = "{\"body\":2}"
+
+	faker := FakeDataParse{DummyDataFaker{"AleixMG"}}
+	faker.Parse(&req, &res)
+
+	if res.Body != "{\"body\":2}" {
+		t.Error("BodyAppend fields should override the response body fields", res.Body)
 	}
 }

@@ -56,7 +56,7 @@ func (fbp FileBodyPersister) LoadBody(req *definition.Request, res *definition.R
 
 	// use notFound info
 	if os.IsNotExist(err) {
-		res.Body = "404: Not Found"
+		res.Body = "Not Found"
 		if res.Persisted.NotFound.Body != "" {
 			res.Body = fbp.Parser.ParseBody(req, res.Persisted.NotFound.Body, res.Persisted.NotFound.BodyAppend)
 		}
