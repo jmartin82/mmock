@@ -12,7 +12,7 @@
             "name" : "/users/user-{{request.url.users/(?P<Value>\\d+)}}.json",
             "notFound": {
                 "statusCode": 404,
-                "body": "404: Not Found"
+                "body": "File /users/user-{{request.url.users/(?P<Value>\\d+)}}.json Not Found"
             },
             "bodyAppend": "{ \"id\": {{request.url.users/(?P<Value>\\d+)}} }"
         }

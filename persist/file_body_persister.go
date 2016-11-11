@@ -32,20 +32,47 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 	} else {
 		fileContent := []byte(res.Body)
 		err := os.MkdirAll(fileDir, 0644)
-		if fbp.checkForFileWriteError(err, res) == nil {
+		if checkForError(err, res) == nil {
 			err = ioutil.WriteFile(filePath, fileContent, 0644)
-			fbp.checkForFileWriteError(err, res)
+			checkForError(err, res)
 		}
 	}
 }
 
-//LoadBody loads the response body from the persisted file
-func (fbp FileBodyPersister) LoadBody(req *definition.Request, res *definition.Response) {
-	a := "test"
-	_ = a
+func (fbp FileBodyPersister) getFilePath(fileName string, req *definition.Request) (filePath string, fileDir string) {
+	fileName = fbp.Parser.ReplaceVars(req, fileName)
+
+	filePath = path.Join(fbp.PersistPath, fileName)
+	fileDir = path.Dir(filePath)
+
+	return filePath, fileDir
 }
 
-func (fbp FileBodyPersister) checkForFileWriteError(err error, res *definition.Response) error {
+//LoadBody loads the response body from the persisted file
+func (fbp FileBodyPersister) LoadBody(req *definition.Request, res *definition.Response) {
+	filePath, _ := fbp.getFilePath(res.Persisted.Name, req)
+
+	var _, err = os.Stat(filePath)
+
+	// use notFound info
+	if os.IsNotExist(err) {
+		res.Body = "404: Not Found"
+		if res.Persisted.NotFound.Body != "" {
+			res.Body = fbp.Parser.ParseBody(req, res.Persisted.NotFound.Body, res.Persisted.NotFound.BodyAppend)
+		}
+		res.StatusCode = 404
+		if res.Persisted.NotFound.StatusCode != 0 {
+			res.StatusCode = res.Persisted.NotFound.StatusCode
+		}
+	} else {
+		fileContent, err := ioutil.ReadFile(filePath)
+		if checkForError(err, res) == nil {
+			res.Body = fbp.Parser.ParseBody(req, string(fileContent), res.Persisted.BodyAppend)
+		}
+	}
+}
+
+func checkForError(err error, res *definition.Response) error {
 	if err != nil {
 		log.Print(err)
 		res.Body = err.Error()
