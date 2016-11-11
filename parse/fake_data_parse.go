@@ -66,7 +66,9 @@ func (fdp FakeDataParse) ReplaceVars(req *definition.Request, input string) stri
 			s = req.Body
 			found = true
 		} else if i := strings.Index(tag, "request.url."); i == 0 {
-			s, found = getURLPart(req, tag[12:], "Value")
+			s, found = getStringPart(req.Path, tag[12:], "Value")
+		} else if i := strings.Index(tag, "request.body."); i == 0 {
+			s, found = getStringPart(req.Body, tag[12:], "Value")
 		} else if i := strings.Index(tag, "request.query."); i == 0 {
 			s, found = getQueryStringParam(req, tag[14:])
 		} else if i := strings.Index(tag, "request.cookie."); i == 0 {
@@ -135,13 +137,13 @@ func joinJSON(inputs ...string) string {
 	return result.String()
 }
 
-func getURLPart(req *definition.Request, pattern string, groupName string) (string, bool) {
+func getStringPart(input string, pattern string, groupName string) (string, bool) {
 	r, error := regexp.Compile(pattern)
 	if error != nil {
 		return "", false
 	}
 
-	match := r.FindStringSubmatch(req.Path)
+	match := r.FindStringSubmatch(input)
 	result := make(map[string]string)
 	for i, name := range r.SubexpNames() {
 		if i != 0 {

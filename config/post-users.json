@@ -10,7 +10,7 @@
 			"Content-Type":["application/json"]
 		},
 		"body": "{{ request.body }}",
-        "bodyAppend": "{ \"id\": {{request.url.users/(?P<Value>\\d+)}} }"
+        "bodyAppend": "{ \"id\": {{request.url.users/(?P<Value>\\d+)}}, \"city\": \"{{ fake.City }}\" }"
     },
     "persist" : {
 		"name" : "/users/user-{{request.url.users/(?P<Value>\\d+)}}.json",
