@@ -1,16 +1,17 @@
 package parse
 
 import (
+	"encoding/json"
 	"log"
 	"reflect"
 	"regexp"
 	"strings"
-	"encoding/json"
 
 	"github.com/Jeffail/gabs"
 
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/parse/fakedata"
+	"github.com/jmartin82/mmock/persist"
 )
 
 //FakeDataParse parses the data looking for fake data tags or request data tags
@@ -19,8 +20,8 @@ type FakeDataParse struct {
 }
 
 func isJSON(s string) bool {
-    var js map[string]interface{}
-    return json.Unmarshal([]byte(s), &js) == nil
+	var js map[string]interface{}
+	return json.Unmarshal([]byte(s), &js) == nil
 }
 
 func (fdp FakeDataParse) call(data reflect.Value, name string) string {
@@ -83,7 +84,7 @@ func (fdp FakeDataParse) replaceVars(req *definition.Request, input string) stri
 }
 
 //Parse subtitutes the current mock response and replace the tags stored inside.
-func (fdp FakeDataParse) Parse(req *definition.Request, res *definition.Response) {
+func (fdp FakeDataParse) Parse(req *definition.Request, res *definition.Response, per persist.BodyPersister) {
 	for header, values := range res.Headers {
 		for i, value := range values {
 			res.Headers[header][i] = fdp.replaceVars(req, value)
@@ -94,19 +95,22 @@ func (fdp FakeDataParse) Parse(req *definition.Request, res *definition.Response
 		res.Cookies[cookie] = fdp.replaceVars(req, value)
 	}
 
-	res.Body = fdp.ParseBody(res.Body, res.BodyAppend, req)
-
+	if res.Persisted.Name != "" {
+		per.LoadBody(res)
+	} else {
+		res.Body = fdp.ParseBody(res.Body, res.BodyAppend, req)
+	}
 }
 
 //ParseBody parses body respecting bodyAppend and replacing variables from request
-func (fdp FakeDataParse) ParseBody(body string, bodyAppend string, req *definition.Request) string{
+func (fdp FakeDataParse) ParseBody(body string, bodyAppend string, req *definition.Request) string {
 	resultBody := fdp.replaceVars(req, body)
-	if(bodyAppend != ""){
+	if bodyAppend != "" {
 		resultBodyAppend := fdp.replaceVars(req, bodyAppend)
 
-		if isJSON(resultBody) && isJSON(resultBodyAppend){
+		if isJSON(resultBody) && isJSON(resultBodyAppend) {
 			resultBody = fdp.JoinJSON(resultBody, resultBodyAppend)
-		} else if isJSON(resultBody) && !isJSON(resultBodyAppend){
+		} else if isJSON(resultBody) && !isJSON(resultBodyAppend) {
 			// strip resultBodyAppend as it is not in appropriate format
 			log.Printf("BodyAppend not in JSON format : %s\n", resultBodyAppend)
 		} else {
@@ -117,14 +121,14 @@ func (fdp FakeDataParse) ParseBody(body string, bodyAppend string, req *definiti
 	return resultBody
 }
 
-//JoinJSON joins the properties of the passed jsons 
+//JoinJSON joins the properties of the passed jsons
 func (fdp FakeDataParse) JoinJSON(inputs ...string) string {
 	if len(inputs) == 1 {
 		return inputs[0]
-	} 
+	}
 
 	result := gabs.New()
-	for _, input := range inputs{
+	for _, input := range inputs {
 		jsonParsed, _ := gabs.ParseJSON([]byte(input))
 		children, _ := jsonParsed.S().ChildrenMap()
 
