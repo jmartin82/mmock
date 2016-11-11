@@ -226,7 +226,7 @@ Request data:
  - request.url."regex to match value"
  - request.body."regex to match value"
 
-> Regex: The regex should contain a group named **value** which will be matched and its value will be returned. E.g. if we want to match the id from this url **/your/path/4** the regex should look like **/your/path/(?P<value>\\d+)**. Note that in *golang* the named regex group match need to contain a **P** symbol after the question mark. The regex should be prefixed either with **request.url.** or **request.body.** considering your input.
+> Regex: The regex should contain a group named **value** which will be matched and its value will be returned. E.g. if we want to match the id from this url **/your/path/4** the regex should look like **`/your/path/(?P<value>\\d+)`**. Note that in *golang* the named regex group match need to contain a **P** symbol after the question mark. The regex should be prefixed either with **request.url.** or **request.body.** considering your input.
 
 
 Fake data:
