@@ -5,15 +5,15 @@ import (
 	"log"
 	"os"
 	"path"
-	"regexp"
-	"strings"
 
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/parse"
 )
 
 //FileBodyPersister persists body in file
 type FileBodyPersister struct {
 	PersistPath string
+	Parser      parse.ResponseParser
 }
 
 //Persist the body of the response to fiel if needed
@@ -22,7 +22,7 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 		return
 	}
 
-	per.Name = fbp.replaceVars(req, per.Name)
+	per.Name = fbp.Parser.ReplaceVars(req, per.Name)
 
 	filePath := path.Join(fbp.PersistPath, per.Name)
 	fileDir := path.Dir(filePath)
@@ -40,7 +40,7 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 }
 
 //LoadBody loads the response body from the persisted file
-func (fbp FileBodyPersister) LoadBody(res *definition.Response) {
+func (fbp FileBodyPersister) LoadBody(req *definition.Request, res *definition.Response) {
 	a := "test"
 	_ = a
 }
@@ -55,8 +55,8 @@ func (fbp FileBodyPersister) checkForFileWriteError(err error, res *definition.R
 }
 
 //NewFileBodyPersister creates a new FileBodyPersister
-func NewFileBodyPersister(persistPath string) *FileBodyPersister {
-	result := FileBodyPersister{PersistPath: persistPath}
+func NewFileBodyPersister(persistPath string, parser parse.ResponseParser) *FileBodyPersister {
+	result := FileBodyPersister{PersistPath: persistPath, Parser: parser}
 
 	err := os.MkdirAll(result.PersistPath, 0644)
 	if err != nil {
@@ -64,30 +64,4 @@ func NewFileBodyPersister(persistPath string) *FileBodyPersister {
 	}
 
 	return &result
-}
-
-func (fbp FileBodyPersister) replaceVars(req *definition.Request, input string) string {
-	r := regexp.MustCompile(`\{\{\s*([^\}]+)\s*\}\}`)
-
-	return r.ReplaceAllStringFunc(input, func(raw string) string {
-		found := false
-		s := ""
-		tag := strings.Trim(raw[2:len(raw)-2], " ")
-		if tag == "request.body" {
-			s = req.Body
-			found = true
-		} else if i := strings.Index(tag, "request.url."); i == 0 {
-			s, found = req.GetURLPart(tag[12:], "Value")
-		} else if i := strings.Index(tag, "request.query."); i == 0 {
-			s, found = req.GetQueryStringParam(tag[14:])
-		} else if i := strings.Index(tag, "request.cookie."); i == 0 {
-			s, found = req.GetCookieParam(tag[15:])
-		}
-
-		if !found {
-			log.Printf("Defined tag {{%s}} not found\n", tag)
-			return raw
-		}
-		return s
-	})
 }

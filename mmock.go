@@ -14,10 +14,10 @@ import (
 	"github.com/jmartin82/mmock/match"
 	"github.com/jmartin82/mmock/parse"
 	"github.com/jmartin82/mmock/parse/fakedata"
+	"github.com/jmartin82/mmock/persist"
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/server"
 	"github.com/jmartin82/mmock/translate"
-	"github.com/jmartin82/mmock/persist"
 )
 
 //ErrNotFoundDefaultPath if we can't resolve the current path
@@ -75,7 +75,7 @@ func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.
 
 func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, persistPath string) {
 	filler := parse.FakeDataParse{Fake: fakedata.FakeAdapter{}}
-	persister := persist.NewFileBodyPersister(persistPath)
+	persister := persist.NewFileBodyPersister(persistPath, filler)
 	dispatcher := server.Dispatcher{IP: ip, Port: port, Router: router, Translator: translate.HTTPTranslator{}, ResponseParser: filler, BodyPersister: persister, Mlog: mLog}
 	dispatcher.Start()
 	done <- true

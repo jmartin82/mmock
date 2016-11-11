@@ -66,7 +66,11 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			pr := proxy.Proxy{URL: mock.Control.ProxyBaseURL}
 			response = pr.MakeRequest(mock.Request)
 		} else {
-			di.ResponseParser.Parse(&mRequest, &mock.Response, di.BodyPersister)
+			if mock.Response.Persisted.Name != "" {
+				di.BodyPersister.LoadBody(&mRequest, &mock.Response)
+			} else {
+				di.ResponseParser.Parse(&mRequest, &mock.Response)
+			}
 			di.BodyPersister.Persist(&mock.Persist, &mRequest, &mock.Response)
 			if mock.Control.Crazy {
 				log.Printf("Running crazy mode")

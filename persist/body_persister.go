@@ -9,5 +9,5 @@ type BodyPersister interface {
 	//Persists Response body if needed
 	Persist(*definition.Persist, *definition.Request, *definition.Response)
 	//LoadBody loads the response body from the persisted location
-	LoadBody(res *definition.Response)
+	LoadBody(*definition.Request, *definition.Response)
 }

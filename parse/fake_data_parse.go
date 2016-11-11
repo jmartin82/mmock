@@ -11,7 +11,6 @@ import (
 
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/parse/fakedata"
-	"github.com/jmartin82/mmock/persist"
 )
 
 //FakeDataParse parses the data looking for fake data tags or request data tags
@@ -55,7 +54,8 @@ func (fdp FakeDataParse) callMethod(name string) (string, bool) {
 	return "", found
 }
 
-func (fdp FakeDataParse) replaceVars(req *definition.Request, input string) string {
+//ReplaceVars relplaces variables from the request in the input
+func (fdp FakeDataParse) ReplaceVars(req *definition.Request, input string) string {
 	r := regexp.MustCompile(`\{\{\s*([^\}]+)\s*\}\}`)
 
 	return r.ReplaceAllStringFunc(input, func(raw string) string {
@@ -66,11 +66,11 @@ func (fdp FakeDataParse) replaceVars(req *definition.Request, input string) stri
 			s = req.Body
 			found = true
 		} else if i := strings.Index(tag, "request.url."); i == 0 {
-			s, found = req.GetURLPart(tag[12:], "Value")
+			s, found = getURLPart(req, tag[12:], "Value")
 		} else if i := strings.Index(tag, "request.query."); i == 0 {
-			s, found = req.GetQueryStringParam(tag[14:])
+			s, found = getQueryStringParam(req, tag[14:])
 		} else if i := strings.Index(tag, "request.cookie."); i == 0 {
-			s, found = req.GetCookieParam(tag[15:])
+			s, found = getCookieParam(req, tag[15:])
 		} else if i := strings.Index(tag, "fake."); i == 0 {
 			s, found = fdp.callMethod(tag[5:])
 		}
@@ -84,32 +84,28 @@ func (fdp FakeDataParse) replaceVars(req *definition.Request, input string) stri
 }
 
 //Parse subtitutes the current mock response and replace the tags stored inside.
-func (fdp FakeDataParse) Parse(req *definition.Request, res *definition.Response, per persist.BodyPersister) {
+func (fdp FakeDataParse) Parse(req *definition.Request, res *definition.Response) {
 	for header, values := range res.Headers {
 		for i, value := range values {
-			res.Headers[header][i] = fdp.replaceVars(req, value)
+			res.Headers[header][i] = fdp.ReplaceVars(req, value)
 		}
 
 	}
 	for cookie, value := range res.Cookies {
-		res.Cookies[cookie] = fdp.replaceVars(req, value)
+		res.Cookies[cookie] = fdp.ReplaceVars(req, value)
 	}
 
-	if res.Persisted.Name != "" {
-		per.LoadBody(res)
-	} else {
-		res.Body = fdp.ParseBody(res.Body, res.BodyAppend, req)
-	}
+	res.Body = fdp.ParseBody(req, res.Body, res.BodyAppend)
 }
 
 //ParseBody parses body respecting bodyAppend and replacing variables from request
-func (fdp FakeDataParse) ParseBody(body string, bodyAppend string, req *definition.Request) string {
-	resultBody := fdp.replaceVars(req, body)
+func (fdp FakeDataParse) ParseBody(req *definition.Request, body string, bodyAppend string) string {
+	resultBody := fdp.ReplaceVars(req, body)
 	if bodyAppend != "" {
-		resultBodyAppend := fdp.replaceVars(req, bodyAppend)
+		resultBodyAppend := fdp.ReplaceVars(req, bodyAppend)
 
 		if isJSON(resultBody) && isJSON(resultBodyAppend) {
-			resultBody = fdp.JoinJSON(resultBody, resultBodyAppend)
+			resultBody = joinJSON(resultBody, resultBodyAppend)
 		} else if isJSON(resultBody) && !isJSON(resultBodyAppend) {
 			// strip resultBodyAppend as it is not in appropriate format
 			log.Printf("BodyAppend not in JSON format : %s\n", resultBodyAppend)
@@ -121,8 +117,7 @@ func (fdp FakeDataParse) ParseBody(body string, bodyAppend string, req *definiti
 	return resultBody
 }
 
-//JoinJSON joins the properties of the passed jsons
-func (fdp FakeDataParse) JoinJSON(inputs ...string) string {
+func joinJSON(inputs ...string) string {
 	if len(inputs) == 1 {
 		return inputs[0]
 	}
@@ -138,4 +133,49 @@ func (fdp FakeDataParse) JoinJSON(inputs ...string) string {
 	}
 
 	return result.String()
+}
+
+func getURLPart(req *definition.Request, pattern string, groupName string) (string, bool) {
+	r, error := regexp.Compile(pattern)
+	if error != nil {
+		return "", false
+	}
+
+	match := r.FindStringSubmatch(req.Path)
+	result := make(map[string]string)
+	for i, name := range r.SubexpNames() {
+		if i != 0 {
+			result[name] = match[i]
+		}
+	}
+
+	value, present := result[groupName]
+
+	return value, present
+}
+
+func getQueryStringParam(req *definition.Request, name string) (string, bool) {
+
+	if len(req.QueryStringParameters) == 0 {
+		return "", false
+	}
+	value, f := req.QueryStringParameters[name]
+	if !f {
+		return "", false
+	}
+
+	return value[0], true
+}
+
+func getCookieParam(req *definition.Request, name string) (string, bool) {
+
+	if len(req.Cookies) == 0 {
+		return "", false
+	}
+	value, f := req.Cookies[name]
+	if !f {
+		return "", false
+	}
+
+	return value, true
 }
