@@ -17,7 +17,8 @@ Built with Go - Mmock runs without installation on multiple platforms.
 ### Features
 
 * Easy mock definition via JSON or YAML
-* Variables in response (fake or request data)
+* Variables in response (fake or request data, including regex support)
+* Persist request body to file and load request from file
 * Glob matching ( /a/b/* )
 * Match request by method, URL params, headers, cookies and bodies.
 * Mock definitions hot replace (edit your mocks without restart)
@@ -102,6 +103,8 @@ To configure Mmock, use command line flags described in help.
           Console server Port (default 8082)
       -config-path string
           Mocks definition folder (default "execution_path/config")
+      -config-persist-path
+          Path to the folder where requests can be persisted (default "execution_path/data") 
       -console
           Console enabled  (true/false) (default true)
       -console-ip string
@@ -141,7 +144,20 @@ Mock definition:
 		"cookies": {
 			"name": "value"
 		},
-		"body": "Response body"
+		"body": "Response body",
+		"persisted": {
+            "name" : "/users/user-{{request.url./your/path/(?P<value>\\d+)}}.json",
+            "notFound": {
+                "statusCode": 404,
+                "body": "404: Not Found"
+				"bodyAppend": " File for Id : {{request.url./your/path/(?P<value>\\d+)}}"
+            },
+            "bodyAppend": "{ \"id\": {{request.url./your/path/(?P<value>\\d+)}} }"
+        }
+	},
+	"persist" : {
+		"name" : "/users/user-{{request.url./your/path/(?P<value>\\d+)}}.json",
+        "delete": false
 	},
 	"control": {
 		"proxyBaseURL": "string (original URL endpoint)
@@ -172,6 +188,23 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 * *headers*: Array of headers. It allows more than one value for the same key and vars.
 * *cookies*: Array of cookies. It allows vars.
 * *body*: Body string. It allows vars.
+* *bodyAppend*: Additional text or json object to be appended to the body. It allows vars. If the body is in JSON format and the bodyAppend is JSON the two JSONs will be merged and bodyAppend fields will replace any field from both JSONS. If the body type is not JSON the strings will be concatenated.  
+* *persisted*: Configuration for reading the body content from file.
+
+##### Persisted
+
+* *name*: The relative path from config-persist-path to the file where the response body to be loaded from. It allows vars.
+* *notFound*: The status code and body which will be returned if the file does not exist. The default values are statusCode: **404** and body: **Not Found**
+* *notFound.statusCode*: The status code to be returned if the file is not found. The default value is **404**
+* *notFound.body*: The body to be returned if the file is not found. It allows vars. The default value is **Not Found**
+* *notFound.bodyAppend*: Additional text or json object to be appended to the body if the file is not found. It allows vars.
+* *bodyAppend*: Additional text or json object to be appended to the body loaded from the file. It allows vars.
+* *persisted*: Configuration for reading the body content from file.
+
+#### Persist
+
+* *name*: The relative path from config-persist-path to the file where the ressponse body will be persisted. It allows vars.
+* *delete*: True or false. This is useful for making **DELETE** verb to delete the file.
 
 #### Control
 
@@ -182,12 +215,19 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 
 ### Variable tags
 
-You can use variable data (random data or request data) in response. The variables will be defined as tags like this {{nameVar}}.
+You can use variable data (random data or request data) in response. The variables will be defined as tags like this {{nameVar}} 
 
 Request data:
 
  - request.query."*key*"
  - request.cookie."*key*"
+ - request.url
+ - request.body
+ - request.url."regex to match value"
+ - request.body."regex to match value"
+
+> Regex: The regex should contain a group named **value** which will be matched and its value will be returned. E.g. if we want to match the id from this url **/your/path/4** the regex should look like **/your/path/(?P<value>\\d+)**. Note that in *golang* the named regex group match need to contain a **P** symbol after the question mark. The regex should be prefixed either with **request.url.** or **request.body.** considering your input.
+
 
 Fake data:
 

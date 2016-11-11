@@ -117,7 +117,7 @@ func main() {
 	cIP := flag.String("console-ip", outIP, "Console Server IP")
 	cPort := flag.Int("cconsole-port", 8082, "Console server Port")
 	cPath := flag.String("config-path", path, "Mocks definition folder")
-	cPersistPath := flag.String("config-persist-path", persistPath, "Path to store persisted data into")
+	cPersistPath := flag.String("config-persist-path", persistPath, "Path to the folder where requests can be persisted")
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
 	flag.Parse()
 

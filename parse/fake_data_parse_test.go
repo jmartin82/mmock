@@ -94,7 +94,7 @@ func TestReplaceUrlRegex(t *testing.T) {
 	res := definition.Response{}
 
 	req.Path = "/users/15"
-	res.Body = "{ \"id\": {{request.url.users/(?P<Value>\\d+)}} }"
+	res.Body = "{ \"id\": {{request.url.users/(?P<value>\\d+)}} }"
 
 	faker := FakeDataParse{DummyDataFaker{"AleixMG"}}
 	faker.Parse(&req, &res)
@@ -110,7 +110,7 @@ func TestReplaceBodyRegex(t *testing.T) {
 
 	req.Path = "/"
 	req.Body = "/users/15"
-	res.Body = "{ \"id\": {{request.body.users/(?P<Value>\\d+)}} }"
+	res.Body = "{ \"id\": {{request.body.users/(?P<value>\\d+)}} }"
 
 	faker := FakeDataParse{DummyDataFaker{"AleixMG"}}
 	faker.Parse(&req, &res)

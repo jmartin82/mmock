@@ -66,9 +66,9 @@ func (fdp FakeDataParse) ReplaceVars(req *definition.Request, input string) stri
 			s = req.Body
 			found = true
 		} else if i := strings.Index(tag, "request.url."); i == 0 {
-			s, found = getStringPart(req.Path, tag[12:], "Value")
+			s, found = getStringPart(req.Path, tag[12:], "value")
 		} else if i := strings.Index(tag, "request.body."); i == 0 {
-			s, found = getStringPart(req.Body, tag[12:], "Value")
+			s, found = getStringPart(req.Body, tag[12:], "value")
 		} else if i := strings.Index(tag, "request.query."); i == 0 {
 			s, found = getQueryStringParam(req, tag[14:])
 		} else if i := strings.Index(tag, "request.cookie."); i == 0 {
