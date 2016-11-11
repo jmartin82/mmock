@@ -146,17 +146,17 @@ Mock definition:
 		},
 		"body": "Response body",
 		"persisted": {
-            "name" : "/users/user-{{request.url./your/path/(?P<value>\\d+)}}.json",
+            "name" : "/users/user-{{request.url./your/path/(?P`<value>`\\d+)}}.json",
             "notFound": {
                 "statusCode": 404,
                 "body": "404: Not Found"
-				"bodyAppend": " File for Id : {{request.url./your/path/(?P<value>\\d+)}}"
+				"bodyAppend": " File for Id : {{request.url./your/path/(?P`<value>`\\d+)}}"
             },
-            "bodyAppend": "{ \"id\": {{request.url./your/path/(?P<value>\\d+)}} }"
+            "bodyAppend": "{ \"id\": {{request.url./your/path/(?P`<value>`\\d+)}} }"
         }
 	},
 	"persist" : {
-		"name" : "/users/user-{{request.url./your/path/(?P<value>\\d+)}}.json",
+		"name" : "/users/user-{{request.url./your/path/(?P`<value>`\\d+)}}.json",
         "delete": false
 	},
 	"control": {
@@ -226,7 +226,7 @@ Request data:
  - request.url."regex to match value"
  - request.body."regex to match value"
 
-> Regex: The regex should contain a group named **value** which will be matched and its value will be returned. E.g. if we want to match the id from this url **/your/path/4** the regex should look like **`/your/path/(?P<value>\\d+)`**. Note that in *golang* the named regex group match need to contain a **P** symbol after the question mark. The regex should be prefixed either with **request.url.** or **request.body.** considering your input.
+> Regex: The regex should contain a group named **value** which will be matched and its value will be returned. E.g. if we want to match the id from this url **/your/path/4** the regex should look like **/your/path/(?P`<value>`\\d+)**. Note that in *golang* the named regex group match need to contain a **P** symbol after the question mark. The regex should be prefixed either with **request.url.** or **request.body.** considering your input.
 
 
 Fake data:
