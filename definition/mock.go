@@ -2,10 +2,10 @@ package definition
 
 //Mock contains the user mock definition
 type Mock struct {
-	Name string
-	Request Request `json:"request"`
+	Name     string
+	Request  Request  `json:"request"`
 	Response Response `json:"response"`
-	Persist Persist `json:"persist"`
+	Persist  Persist  `json:"persist"`
 	Control  struct {
 		Priority     int    `json:"priority"`
 		Delay        int    `json:"delay"`
