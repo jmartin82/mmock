@@ -8,7 +8,7 @@ type ResponseParser interface {
 	//Parse subtitutes the current mock response and replace the tags stored inside.
 	Parse(*definition.Request, *definition.Response)
 	//ReplaceVars relplaces variables from the request in the input
-	ReplaceVars(req *definition.Request, input string) string
+	ReplaceVars(req *definition.Request, res *definition.Response, input string) string
 	//ParseBody parses body respecting bodyAppend and replacing variables from request
-	ParseBody(req *definition.Request, body string, bodyAppend string) string
+	ParseBody(req *definition.Request, res *definition.Response, body string, bodyAppend string) string
 }

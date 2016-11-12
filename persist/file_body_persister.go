@@ -21,14 +21,16 @@ type FileBodyPersister struct {
 }
 
 //Persist the body of the response to fiel if needed
-func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Request, res *definition.Response) {
+func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Request, res *definition.Response) bool {
+	result := true
+
 	if per.Name == "" {
-		return
+		return result
 	}
 
 	pathToFile, fileDir := fbp.getFilePath(per.Name, req, res)
 	if pathToFile == "" {
-		return
+		return false
 	}
 
 	if per.Delete {
@@ -36,15 +38,18 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 	} else {
 		fileContent := []byte(res.Body)
 		err := os.MkdirAll(fileDir, 0644)
-		if checkForError(err, res) == nil {
+		result = (checkForError(err, res) == nil)
+		if result {
 			err = ioutil.WriteFile(pathToFile, fileContent, 0644)
-			checkForError(err, res)
+			result = (checkForError(err, res) == nil)
 		}
 	}
+
+	return result
 }
 
 func (fbp FileBodyPersister) getFilePath(fileName string, req *definition.Request, res *definition.Response) (pathToFile string, fileDir string) {
-	fileName = fbp.Parser.ReplaceVars(req, fileName)
+	fileName = fbp.Parser.ReplaceVars(req, res, fileName)
 
 	pathToFile = path.Join(fbp.PersistPath, fileName)
 	fileDir = path.Dir(pathToFile)
@@ -76,7 +81,7 @@ func (fbp FileBodyPersister) LoadBody(req *definition.Request, res *definition.R
 	if os.IsNotExist(err) {
 		res.Body = "Not Found"
 		if res.Persisted.NotFound.Body != "" {
-			res.Body = fbp.Parser.ParseBody(req, res.Persisted.NotFound.Body, res.Persisted.NotFound.BodyAppend)
+			res.Body = fbp.Parser.ParseBody(req, res, res.Persisted.NotFound.Body, res.Persisted.NotFound.BodyAppend)
 		}
 		res.StatusCode = 404
 		if res.Persisted.NotFound.StatusCode != 0 {
@@ -85,7 +90,7 @@ func (fbp FileBodyPersister) LoadBody(req *definition.Request, res *definition.R
 	} else {
 		fileContent, err := ioutil.ReadFile(pathToFile)
 		if checkForError(err, res) == nil {
-			res.Body = fbp.Parser.ParseBody(req, string(fileContent), res.Persisted.BodyAppend)
+			res.Body = fbp.Parser.ParseBody(req, res, string(fileContent), res.Persisted.BodyAppend)
 		}
 	}
 }

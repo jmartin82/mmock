@@ -36,6 +36,7 @@ type Persisted struct {
 }
 
 type Persist struct {
-	Name   string `json:"name"`
-	Delete bool   `json:"delete"`
+	Name   string         `json:"name"`
+	Delete bool           `json:"delete"`
+	AMQP   AMQPPublishing `json:"amqp"`
 }

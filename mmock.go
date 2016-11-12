@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/jmartin82/mmock/amqp"
 	"github.com/jmartin82/mmock/console"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
@@ -76,7 +77,16 @@ func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.
 func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, persistPath string) {
 	filler := parse.FakeDataParse{Fake: fakedata.FakeAdapter{}}
 	persister := persist.NewFileBodyPersister(persistPath, filler)
-	dispatcher := server.Dispatcher{IP: ip, Port: port, Router: router, Translator: translate.HTTPTranslator{}, ResponseParser: filler, BodyPersister: persister, Mlog: mLog}
+	sender := amqp.NewRabbitMQSender(filler)
+	dispatcher := server.Dispatcher{IP: ip,
+		Port:           port,
+		Router:         router,
+		Translator:     translate.HTTPTranslator{},
+		ResponseParser: filler,
+		BodyPersister:  persister,
+		Mlog:           mLog,
+		AMQPSender:     sender,
+	}
 	dispatcher.Start()
 	done <- true
 }
