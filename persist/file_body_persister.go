@@ -28,10 +28,10 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 		return result
 	}
 
-	per.Name = fbp.Parser.ReplaceVars(req, res, per.Name)
-
-	pathToFile := path.Join(fbp.PersistPath, per.Name)
-	fileDir := path.Dir(pathToFile)
+	pathToFile, fileDir := fbp.getFilePath(per.Name, req, res)
+	if pathToFile == "" {
+		return false
+	}
 
 	if per.Delete {
 		os.Remove(pathToFile)
@@ -54,25 +54,28 @@ func (fbp FileBodyPersister) getFilePath(fileName string, req *definition.Reques
 	pathToFile = path.Join(fbp.PersistPath, fileName)
 	fileDir = path.Dir(pathToFile)
 
+	var err error
+	pathToFile, err = filepath.Abs(pathToFile)
+	if checkForError(err, res) != nil {
+		return "", ""
+	}
+	if !strings.HasPrefix(pathToFile, fbp.PersistPath) {
+		errorText := fmt.Sprintf("File path not under the persist path. FilePath: %s, PersistPath %s", pathToFile, fbp.PersistPath)
+		checkForError(errors.New(errorText), res)
+		return "", ""
+	}
+
 	return pathToFile, fileDir
 }
 
 //LoadBody loads the response body from the persisted file
 func (fbp FileBodyPersister) LoadBody(req *definition.Request, res *definition.Response) {
 	pathToFile, _ := fbp.getFilePath(res.Persisted.Name, req, res)
-
-	var err error
-	pathToFile, err = filepath.Abs(pathToFile)
-	if checkForError(err, res) != nil {
-		return
-	}
-	if !strings.HasPrefix(pathToFile, fbp.PersistPath) {
-		errorText := fmt.Sprintf("File path not under the persist path. FilePath: %s, PersistPath %s", pathToFile, fbp.PersistPath)
-		checkForError(errors.New(errorText), res)
+	if pathToFile == "" {
 		return
 	}
 
-	_, err = os.Stat(pathToFile)
+	_, err := os.Stat(pathToFile)
 
 	// use notFound info
 	if os.IsNotExist(err) {
