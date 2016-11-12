@@ -1,10 +1,14 @@
 package persist
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
+	"path/filepath"
+	"strings"
 
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/parse"
@@ -26,17 +30,17 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 
 	per.Name = fbp.Parser.ReplaceVars(req, res, per.Name)
 
-	filePath := path.Join(fbp.PersistPath, per.Name)
-	fileDir := path.Dir(filePath)
+	pathToFile := path.Join(fbp.PersistPath, per.Name)
+	fileDir := path.Dir(pathToFile)
 
 	if per.Delete {
-		os.Remove(filePath)
+		os.Remove(pathToFile)
 	} else {
 		fileContent := []byte(res.Body)
 		err := os.MkdirAll(fileDir, 0644)
 		result = (checkForError(err, res) == nil)
 		if result {
-			err = ioutil.WriteFile(filePath, fileContent, 0644)
+			err = ioutil.WriteFile(pathToFile, fileContent, 0644)
 			result = (checkForError(err, res) == nil)
 		}
 	}
@@ -44,20 +48,31 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 	return result
 }
 
-func (fbp FileBodyPersister) getFilePath(fileName string, req *definition.Request, res *definition.Response) (filePath string, fileDir string) {
+func (fbp FileBodyPersister) getFilePath(fileName string, req *definition.Request, res *definition.Response) (pathToFile string, fileDir string) {
 	fileName = fbp.Parser.ReplaceVars(req, res, fileName)
 
-	filePath = path.Join(fbp.PersistPath, fileName)
-	fileDir = path.Dir(filePath)
+	pathToFile = path.Join(fbp.PersistPath, fileName)
+	fileDir = path.Dir(pathToFile)
 
-	return filePath, fileDir
+	return pathToFile, fileDir
 }
 
 //LoadBody loads the response body from the persisted file
 func (fbp FileBodyPersister) LoadBody(req *definition.Request, res *definition.Response) {
-	filePath, _ := fbp.getFilePath(res.Persisted.Name, req, res)
+	pathToFile, _ := fbp.getFilePath(res.Persisted.Name, req, res)
 
-	var _, err = os.Stat(filePath)
+	var err error
+	pathToFile, err = filepath.Abs(pathToFile)
+	if checkForError(err, res) != nil {
+		return
+	}
+	if !strings.HasPrefix(pathToFile, fbp.PersistPath) {
+		errorText := fmt.Sprintf("File path not under the persist path. FilePath: %s, PersistPath %s", pathToFile, fbp.PersistPath)
+		checkForError(errors.New(errorText), res)
+		return
+	}
+
+	_, err = os.Stat(pathToFile)
 
 	// use notFound info
 	if os.IsNotExist(err) {
@@ -70,7 +85,7 @@ func (fbp FileBodyPersister) LoadBody(req *definition.Request, res *definition.R
 			res.StatusCode = res.Persisted.NotFound.StatusCode
 		}
 	} else {
-		fileContent, err := ioutil.ReadFile(filePath)
+		fileContent, err := ioutil.ReadFile(pathToFile)
 		if checkForError(err, res) == nil {
 			res.Body = fbp.Parser.ParseBody(req, res, string(fileContent), res.Persisted.BodyAppend)
 		}

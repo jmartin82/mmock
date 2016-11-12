@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/jmartin82/mmock/definition"
@@ -39,6 +40,7 @@ func TestFileBodyPersister_Persist_NoPersistName(t *testing.T) {
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
 
 	persistPath, _ := filepath.Abs("./test_persist")
+	defer os.RemoveAll(persistPath)
 
 	os.RemoveAll(persistPath)
 
@@ -50,8 +52,6 @@ func TestFileBodyPersister_Persist_NoPersistName(t *testing.T) {
 	if hasFiles {
 		t.Error("No file should be created")
 	}
-
-	os.RemoveAll(persistPath)
 }
 
 func TestFileBodyPersister_Persist_WithBodyToSave(t *testing.T) {
@@ -65,6 +65,7 @@ func TestFileBodyPersister_Persist_WithBodyToSave(t *testing.T) {
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
 
 	persistPath, _ := filepath.Abs("./test_persist")
+	defer os.RemoveAll(persistPath)
 
 	os.RemoveAll(persistPath)
 
@@ -96,8 +97,6 @@ func TestFileBodyPersister_Persist_WithBodyToSave(t *testing.T) {
 			}
 		}
 	}
-
-	os.RemoveAll(persistPath)
 }
 
 func TestFileBodyPersister_LoadBody(t *testing.T) {
@@ -107,6 +106,7 @@ func TestFileBodyPersister_LoadBody(t *testing.T) {
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
 
 	persistPath, _ := filepath.Abs("./test_persist")
+	defer os.RemoveAll(persistPath)
 
 	os.RemoveAll(persistPath)
 
@@ -127,8 +127,6 @@ func TestFileBodyPersister_LoadBody(t *testing.T) {
 			t.Error("Result body and file content should be the same", res.Body, fileContent)
 		}
 	}
-
-	os.RemoveAll(persistPath)
 }
 
 func TestFileBodyPersister_LoadBody_WithAppend(t *testing.T) {
@@ -138,6 +136,7 @@ func TestFileBodyPersister_LoadBody_WithAppend(t *testing.T) {
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
 
 	persistPath, _ := filepath.Abs("./test_persist")
+	defer os.RemoveAll(persistPath)
 
 	os.RemoveAll(persistPath)
 
@@ -159,8 +158,29 @@ func TestFileBodyPersister_LoadBody_WithAppend(t *testing.T) {
 			t.Error("Result body and file content plus bodyAppend should be the same", res.Body, fileContent, res.Persisted.BodyAppend)
 		}
 	}
+}
+
+func TestFileBodyPersister_LoadBody_FileNotUnderPersistPath(t *testing.T) {
+	req := definition.Request{}
+	res := definition.Response{}
+
+	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
+
+	persistPath, _ := filepath.Abs("./test_persist")
+	defer os.RemoveAll(persistPath)
 
 	os.RemoveAll(persistPath)
+
+	res.Persisted = definition.Persisted{Name: "../../testing_load.json"}
+	persister := NewFileBodyPersister(persistPath, parser)
+
+	persister.LoadBody(&req, &res)
+
+	if !strings.HasPrefix(res.Body, "File path not under the persist path.") {
+		t.Error("We should end up with an error as the path to the file is not under persist path", res.Body)
+	} else if res.StatusCode != 500 {
+		t.Error("Status code should be 500", res.StatusCode)
+	}
 }
 
 func TestFileBodyPersister_LoadBody_NotFound(t *testing.T) {
@@ -170,6 +190,7 @@ func TestFileBodyPersister_LoadBody_NotFound(t *testing.T) {
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
 
 	persistPath, _ := filepath.Abs("./test_persist")
+	defer os.RemoveAll(persistPath)
 
 	os.RemoveAll(persistPath)
 
@@ -183,8 +204,6 @@ func TestFileBodyPersister_LoadBody_NotFound(t *testing.T) {
 	} else if res.StatusCode != 404 {
 		t.Error("Status code should be 404", res.StatusCode)
 	}
-
-	os.RemoveAll(persistPath)
 }
 
 func TestFileBodyPersister_LoadBody_NotFound_CustomTextAndCode(t *testing.T) {
@@ -194,6 +213,7 @@ func TestFileBodyPersister_LoadBody_NotFound_CustomTextAndCode(t *testing.T) {
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
 
 	persistPath, _ := filepath.Abs("./test_persist")
+	defer os.RemoveAll(persistPath)
 
 	os.RemoveAll(persistPath)
 
@@ -211,8 +231,6 @@ func TestFileBodyPersister_LoadBody_NotFound_CustomTextAndCode(t *testing.T) {
 	} else if res.StatusCode != res.Persisted.NotFound.StatusCode {
 		t.Error("Status code should be equal to notFound.StatusCode", res.StatusCode, res.Persisted.NotFound.StatusCode)
 	}
-
-	os.RemoveAll(persistPath)
 }
 
 func TestNewFileBodyPersister(t *testing.T) {
@@ -221,6 +239,7 @@ func TestNewFileBodyPersister(t *testing.T) {
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
 
 	persistPath, _ := filepath.Abs("./test_persist")
+	defer os.RemoveAll(persistPath)
 
 	os.RemoveAll(persistPath)
 
@@ -231,6 +250,4 @@ func TestNewFileBodyPersister(t *testing.T) {
 	if !folderExists {
 		t.Error("Folder should be created if not existing", res.Body)
 	}
-
-	os.RemoveAll(persistPath)
 }
