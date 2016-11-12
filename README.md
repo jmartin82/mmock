@@ -262,6 +262,7 @@ Request data:
  - request.cookie."*key*"
  - request.url
  - request.body
+ - response.body
  - request.url."regex to match value"
  - request.body."regex to match value"
  - response.body."regex to match value"
