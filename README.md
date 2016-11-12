@@ -274,38 +274,10 @@ Fake data:
  - fake.Zip
 
 
-### Benchmark
+### Contributors
 
-Basic benchmark with ab (Apache HTTP server benchmarking tool)
+- [@vtrifonov](https://github.com/vtrifonov) Persisting state feature and improved variables support
 
-Intel(R) Pentium(R) CPU 2127U @ 1.90GHz
-350 Concurrent
-20000 Request
-
-```
-ab -k -c 350 -n 20000 http://YOURIP:8083/
-
-Server Software:        
-Server Hostname:        172.17.0.2
-Server Port:            8083
-
-Document Path:          /
-Document Length:        0 bytes
-
-Concurrency Level:      350
-Time taken for tests:   11.348 seconds
-Complete requests:      20000
-Failed requests:        0
-Non-2xx responses:      20000
-Keep-Alive requests:    20000
-Total transferred:      2940000 bytes
-HTML transferred:       0 bytes
-Requests per second:    1762.49 [#/sec] (mean)
-Time per request:       198.583 [ms] (mean)
-Time per request:       0.567 [ms] (mean, across all concurrent requests)
-Transfer rate:          253.01 [Kbytes/sec] received
-
-```
 
 ### Contributing
 
