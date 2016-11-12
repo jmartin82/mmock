@@ -276,7 +276,7 @@ Fake data:
 
 ### Contributors
 
-- @vtrifonov Persisting state feature and improved variables support
+- [@vtrifonov](https://github.com/vtrifonov) Persisting state feature and improved variables support
 
 
 ### Contributing
