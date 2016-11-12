@@ -54,6 +54,31 @@ func TestFileBodyPersister_Persist_NoPersistName(t *testing.T) {
 	}
 }
 
+func TestFileBodyPersister_Persist_FileNotUnderPersistPath(t *testing.T) {
+	req := definition.Request{}
+	res := definition.Response{}
+	per := definition.Persist{}
+
+	res.Body = "BodyToSave"
+	per.Name = "../../testing.json"
+
+	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
+
+	persistPath, _ := filepath.Abs("./test_persist")
+	defer os.RemoveAll(persistPath)
+
+	os.RemoveAll(persistPath)
+
+	persister := NewFileBodyPersister(persistPath, parser)
+	persister.Persist(&per, &req, &res)
+
+	if !strings.HasPrefix(res.Body, "File path not under the persist path.") {
+		t.Error("We should end up with an error as the path to the file is not under persist path", res.Body)
+	} else if res.StatusCode != 500 {
+		t.Error("Status code should be 500", res.StatusCode)
+	}
+}
+
 func TestFileBodyPersister_Persist_WithBodyToSave(t *testing.T) {
 	req := definition.Request{}
 	res := definition.Response{}

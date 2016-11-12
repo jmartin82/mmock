@@ -26,10 +26,10 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 		return
 	}
 
-	per.Name = fbp.Parser.ReplaceVars(req, per.Name)
-
-	pathToFile := path.Join(fbp.PersistPath, per.Name)
-	fileDir := path.Dir(pathToFile)
+	pathToFile, fileDir := fbp.getFilePath(per.Name, req, res)
+	if pathToFile == "" {
+		return
+	}
 
 	if per.Delete {
 		os.Remove(pathToFile)
@@ -43,31 +43,34 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 	}
 }
 
-func (fbp FileBodyPersister) getFilePath(fileName string, req *definition.Request) (pathToFile string, fileDir string) {
+func (fbp FileBodyPersister) getFilePath(fileName string, req *definition.Request, res *definition.Response) (pathToFile string, fileDir string) {
 	fileName = fbp.Parser.ReplaceVars(req, fileName)
 
 	pathToFile = path.Join(fbp.PersistPath, fileName)
 	fileDir = path.Dir(pathToFile)
+
+	var err error
+	pathToFile, err = filepath.Abs(pathToFile)
+	if checkForError(err, res) != nil {
+		return "", ""
+	}
+	if !strings.HasPrefix(pathToFile, fbp.PersistPath) {
+		errorText := fmt.Sprintf("File path not under the persist path. FilePath: %s, PersistPath %s", pathToFile, fbp.PersistPath)
+		checkForError(errors.New(errorText), res)
+		return "", ""
+	}
 
 	return pathToFile, fileDir
 }
 
 //LoadBody loads the response body from the persisted file
 func (fbp FileBodyPersister) LoadBody(req *definition.Request, res *definition.Response) {
-	pathToFile, _ := fbp.getFilePath(res.Persisted.Name, req)
-
-	var err error
-	pathToFile, err = filepath.Abs(pathToFile)
-	if checkForError(err, res) != nil {
-		return
-	}
-	if !strings.HasPrefix(pathToFile, fbp.PersistPath) {
-		errorText := fmt.Sprintf("File path not under the persist path. FilePath: %s, PersistPath %s", pathToFile, fbp.PersistPath)
-		checkForError(errors.New(errorText), res)
+	pathToFile, _ := fbp.getFilePath(res.Persisted.Name, req, res)
+	if pathToFile == "" {
 		return
 	}
 
-	_, err = os.Stat(pathToFile)
+	_, err := os.Stat(pathToFile)
 
 	// use notFound info
 	if os.IsNotExist(err) {
