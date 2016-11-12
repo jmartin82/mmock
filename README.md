@@ -18,7 +18,8 @@ Built with Go - Mmock runs without installation on multiple platforms.
 
 * Easy mock definition via JSON or YAML
 * Variables in response (fake or request data, including regex support)
-* Persist request body to file and load request from file
+* Persist request body to file and load response from file
+* Ability to send message to AMQP server
 * Glob matching ( /a/b/* )
 * Match request by method, URL params, headers, cookies and bodies.
 * Mock definitions hot replace (edit your mocks without restart)
@@ -157,7 +158,25 @@ Mock definition:
 	},
 	"persist" : {
 		"name" : "/users/user-{{request.url./your/path/(?P<value>\\d+)}}.json",
-        "delete": false
+        "delete": false,
+		"amqp": {
+            "url": "amqp://guest:guest@localhost:5672/myVHost",
+            "body": "{{ response.body }}",
+			"bodyAppend": "{ \"itemToAppend\": 5}"
+            "exchange": "myExchange",
+            "type": "MockType",
+            "correlationId": "9782b88f-0c6e-4879-8c23-4699785e6a95",
+			"routingKey": "routing",
+			"contentType": "application/json",
+			"contentEncoding": "",
+			"priority": 0,
+			"replyTo": "",
+			"expiration": "",
+			"messageId": "",
+			"timestamp": "01-01-2016",
+			"userId": "",
+			"appId": "" 
+        }
 	},
 	"control": {
 		"proxyBaseURL": "string (original URL endpoint)
@@ -194,9 +213,9 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 ##### Persisted
 
 * *name*: The relative path from config-persist-path to the file where the response body to be loaded from. It allows vars.
-* *notFound*: The status code and body which will be returned if the file does not exist. The default values are statusCode: **404** and body: **Not Found**
-* *notFound.statusCode*: The status code to be returned if the file is not found. The default value is **404**
-* *notFound.body*: The body to be returned if the file is not found. It allows vars. The default value is **Not Found**
+* *notFound*: The status code and body which will be returned if the file does not exist. The default values are statusCode: **404** and body: **Not Found**.
+* *notFound.statusCode*: The status code to be returned if the file is not found. The default value is **404**.
+* *notFound.body*: The body to be returned if the file is not found. It allows vars. The default value is **Not Found**.
 * *notFound.bodyAppend*: Additional text or json object to be appended to the body if the file is not found. It allows vars.
 * *bodyAppend*: Additional text or json object to be appended to the body loaded from the file. It allows vars.
 * *persisted*: Configuration for reading the body content from file.
@@ -205,6 +224,26 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 
 * *name*: The relative path from config-persist-path to the file where the ressponse body will be persisted. It allows vars.
 * *delete*: True or false. This is useful for making **DELETE** verb to delete the file.
+* *amqp*: Configuration for sending message to AMQP server. If such configuration is present a message will be sent to the configured server.
+
+##### AMQP
+
+* *url*: Url to the amqp server e.g. amqp://guest:guest@localhost:5672/vhost **Mandatory**.
+* *exchange*: The name of the exchange to post to **Mandatory**.
+* *routingKey*: The routing key for posting the message.
+* *body*: Payload of the message. It allows vars.
+* *bodyAppend*: Text or JSON to be appended to the body. It allows vars.
+* *contentType*: MIME content type.
+* *contentEncoding*: MIME content encoding.
+* *priority*: Priority from 0 to 9.
+* *correlationId*: Correlation identifier.
+* *replyTo*: Address to to reply to (ex: RPC).
+* *expiration*: Message expiration spec.
+* *messageId*: Message identifier.
+* *timestamp*: Message timestamp.
+* *type*: Message type name.
+* *userId*: Creating user id - ex: "guest".
+* *appId*: Creating application id.
 
 #### Control
 
@@ -225,8 +264,9 @@ Request data:
  - request.body
  - request.url."regex to match value"
  - request.body."regex to match value"
+ - response.body."regex to match value"
 
-> Regex: The regex should contain a group named **value** which will be matched and its value will be returned. E.g. if we want to match the id from this url **`/your/path/4`** the regex should look like **`/your/path/(?P<value>\\d+)`**. Note that in *golang* the named regex group match need to contain a **P** symbol after the question mark. The regex should be prefixed either with **request.url.** or **request.body.** considering your input.
+> Regex: The regex should contain a group named **value** which will be matched and its value will be returned. E.g. if we want to match the id from this url **`/your/path/4`** the regex should look like **`/your/path/(?P<value>\\d+)`**. Note that in *golang* the named regex group match need to contain a **P** symbol after the question mark. The regex should be prefixed either with **request.url.**, **request.body.** or **response.body.** considering your input.
 
 
 Fake data:
