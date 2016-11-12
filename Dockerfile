@@ -7,4 +7,4 @@ VOLUME /config
 
 EXPOSE 8082 8083
 
-ENTRYPOINT ["/go/bin/mmock","-config-path","/config"]
+ENTRYPOINT ["/go/bin/mmock","-config-path","/config","-config-persist-path","/data"]

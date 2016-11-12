@@ -20,5 +20,22 @@ type Request struct {
 type Response struct {
 	StatusCode int `json:"statusCode"`
 	headers
-	Body string `json:"body"`
+	Persisted  Persisted `json:"persisted"`
+	Body       string    `json:"body"`
+	BodyAppend string    `json:"BodyAppend"`
+}
+
+type Persisted struct {
+	Name     string `json:"name"`
+	NotFound struct {
+		StatusCode int    `json:"statusCode"`
+		Body       string `json:"body"`
+		BodyAppend string `json:"BodyAppend"`
+	} `json:"notFound"`
+	BodyAppend string `json:"BodyAppend"`
+}
+
+type Persist struct {
+	Name   string `json:"name"`
+	Delete bool   `json:"delete"`
 }

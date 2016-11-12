@@ -14,6 +14,7 @@ import (
 	"github.com/jmartin82/mmock/match"
 	"github.com/jmartin82/mmock/parse"
 	"github.com/jmartin82/mmock/parse/fakedata"
+	"github.com/jmartin82/mmock/persist"
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/server"
 	"github.com/jmartin82/mmock/translate"
@@ -72,9 +73,10 @@ func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.
 	return router
 }
 
-func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match) {
+func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, persistPath string) {
 	filler := parse.FakeDataParse{Fake: fakedata.FakeAdapter{}}
-	dispatcher := server.Dispatcher{IP: ip, Port: port, Router: router, Translator: translate.HTTPTranslator{}, ResponseParser: filler, Mlog: mLog}
+	persister := persist.NewFileBodyPersister(persistPath, filler)
+	dispatcher := server.Dispatcher{IP: ip, Port: port, Router: router, Translator: translate.HTTPTranslator{}, ResponseParser: filler, BodyPersister: persister, Mlog: mLog}
 	dispatcher.Start()
 	done <- true
 }
@@ -108,11 +110,14 @@ func main() {
 		panic(ErrNotFoundDefaultPath)
 	}
 
+	persistPath, _ := filepath.Abs("./data")
+
 	sIP := flag.String("server-ip", outIP, "Mock server IP")
 	sPort := flag.Int("server-port", 8083, "Mock Server Port")
 	cIP := flag.String("console-ip", outIP, "Console Server IP")
 	cPort := flag.Int("cconsole-port", 8082, "Console server Port")
 	cPath := flag.String("config-path", path, "Mocks definition folder")
+	cPersistPath := flag.String("config-persist-path", persistPath, "Path to the folder where requests can be persisted")
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
 	flag.Parse()
 
@@ -122,10 +127,11 @@ func main() {
 	done := make(chan bool)
 
 	path, _ = filepath.Abs(*cPath)
+	persistPath, _ = filepath.Abs(*cPersistPath)
 	mocks := getMocks(path, dUpdates)
 	router := getRouter(mocks, dUpdates)
 
-	go startServer(*sIP, *sPort, done, router, mLog)
+	go startServer(*sIP, *sPort, done, router, mLog, persistPath)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	if *console {
 		go startConsole(*cIP, *cPort, done, mLog)
