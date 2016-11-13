@@ -28,6 +28,8 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 		return result
 	}
 
+	per.Name = fbp.Parser.ReplaceVars(req, res, per.Name)
+
 	pathToFile, fileDir := fbp.getFilePath(per.Name, req, res)
 	if pathToFile == "" {
 		return false
@@ -37,7 +39,7 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 		os.Remove(pathToFile)
 	} else {
 		fileContent := []byte(res.Body)
-		err := os.MkdirAll(fileDir, 0644)
+		err := os.MkdirAll(fileDir, 0755)
 		result = (checkForError(err, res) == nil)
 		if result {
 			err = ioutil.WriteFile(pathToFile, fileContent, 0755)
@@ -49,8 +51,6 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 }
 
 func (fbp FileBodyPersister) getFilePath(fileName string, req *definition.Request, res *definition.Response) (pathToFile string, fileDir string) {
-	fileName = fbp.Parser.ReplaceVars(req, res, fileName)
-
 	pathToFile = path.Join(fbp.PersistPath, fileName)
 	fileDir = path.Dir(pathToFile)
 
@@ -70,6 +70,8 @@ func (fbp FileBodyPersister) getFilePath(fileName string, req *definition.Reques
 
 //LoadBody loads the response body from the persisted file
 func (fbp FileBodyPersister) LoadBody(req *definition.Request, res *definition.Response) {
+	res.Persisted.Name = fbp.Parser.ReplaceVars(req, res, res.Persisted.Name)
+
 	pathToFile, _ := fbp.getFilePath(res.Persisted.Name, req, res)
 	if pathToFile == "" {
 		return
