@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>MMock Console</title>
+	<title>MMock Console 1</title>
 
 	<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
 	<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
@@ -76,6 +76,7 @@
 						<ul class="nav nav-tabs">
 						  <li class="active" ><a href="#tabrequest" data-toggle="tab">Request</a></li>
 						  <li><a href="#tabresponse" data-toggle="tab">Response</a></li>
+							<li><a href="#tabAMQP" data-toggle="tab">AMQP</a></li>
 						  <li><a href="#tablog" data-toggle="tab">Log</a></li>
 						</ul>
 
@@ -87,6 +88,9 @@
 						  <div id="tabresponse" class="tab-pane fade">
 						    <pre id="hdresponse"></pre>
 						  </div>
+							<div id="tabAMQP" class="tab-pane fade">
+						    <pre id="hdAMQP"></pre>
+						  </div >
 						  <div id="tablog" class="tab-pane fade">
 						    <pre id="hdlog"></pre>
 						  </div >

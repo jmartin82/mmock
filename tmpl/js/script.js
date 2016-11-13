@@ -7,6 +7,7 @@ $(document).ready(function() {
         $("#tirecap").hide();
         $("#hdrequest").html("");
         $("#hdresponse").html("");
+        $("#hdAMQP").html("");
         $("#hdlog").html("");
     });
 });
@@ -40,6 +41,7 @@ function logDetails(json) {
     $("#tirecap").fadeOut(100);
     var request = JSON.stringify(json.request, undefined, 4);
     var response = JSON.stringify(json.response, undefined, 4);
+    var amqp = JSON.stringify(json.amqp, undefined, 4);
     var log = JSON.stringify(json.result, undefined, 4);
     var status = json.response.statusCode;
     $("#tirecap").attr('class', 'alert alert-' + getColorByStatus(status));
@@ -48,6 +50,7 @@ function logDetails(json) {
     $("#tirequest").html(json.request.method + " " + json.request.path);
     $("#hdrequest").html(syntaxHighlight(request));
     $("#hdresponse").html(syntaxHighlight(response));
+    $("#hdAMQP").html(syntaxHighlight(amqp));
     $("#hdlog").html(syntaxHighlight(log));
 }
 

@@ -8,7 +8,8 @@ type Result struct {
 
 //Match contains the whole information about the request match. The http request, the final response received and the matching result.
 type Match struct {
-	Request  Request  `json:"request"`
-	Response Response `json:"response"`
-	Result   Result   `json:"result"`
+	Request  Request        `json:"request"`
+	Response Response       `json:"response"`
+	Result   Result         `json:"result"`
+	AMQP     AMQPPublishing `json:"amqp"`
 }

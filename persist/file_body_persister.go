@@ -40,7 +40,7 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 		err := os.MkdirAll(fileDir, 0644)
 		result = (checkForError(err, res) == nil)
 		if result {
-			err = ioutil.WriteFile(pathToFile, fileContent, 0644)
+			err = ioutil.WriteFile(pathToFile, fileContent, 0755)
 			result = (checkForError(err, res) == nil)
 		}
 	}
@@ -108,7 +108,7 @@ func checkForError(err error, res *definition.Response) error {
 func NewFileBodyPersister(persistPath string, parser parse.ResponseParser) *FileBodyPersister {
 	result := FileBodyPersister{PersistPath: persistPath, Parser: parser}
 
-	err := os.MkdirAll(result.PersistPath, 0644)
+	err := os.MkdirAll(result.PersistPath, 0755)
 	if err != nil {
 		panic(err)
 	}
