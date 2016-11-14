@@ -26,7 +26,7 @@
             "showLog": true
         },
         {
-            "name": "All Tests In File",
+            "name": "All Tests In Folder",
             "type": "go",
             "request": "launch",
             "mode": "test",

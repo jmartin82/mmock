@@ -67,7 +67,8 @@ func (mbp MongoBodyPersister) getItemInfo(name string, res *definition.Response)
 	return collectionName, id
 }
 
-func (mbp MongoBodyPersister) connectMongo() (session *mgo.Session, err error) {
+//ConnectMongo connects to the configured mongoDB server
+func (mbp MongoBodyPersister) ConnectMongo() (session *mgo.Session, err error) {
 	session, err = mgo.DialWithInfo(&mbp.ConnectionInfo)
 	if err == nil {
 		// Optional. Switch the session to a monotonic behavior.
@@ -77,7 +78,7 @@ func (mbp MongoBodyPersister) connectMongo() (session *mgo.Session, err error) {
 }
 
 func (mbp MongoBodyPersister) saveItem(collectionName string, id string, body string) error {
-	session, err := mbp.connectMongo()
+	session, err := mbp.ConnectMongo()
 	if err != nil {
 		return err
 	}
@@ -96,7 +97,7 @@ func (mbp MongoBodyPersister) saveItem(collectionName string, id string, body st
 }
 
 func (mbp MongoBodyPersister) deleteItem(collectionName string, id string) error {
-	session, err := mbp.connectMongo()
+	session, err := mbp.ConnectMongo()
 	if err != nil {
 		return err
 	}
@@ -108,7 +109,8 @@ func (mbp MongoBodyPersister) deleteItem(collectionName string, id string) error
 	return collection.RemoveId(id)
 }
 
-func (mbp MongoBodyPersister) getResultString(result interface{}) (string, error) {
+//GetResultString gets the result string rom interface
+func (mbp MongoBodyPersister) GetResultString(result interface{}) (string, error) {
 	byteResult, err := json.Marshal(result)
 	if err != nil {
 		return "", err
@@ -131,7 +133,7 @@ func (mbp MongoBodyPersister) LoadBody(req *definition.Request, res *definition.
 		return
 	}
 
-	session, err := mbp.connectMongo()
+	session, err := mbp.ConnectMongo()
 	if mbp.checkForError(err, res) != nil {
 		return
 	}
@@ -159,7 +161,7 @@ func (mbp MongoBodyPersister) LoadBody(req *definition.Request, res *definition.
 			}
 		}
 	} else {
-		resultString, err := mbp.getResultString(result)
+		resultString, err := mbp.GetResultString(result)
 		if mbp.checkForError(err, res) == nil {
 			res.Body = mbp.Parser.ParseBody(req, res, resultString, res.Persisted.BodyAppend)
 		}
