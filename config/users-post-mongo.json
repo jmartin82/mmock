@@ -1,0 +1,19 @@
+{
+    "request": {
+        "method": "POST",
+        "path": "/users/*",
+        "body": "*"
+    },
+	"response": {
+        "statusCode": 202,
+        "headers": {
+			"Content-Type":["application/json"]
+		},
+		"body": "{{ request.body }}",
+        "bodyAppend": "{ \"id\": {{request.url./users/(?P<value>\\d+)}}, \"city\": \"{{ fake.City }}\" }"
+    },
+    "persist" : {
+		"name" : "users/user-{{request.url./users/(?P<value>\\d+)}}",
+        "delete": false
+	}
+}

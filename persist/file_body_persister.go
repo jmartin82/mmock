@@ -20,7 +20,7 @@ type FileBodyPersister struct {
 	Parser      parse.ResponseParser
 }
 
-//Persist the body of the response to fiel if needed
+//Persist the body of the response to file if needed
 func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Request, res *definition.Response) bool {
 	result := true
 
@@ -40,10 +40,10 @@ func (fbp FileBodyPersister) Persist(per *definition.Persist, req *definition.Re
 	} else {
 		fileContent := []byte(res.Body)
 		err := os.MkdirAll(fileDir, 0755)
-		result = (checkForError(err, res) == nil)
+		result = (fbp.checkForError(err, res) == nil)
 		if result {
 			err = ioutil.WriteFile(pathToFile, fileContent, 0755)
-			result = (checkForError(err, res) == nil)
+			result = (fbp.checkForError(err, res) == nil)
 		}
 	}
 
@@ -56,12 +56,12 @@ func (fbp FileBodyPersister) getFilePath(fileName string, req *definition.Reques
 
 	var err error
 	pathToFile, err = filepath.Abs(pathToFile)
-	if checkForError(err, res) != nil {
+	if fbp.checkForError(err, res) != nil {
 		return "", ""
 	}
 	if !strings.HasPrefix(pathToFile, fbp.PersistPath) {
 		errorText := fmt.Sprintf("File path not under the persist path. FilePath: %s, PersistPath %s", pathToFile, fbp.PersistPath)
-		checkForError(errors.New(errorText), res)
+		fbp.checkForError(errors.New(errorText), res)
 		return "", ""
 	}
 
@@ -91,13 +91,13 @@ func (fbp FileBodyPersister) LoadBody(req *definition.Request, res *definition.R
 		}
 	} else {
 		fileContent, err := ioutil.ReadFile(pathToFile)
-		if checkForError(err, res) == nil {
+		if fbp.checkForError(err, res) == nil {
 			res.Body = fbp.Parser.ParseBody(req, res, string(fileContent), res.Persisted.BodyAppend)
 		}
 	}
 }
 
-func checkForError(err error, res *definition.Response) error {
+func (fbp FileBodyPersister) checkForError(err error, res *definition.Response) error {
 	if err != nil {
 		log.Print(err)
 		res.Body = err.Error()

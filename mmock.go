@@ -76,7 +76,7 @@ func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.
 
 func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, persistPath string) {
 	filler := parse.FakeDataParse{Fake: fakedata.FakeAdapter{}}
-	persister := persist.NewFileBodyPersister(persistPath, filler)
+	persister := persist.NewMongoBodyPersister(persistPath, filler)
 	sender := amqp.NewRabbitMQSender(filler)
 	dispatcher := server.Dispatcher{IP: ip,
 		Port:           port,
@@ -138,6 +138,9 @@ func main() {
 
 	path, _ = filepath.Abs(*cPath)
 	persistPath, _ = filepath.Abs(*cPersistPath)
+
+	persistPath = "mongodb://localhost/mmock"
+
 	mocks := getMocks(path, dUpdates)
 	router := getRouter(mocks, dUpdates)
 
