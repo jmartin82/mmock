@@ -14,6 +14,11 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+var (
+	WrongNameFormat        = errors.New("The name of the persist item should be in the following format {collectionName}/{collectionId}")
+	MongoDatabaseNotPassed = errors.New("Mongo database not passed. Please add the database at the end of the connection string e.g. /DatabasName ")
+)
+
 //MongoBodyPersister persists body in file
 type MongoBodyPersister struct {
 	ConnectionInfo mgo.DialInfo
@@ -56,7 +61,7 @@ func (mbp MongoBodyPersister) getItemInfo(name string, res *definition.Response)
 		collectionName = name[0:i]
 		id = name[(i + 1):]
 	} else {
-		mbp.checkForError(errors.New("The name of the persist item should be in the following format {collectionName}/{collectionId}"), res)
+		mbp.checkForError(WrongNameFormat, res)
 	}
 
 	return collectionName, id
@@ -179,7 +184,7 @@ func NewMongoBodyPersister(mongoConnectionString string, parser parse.ResponsePa
 	}
 
 	if dialInfo.Database == "" {
-		panic(errors.New("Mongo database not passed. Please add the database at the end of the connection string e.g. /DatabasName "))
+		panic(MongoDatabaseNotPassed)
 	}
 
 	session, err := mgo.DialWithInfo(dialInfo)

@@ -1,7 +1,7 @@
 {
     "request": {
         "method": "POST",
-        "path": "/users/*",
+        "path": "/mongo/users/*",
         "body": "*"
     },
 	"response": {

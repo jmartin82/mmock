@@ -1,7 +1,7 @@
 {
     "request": {
         "method": "DELETE",
-        "path": "/users/*",
+        "path": "/mongo/users/*",
         "body": "*"
     },
 	"response": {

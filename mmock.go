@@ -76,7 +76,15 @@ func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.
 
 func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, persistPath string) {
 	filler := parse.FakeDataParse{Fake: fakedata.FakeAdapter{}}
-	persister := persist.NewMongoBodyPersister(persistPath, filler)
+
+	var persister persist.BodyPersister
+
+	if strings.Index(persistPath, "mongodb://") == 0 {
+		persister = persist.NewMongoBodyPersister(persistPath, filler)
+	} else {
+		persister = persist.NewFileBodyPersister(persistPath, filler)
+	}
+
 	sender := amqp.NewRabbitMQSender(filler)
 	dispatcher := server.Dispatcher{IP: ip,
 		Port:           port,
@@ -121,13 +129,14 @@ func main() {
 	}
 
 	persistPath, _ := filepath.Abs("./data")
+	//persistPath := "mongodb://localhost/mmock"
 
 	sIP := flag.String("server-ip", outIP, "Mock server IP")
 	sPort := flag.Int("server-port", 8083, "Mock Server Port")
 	cIP := flag.String("console-ip", outIP, "Console Server IP")
 	cPort := flag.Int("cconsole-port", 8082, "Console server Port")
 	cPath := flag.String("config-path", path, "Mocks definition folder")
-	cPersistPath := flag.String("config-persist-path", persistPath, "Path to the folder where requests can be persisted")
+	cPersistPath := flag.String("config-persist-path", persistPath, "Path to the folder where requests can be persisted or connection string to mongo database starting with mongodb:// and having database at the end /DatabaseName")
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
 	flag.Parse()
 
@@ -137,9 +146,10 @@ func main() {
 	done := make(chan bool)
 
 	path, _ = filepath.Abs(*cPath)
-	persistPath, _ = filepath.Abs(*cPersistPath)
 
-	persistPath = "mongodb://localhost/mmock"
+	if strings.Index(persistPath, "mongodb://") != 0 {
+		persistPath, _ = filepath.Abs(*cPersistPath)
+	}
 
 	mocks := getMocks(path, dUpdates)
 	router := getRouter(mocks, dUpdates)
