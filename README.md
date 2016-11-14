@@ -162,7 +162,8 @@ Mock definition:
 		"amqp": {
             "url": "amqp://guest:guest@localhost:5672/myVHost",
             "body": "{{ response.body }}",
-			"bodyAppend": "{ \"itemToAppend\": 5}"
+			"delay": 2,
+			"bodyAppend": "{ \"itemToAppend\": 5}",
             "exchange": "myExchange",
             "type": "MockType",
             "correlationId": "9782b88f-0c6e-4879-8c23-4699785e6a95",
@@ -173,7 +174,7 @@ Mock definition:
 			"replyTo": "",
 			"expiration": "",
 			"messageId": "",
-			"timestamp": "01-01-2016",
+			"timestamp": "2016-01-01T00:00:00Z",
 			"userId": "",
 			"appId": "" 
         }
@@ -230,6 +231,7 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 
 * *url*: Url to the amqp server e.g. amqp://guest:guest@localhost:5672/vhost **Mandatory**.
 * *exchange*: The name of the exchange to post to **Mandatory**.
+* *delay*: message send delay in seconds.
 * *routingKey*: The routing key for posting the message.
 * *body*: Payload of the message. It allows vars.
 * *bodyAppend*: Text or JSON to be appended to the body. It allows vars.

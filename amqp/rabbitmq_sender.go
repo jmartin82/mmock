@@ -2,6 +2,7 @@ package amqp
 
 import (
 	"log"
+	"time"
 
 	"fmt"
 
@@ -22,6 +23,12 @@ func (rmqs RabbitMQSender) Send(per *definition.Persist, req *definition.Request
 	}
 
 	per.AMQP.Body = rmqs.Parser.ParseBody(req, res, per.AMQP.Body, per.AMQP.BodyAppend)
+
+	if per.AMQP.Delay > 0 {
+		log.Printf("Adding a delay before sending message")
+		time.Sleep(time.Duration(per.AMQP.Delay) * time.Second)
+	}
+
 	return sendMessage(per.AMQP, res)
 }
 

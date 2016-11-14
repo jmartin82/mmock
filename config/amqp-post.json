@@ -17,6 +17,7 @@
 		"amqp": {
             "url": "amqp://guest:guest@localhost:5672/myVHost",
             "body": "{{ response.body }}",
+            "delay": 2,
             "exchange": "myExchange",
             "type": "MockType",
             "correlationId": "9782b88f-0c6e-4879-8c23-4699785e6a95"

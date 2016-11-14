@@ -6,6 +6,7 @@ import "time"
 type AMQPPublishing struct {
 	URL        string `json:"url"`        // url to the amqp server e.g. amqp://guest:guest@localhost:5672/vhost
 	RoutingKey string `json:"routingKey"` // the routing key for posting the message
+	Delay      int    `json:"delay"`      // message send delay in seconds
 	Exchange   string `json:"exchange"`   // the name of the exchange to post to
 	Body       string `json:"body"`       // payload of the message
 	BodyAppend string `json:"bodyAppend"` // text or JSON to be appended to the body
