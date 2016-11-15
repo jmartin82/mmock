@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/jmartin82/mmock/amqp"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/parse"
 	"github.com/jmartin82/mmock/persist"
@@ -24,6 +25,7 @@ type Dispatcher struct {
 	Translator     translate.MessageTranslator
 	ResponseParser parse.ResponseParser
 	BodyPersister  persist.BodyPersister
+	MessageSender  amqp.Sender
 	Mlog           chan definition.Match
 }
 
@@ -71,7 +73,10 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			} else {
 				di.ResponseParser.Parse(&mRequest, &mock.Response)
 			}
-			di.BodyPersister.Persist(&mock.Persist, &mRequest, &mock.Response)
+			if di.BodyPersister.Persist(&mock.Persist, &mRequest, &mock.Response) {
+				go di.MessageSender.Send(&mock.Persist, &mRequest, &mock.Response)
+			}
+
 			if mock.Control.Crazy {
 				log.Printf("Running crazy mode")
 				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)
@@ -89,7 +94,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	di.Translator.WriteHTTPResponseFromDefinition(&response, w)
 
 	//log to console
-	m := definition.Match{Request: mRequest, Response: response, Result: result}
+	m := definition.Match{Request: mRequest, Response: response, Result: result, Persist: mock.Persist}
 	go di.recordMatchData(m)
 }
 

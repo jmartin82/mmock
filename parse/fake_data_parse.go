@@ -55,7 +55,7 @@ func (fdp FakeDataParse) callMethod(name string) (string, bool) {
 }
 
 //ReplaceVars relplaces variables from the request in the input
-func (fdp FakeDataParse) ReplaceVars(req *definition.Request, input string) string {
+func (fdp FakeDataParse) ReplaceVars(req *definition.Request, res *definition.Response, input string) string {
 	r := regexp.MustCompile(`\{\{\s*([^\}]+)\s*\}\}`)
 
 	return r.ReplaceAllStringFunc(input, func(raw string) string {
@@ -65,10 +65,15 @@ func (fdp FakeDataParse) ReplaceVars(req *definition.Request, input string) stri
 		if tag == "request.body" {
 			s = req.Body
 			found = true
+		} else if tag == "response.body" {
+			s = res.Body
+			found = true
 		} else if i := strings.Index(tag, "request.url."); i == 0 {
 			s, found = getStringPart(req.Path, tag[12:], "value")
 		} else if i := strings.Index(tag, "request.body."); i == 0 {
 			s, found = getStringPart(req.Body, tag[13:], "value")
+		} else if i := strings.Index(tag, "response.body."); i == 0 {
+			s, found = getStringPart(res.Body, tag[14:], "value")
 		} else if i := strings.Index(tag, "request.query."); i == 0 {
 			s, found = getQueryStringParam(req, tag[14:])
 		} else if i := strings.Index(tag, "request.cookie."); i == 0 {
@@ -89,22 +94,22 @@ func (fdp FakeDataParse) ReplaceVars(req *definition.Request, input string) stri
 func (fdp FakeDataParse) Parse(req *definition.Request, res *definition.Response) {
 	for header, values := range res.Headers {
 		for i, value := range values {
-			res.Headers[header][i] = fdp.ReplaceVars(req, value)
+			res.Headers[header][i] = fdp.ReplaceVars(req, res, value)
 		}
 
 	}
 	for cookie, value := range res.Cookies {
-		res.Cookies[cookie] = fdp.ReplaceVars(req, value)
+		res.Cookies[cookie] = fdp.ReplaceVars(req, res, value)
 	}
 
-	res.Body = fdp.ParseBody(req, res.Body, res.BodyAppend)
+	res.Body = fdp.ParseBody(req, res, res.Body, res.BodyAppend)
 }
 
 //ParseBody parses body respecting bodyAppend and replacing variables from request
-func (fdp FakeDataParse) ParseBody(req *definition.Request, body string, bodyAppend string) string {
-	resultBody := fdp.ReplaceVars(req, body)
+func (fdp FakeDataParse) ParseBody(req *definition.Request, res *definition.Response, body string, bodyAppend string) string {
+	resultBody := fdp.ReplaceVars(req, res, body)
 	if bodyAppend != "" {
-		resultBodyAppend := fdp.ReplaceVars(req, bodyAppend)
+		resultBodyAppend := fdp.ReplaceVars(req, res, bodyAppend)
 
 		if isJSON(resultBody) && isJSON(resultBodyAppend) {
 			resultBody = joinJSON(resultBody, resultBodyAppend)

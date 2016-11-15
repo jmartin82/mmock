@@ -7,6 +7,7 @@ $(document).ready(function() {
         $("#tirecap").hide();
         $("#hdrequest").html("");
         $("#hdresponse").html("");
+        $("#hdpersist").html("");
         $("#hdlog").html("");
     });
 });
@@ -38,8 +39,25 @@ function getColorByStatus(statusCode) {
 
 function logDetails(json) {
     $("#tirecap").fadeOut(100);
+
+    if(json.response.persisted && json.response.persisted.name == ""){
+        delete json.response["persisted"];
+    }
+
+    if(json.persist && json.persist.name == ""){
+        delete json.persist["name"];
+    }
+    if(json.persist.delete == false){
+        delete json.persist["delete"];
+    }
+    if(json.persist.amqp && json.persist.amqp.url == ""){
+        delete json.persist["amqp"];
+    }
+
     var request = JSON.stringify(json.request, undefined, 4);
     var response = JSON.stringify(json.response, undefined, 4);
+    var persist = JSON.stringify(json.persist, undefined, 4);
+
     var log = JSON.stringify(json.result, undefined, 4);
     var status = json.response.statusCode;
     $("#tirecap").attr('class', 'alert alert-' + getColorByStatus(status));
@@ -48,6 +66,7 @@ function logDetails(json) {
     $("#tirequest").html(json.request.method + " " + json.request.path);
     $("#hdrequest").html(syntaxHighlight(request));
     $("#hdresponse").html(syntaxHighlight(response));
+    $("#hdpersist").html(syntaxHighlight(persist));
     $("#hdlog").html(syntaxHighlight(log));
 }
 
