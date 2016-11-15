@@ -140,9 +140,9 @@ func TestFileBodyPersister_LoadBody(t *testing.T) {
 
 	filePath := path.Join(persistPath, res.Persisted.Name)
 
-	fileContent := "Body to expext"
+	fileContent := "Body to expect"
 
-	err := ioutil.WriteFile(filePath, []byte(fileContent), 0644)
+	err := ioutil.WriteFile(filePath, []byte(fileContent), 0755)
 	if err != nil {
 		t.Error("File should be written", err)
 	} else {
@@ -171,9 +171,9 @@ func TestFileBodyPersister_LoadBody_WithAppend(t *testing.T) {
 
 	filePath := path.Join(persistPath, res.Persisted.Name)
 
-	fileContent := "Body to expext"
+	fileContent := "Body to expect"
 
-	err := ioutil.WriteFile(filePath, []byte(fileContent), 0644)
+	err := ioutil.WriteFile(filePath, []byte(fileContent), 0755)
 	if err != nil {
 		t.Error("File should be written", err)
 	} else {

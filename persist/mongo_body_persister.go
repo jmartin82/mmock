@@ -7,6 +7,8 @@ import (
 
 	"errors"
 
+	"time"
+
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/parse"
 	"github.com/tidwall/sjson"
@@ -15,8 +17,8 @@ import (
 )
 
 var (
-	WrongNameFormat        = errors.New("The name of the persist item should be in the following format {collectionName}/{collectionId}")
-	MongoDatabaseNotPassed = errors.New("Mongo database not passed. Please add the database at the end of the connection string e.g. /DatabasName ")
+	ErrWrongNameFormat        = errors.New("The name of the persist item should be in the following format {collectionName}/{collectionId}")
+	ErrMongoDatabaseNotPassed = errors.New("Mongo database not passed. Please add the database at the end of the connection string e.g. /DatabasName ")
 )
 
 //MongoBodyPersister persists body in file
@@ -42,7 +44,7 @@ func (mbp MongoBodyPersister) Persist(per *definition.Persist, req *definition.R
 		if per.Delete {
 			err = mbp.deleteItem(collectionName, id)
 		} else {
-			err = mbp.saveItem(collectionName, id, res.Body)
+			err = mbp.SaveItem(collectionName, id, res.Body)
 		}
 
 		if err != nil && err.Error() == "not found" {
@@ -61,7 +63,7 @@ func (mbp MongoBodyPersister) getItemInfo(name string, res *definition.Response)
 		collectionName = name[0:i]
 		id = name[(i + 1):]
 	} else {
-		mbp.checkForError(WrongNameFormat, res)
+		mbp.checkForError(ErrWrongNameFormat, res)
 	}
 
 	return collectionName, id
@@ -77,7 +79,8 @@ func (mbp MongoBodyPersister) ConnectMongo() (session *mgo.Session, err error) {
 	return session, err
 }
 
-func (mbp MongoBodyPersister) saveItem(collectionName string, id string, body string) error {
+//SaveItem saves an item in a given collection under a give id
+func (mbp MongoBodyPersister) SaveItem(collectionName string, id string, body string) error {
 	session, err := mbp.ConnectMongo()
 	if err != nil {
 		return err
@@ -186,7 +189,11 @@ func NewMongoBodyPersister(mongoConnectionString string, parser parse.ResponsePa
 	}
 
 	if dialInfo.Database == "" {
-		panic(MongoDatabaseNotPassed)
+		panic(ErrMongoDatabaseNotPassed)
+	}
+
+	if dialInfo.Timeout == 0 {
+		dialInfo.Timeout = 10 * time.Second
 	}
 
 	session, err := mgo.DialWithInfo(dialInfo)

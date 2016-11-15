@@ -112,7 +112,7 @@ func (fdp FakeDataParse) ParseBody(req *definition.Request, res *definition.Resp
 		resultBodyAppend := fdp.ReplaceVars(req, res, bodyAppend)
 
 		if isJSON(resultBody) && isJSON(resultBodyAppend) {
-			resultBody = joinJSON(resultBody, resultBodyAppend)
+			resultBody = JoinJSON(resultBody, resultBodyAppend)
 		} else if isJSON(resultBody) && !isJSON(resultBodyAppend) {
 			// strip resultBodyAppend as it is not in appropriate format
 			log.Printf("BodyAppend not in JSON format : %s\n", resultBodyAppend)
@@ -124,7 +124,7 @@ func (fdp FakeDataParse) ParseBody(req *definition.Request, res *definition.Resp
 	return resultBody
 }
 
-func joinJSON(inputs ...string) string {
+func JoinJSON(inputs ...string) string {
 	if len(inputs) == 1 {
 		return inputs[0]
 	}
