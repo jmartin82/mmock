@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	errWrongNameFormat = errors.New("The name of the persist item should be in the following format {collectionName}/{collectionId}")
+	errWrongNameFormat = errors.New("The name of the persist item should be in the following format {collectionName}/{itemId}")
 )
 
 //MongoBodyPersister persists body in file

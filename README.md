@@ -105,7 +105,7 @@ To configure Mmock, use command line flags described in help.
       -config-path string
           Mocks definition folder (default "execution_path/config")
       -config-persist-path
-          Path to the folder where requests can be persisted (default "execution_path/data") 
+          Path to the folder where requests can be persisted or connection string to mongo database starting with mongodb:// and having database at the end /DatabaseName (default "execution_path/data") 
       -console
           Console enabled  (true/false) (default true)
       -console-ip string
@@ -213,7 +213,7 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 
 ##### Persisted
 
-* *name*: The relative path from config-persist-path to the file where the response body to be loaded from. It allows vars.
+* *name*: The relative path from config-persist-path to the file where the response body to be loaded from or the {collectionName}/{itemId} if you are using mongo. It allows vars.
 * *notFound*: The status code and body which will be returned if the file does not exist. The default values are statusCode: **404** and body: **Not Found**.
 * *notFound.statusCode*: The status code to be returned if the file is not found. The default value is **404**.
 * *notFound.body*: The body to be returned if the file is not found. It allows vars. The default value is **Not Found**.
@@ -223,7 +223,7 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 
 #### Persist
 
-* *name*: The relative path from config-persist-path to the file where the ressponse body will be persisted. It allows vars.
+* *name*: The relative path from config-persist-path to the file where the ressponse body will be persisted or {collectionName}/{itemId} if you are using mongo. It allows vars.
 * *delete*: True or false. This is useful for making **DELETE** verb to delete the file.
 * *amqp*: Configuration for sending message to AMQP server. If such configuration is present a message will be sent to the configured server.
 
@@ -316,10 +316,31 @@ Fake data:
  - fake.Words
  - fake.Zip
 
+### Persistence
+
+Currently the tool supports two persistence modes:
+
+#### File system
+
+If you want to use that mode you need to pass the path to the folder where you want to store your data to the following argument - **config-persist-path**. The default value is set to the **data** folder under your current execution path. In this mode a new file will be created for every request that has [Persist](####Persist) configuration under the given name. The name in that configuration is the relative path to the file where the request data will be stored. To return the data from that file you need to set the same name to the [Persisted](#####Persisted) configuration in the response on the desired mock configuration.
+
+#### MongoDB
+
+To use MongoDB persistence you need to set the url connection string to the **config-persist-path**. The format of that url should be in the following format:
+`mongodb://[user:pass@]host1[:port1][,host2[:port2],...]/database`
+For example if you are using localhost mongo the connection string might be **`mongodb://localhost/mmock`** In this mode the name in the [Persist](####Persist) and [Persisted](#####Persisted) configurations define in which collection and with what ID the records to be stored and retrieved from. To achieve this the names should be in the following format:
+`collectionName/itemId`
+
+You can check the sample configurations for persistence in the following files:
+ * [users-get.json](config/users-get.json)
+ * [users-post.json](config/users-post.json)
+ * [users-delete.json](config/users-delete.json)
+
+That configurations are going to work either with **File system** or **MongoDB** modes.
 
 ### Contributors
 
-- [@vtrifonov](https://github.com/vtrifonov) Persisting state feature and improved variables support
+- [@vtrifonov](https://github.com/vtrifonov) Persisting state feature, improved variables support and AMQP sending
 
 
 ### Contributing
