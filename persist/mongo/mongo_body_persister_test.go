@@ -1,17 +1,16 @@
 package mongo
 
 import (
+	"log"
 	"testing"
 	"time"
-
-	"log"
 
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/parse"
 	"gopkg.in/mgo.v2"
 )
 
-const mongoTestURL = "mongodb://localhost/mmock_test"
+const mongoTestURL = "mongodb://localhost1/mmock_test"
 
 type ConnectionState string
 

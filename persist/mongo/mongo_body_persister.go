@@ -2,10 +2,9 @@ package mongo
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"strings"
-
-	"errors"
 
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/parse"
