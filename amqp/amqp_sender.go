@@ -11,13 +11,13 @@ import (
 	"github.com/streadway/amqp"
 )
 
-//RabbitMQSender sends message to RabbitMQ
-type RabbitMQSender struct {
+//AMQPSender sends message to RabbitMQ
+type AMQPSender struct {
 	Parser parse.ResponseParser
 }
 
 //Send message to rabbitMQ if needed
-func (rmqs RabbitMQSender) Send(per *definition.Persist, req *definition.Request, res *definition.Response) bool {
+func (rmqs AMQPSender) Send(per *definition.Persist, req *definition.Request, res *definition.Response) bool {
 	if per.AMQP.URL == "" {
 		return true
 	}
@@ -32,9 +32,9 @@ func (rmqs RabbitMQSender) Send(per *definition.Persist, req *definition.Request
 	return sendMessage(per.AMQP, res)
 }
 
-//NewRabbitMQSender creates a new RabbitMQSender
-func NewRabbitMQSender(parser parse.ResponseParser) *RabbitMQSender {
-	result := RabbitMQSender{Parser: parser}
+//NewAMQPSender creates a new AMQPSender
+func NewAMQPSender(parser parse.ResponseParser) *AMQPSender {
+	result := AMQPSender{Parser: parser}
 	return &result
 }
 

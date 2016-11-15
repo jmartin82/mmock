@@ -77,7 +77,7 @@ func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.
 func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, persistPath string) {
 	filler := parse.FakeDataParse{Fake: fakedata.FakeAdapter{}}
 	persister := persist.NewFileBodyPersister(persistPath, filler)
-	sender := amqp.NewRabbitMQSender(filler)
+	sender := amqp.NewAMQPSender(filler)
 	dispatcher := server.Dispatcher{IP: ip,
 		Port:           port,
 		Router:         router,
