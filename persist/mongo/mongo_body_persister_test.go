@@ -1,8 +1,6 @@
-package persist
+package mongo
 
 import (
-	"encoding/json"
-	"os"
 	"testing"
 	"time"
 
@@ -60,44 +58,6 @@ func hasConnection(t *testing.T) bool {
 	}
 }
 
-func formatJSON(input string) (result string, err error) {
-	var jsonParsed interface{}
-	json.Unmarshal([]byte(input), &jsonParsed)
-	if err != nil {
-		return "", err
-	}
-
-	byteString, err := json.Marshal(jsonParsed)
-	if err != nil {
-		return "", err
-	}
-
-	return string(byteString), nil
-}
-
-func jsonsAreEqual(input1 string, input2 string) (result bool, err error) {
-	formatedInput1, err := formatJSON(input1)
-	if err != nil {
-		return false, err
-	}
-	formatedInput2, err := formatJSON(input2)
-	if err != nil {
-		return false, err
-	}
-	return formatedInput1 == formatedInput2, nil
-}
-
-func mongoRecordExists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return true, err
-}
-
 func mongoCollectionHasItems(collection *mgo.Collection) (bool, error) {
 	count, err := collection.Count()
 	return count > 0, err
@@ -114,25 +74,20 @@ func TestMongoBodyPersister_Persist_NoPersistName(t *testing.T) {
 
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
 
-	persistPath := mongoTestURL
-	persister := NewMongoBodyPersister(persistPath, parser)
-
-	session, err := persister.ConnectMongo()
-	if err != nil {
-		t.Error(err.Error())
-		return
-	}
-
+	persister := NewMongoBodyPersister(mongoTestURL, parser)
 	defer func() {
-		session.DB(persister.ConnectionInfo.Database).DropDatabase()
-		session.Close()
+		persister.Repository.dropDatabase() // cleanup database
 	}()
+	persister.Repository.dropDatabase() // make sure we are working on a clean database
 
 	persister.Persist(&per, &req, &res)
 
-	collectionNames, _ := session.DB(persister.ConnectionInfo.Database).CollectionNames()
+	hasCollections, err := persister.Repository.hasCollections()
+	if err != nil {
+		t.Error(err)
+	}
 
-	if len(collectionNames) > 0 {
+	if hasCollections {
 		t.Error("No collections should be present")
 	}
 }
@@ -150,45 +105,65 @@ func TestMongoBodyPersister_Persist_WithBodyToSave(t *testing.T) {
 
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
 
-	persistPath := mongoTestURL
-	persister := NewMongoBodyPersister(persistPath, parser)
-
-	session, err := persister.ConnectMongo()
-	if err != nil {
-		t.Error(err.Error())
-		return
-	}
-
+	persister := NewMongoBodyPersister(mongoTestURL, parser)
 	defer func() {
-		session.DB(persister.ConnectionInfo.Database).DropDatabase()
-		session.Close()
+		persister.Repository.dropDatabase() // cleanup database
 	}()
+	persister.Repository.dropDatabase() // make sure we are working on a clean database
 
 	persister.Persist(&per, &req, &res)
 
-	collection := session.DB(persister.ConnectionInfo.Database).C("test")
-
-	hasItems, _ := mongoCollectionHasItems(collection)
+	hasItems, _ := persister.Repository.hasCollectionsItems("test")
 
 	if !hasItems {
 		t.Error("One item should be created")
 	} else {
 
-		var result interface{}
-		err = collection.FindId("testing-1").One(&result)
+		bodyContent, err := persister.Repository.GetItem("test", "testing-1")
 		if err != nil {
-			t.Error(err.Error())
-		} else {
+			t.Error(err)
+		}
 
-			bodyContent, err := persister.GetResultString(result)
-			if err != nil {
-				t.Error(err.Error())
-			} else {
+		if equal, err := parse.JSONSStringsAreEqual(bodyContent, res.Body); !equal || err != nil {
+			t.Error("File content should match result body", bodyContent, res.Body)
+		}
+	}
+}
 
-				if equal, err := jsonsAreEqual(string(bodyContent), res.Body); !equal || err != nil {
-					t.Error("File content should match result body", string(bodyContent), res.Body)
-				}
-			}
+func TestMongoBodyPersister_Persist_WithNonJSONBodyToSave(t *testing.T) {
+	if !hasConnection(t) {
+		return
+	}
+	req := definition.Request{}
+	res := definition.Response{}
+	per := definition.Persist{}
+
+	res.Body = "Body to save"
+	per.Name = "test/testing-1"
+
+	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
+
+	persister := NewMongoBodyPersister(mongoTestURL, parser)
+	defer func() {
+		persister.Repository.dropDatabase() // cleanup database
+	}()
+	persister.Repository.dropDatabase() // make sure we are working on a clean database
+
+	persister.Persist(&per, &req, &res)
+
+	hasItems, _ := persister.Repository.hasCollectionsItems("test")
+
+	if !hasItems {
+		t.Error("One item should be created")
+	} else {
+
+		bodyContent, err := persister.Repository.GetItem("test", "testing-1")
+		if err != nil {
+			t.Error(err)
+		}
+
+		if equal, err := parse.JSONSStringsAreEqual(bodyContent, res.Body); !equal || err != nil {
+			t.Error("File content should match result body", bodyContent, res.Body)
 		}
 	}
 }
@@ -202,32 +177,56 @@ func TestMongoBodyPersister_LoadBody(t *testing.T) {
 
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
 
-	persistPath := mongoTestURL
-	persister := NewMongoBodyPersister(persistPath, parser)
-
-	session, err := persister.ConnectMongo()
-	if err != nil {
-		t.Error(err.Error())
-		return
-	}
-
+	persister := NewMongoBodyPersister(mongoTestURL, parser)
 	defer func() {
-		session.DB(persister.ConnectionInfo.Database).DropDatabase()
-		session.Close()
+		persister.Repository.dropDatabase() // cleanup database
 	}()
+	persister.Repository.dropDatabase() // make sure we are working on a clean database
 
 	res.Persisted = definition.Persisted{Name: "test/item-1"}
 
 	content := "{\"test\": \"body to expect\"}"
 	id := "item-1"
 
-	err = persister.SaveItem("test", id, content)
+	err := persister.Repository.UpsertItem("test", id, content)
 	if err != nil {
 		t.Error("Item should be saved", err)
 	} else {
 		persister.LoadBody(&req, &res)
 
-		if equal, err := jsonsAreEqual(res.Body, content); !equal || err != nil {
+		if equal, err := parse.JSONSStringsAreEqual(res.Body, content); !equal || err != nil {
+			t.Error("Result body and file content should be the same", res.Body, content)
+		}
+	}
+}
+
+func TestMongoBodyPersister_LoadBodyNonJSON(t *testing.T) {
+	if !hasConnection(t) {
+		return
+	}
+	req := definition.Request{}
+	res := definition.Response{}
+
+	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
+
+	persister := NewMongoBodyPersister(mongoTestURL, parser)
+	defer func() {
+		persister.Repository.dropDatabase() // cleanup database
+	}()
+	persister.Repository.dropDatabase() // make sure we are working on a clean database
+
+	res.Persisted = definition.Persisted{Name: "test/item-1"}
+
+	content := "Non JSON body to expect"
+	id := "item-1"
+
+	err := persister.Repository.UpsertItem("test", id, content)
+	if err != nil {
+		t.Error("Item should be saved", err)
+	} else {
+		persister.LoadBody(&req, &res)
+
+		if equal, err := parse.JSONSStringsAreEqual(res.Body, content); !equal || err != nil {
 			t.Error("Result body and file content should be the same", res.Body, content)
 		}
 	}
@@ -242,32 +241,24 @@ func TestMongoBodyPersister_LoadBody_WithAppend(t *testing.T) {
 
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
 
-	persistPath := mongoTestURL
-	persister := NewMongoBodyPersister(persistPath, parser)
-
-	session, err := persister.ConnectMongo()
-	if err != nil {
-		t.Error(err.Error())
-		return
-	}
-
+	persister := NewMongoBodyPersister(mongoTestURL, parser)
 	defer func() {
-		session.DB(persister.ConnectionInfo.Database).DropDatabase()
-		session.Close()
+		persister.Repository.dropDatabase() // cleanup database
 	}()
+	persister.Repository.dropDatabase() // make sure we are working on a clean database
 
 	res.Persisted = definition.Persisted{Name: "test/item-1", BodyAppend: "{\"append\":1}"}
 
 	content := "{\"test\": \"body to expect\"}"
 	id := "item-1"
 
-	err = persister.SaveItem("test", id, content)
+	err := persister.Repository.UpsertItem("test", id, content)
 	if err != nil {
 		t.Error("Item should be saved", err)
 	} else {
 		persister.LoadBody(&req, &res)
 
-		if equal, err := jsonsAreEqual(res.Body, parse.JoinJSON(content, res.Persisted.BodyAppend)); !equal || err != nil {
+		if equal, err := parse.JSONSStringsAreEqual(res.Body, parse.JoinJSON(content, res.Persisted.BodyAppend)); !equal || err != nil {
 			t.Error("Result body and file content plus bodyAppend should be the same", res.Body, content, res.Persisted.BodyAppend)
 		}
 	}
@@ -282,19 +273,11 @@ func TestMongoBodyPersister_LoadBody_NotFound(t *testing.T) {
 
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
 
-	persistPath := mongoTestURL
-	persister := NewMongoBodyPersister(persistPath, parser)
-
-	session, err := persister.ConnectMongo()
-	if err != nil {
-		t.Error(err.Error())
-		return
-	}
-
+	persister := NewMongoBodyPersister(mongoTestURL, parser)
 	defer func() {
-		session.DB(persister.ConnectionInfo.Database).DropDatabase()
-		session.Close()
+		persister.Repository.dropDatabase() // cleanup database
 	}()
+	persister.Repository.dropDatabase() // make sure we are working on a clean database
 
 	res.Persisted = definition.Persisted{Name: "test/item-1"}
 
@@ -316,19 +299,11 @@ func TestMongoBodyPersister_LoadBody_NotFound_CustomTextAndCode(t *testing.T) {
 
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
 
-	persistPath := mongoTestURL
-	persister := NewMongoBodyPersister(persistPath, parser)
-
-	session, err := persister.ConnectMongo()
-	if err != nil {
-		t.Error(err.Error())
-		return
-	}
-
+	persister := NewMongoBodyPersister(mongoTestURL, parser)
 	defer func() {
-		session.DB(persister.ConnectionInfo.Database).DropDatabase()
-		session.Close()
+		persister.Repository.dropDatabase() // cleanup database
 	}()
+	persister.Repository.dropDatabase() // make sure we are working on a clean database
 
 	res.Persisted = definition.Persisted{Name: "test/item-1"}
 

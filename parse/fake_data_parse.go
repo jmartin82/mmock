@@ -1,13 +1,10 @@
 package parse
 
 import (
-	"encoding/json"
 	"log"
 	"reflect"
 	"regexp"
 	"strings"
-
-	"github.com/Jeffail/gabs"
 
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/parse/fakedata"
@@ -16,11 +13,6 @@ import (
 //FakeDataParse parses the data looking for fake data tags or request data tags
 type FakeDataParse struct {
 	Fake fakedata.DataFaker
-}
-
-func isJSON(s string) bool {
-	var js map[string]interface{}
-	return json.Unmarshal([]byte(s), &js) == nil
 }
 
 func (fdp FakeDataParse) call(data reflect.Value, name string) string {
@@ -69,11 +61,11 @@ func (fdp FakeDataParse) ReplaceVars(req *definition.Request, res *definition.Re
 			s = res.Body
 			found = true
 		} else if i := strings.Index(tag, "request.url."); i == 0 {
-			s, found = getStringPart(req.Path, tag[12:], "value")
+			s, found = GetStringPart(req.Path, tag[12:], "value")
 		} else if i := strings.Index(tag, "request.body."); i == 0 {
-			s, found = getStringPart(req.Body, tag[13:], "value")
+			s, found = GetStringPart(req.Body, tag[13:], "value")
 		} else if i := strings.Index(tag, "response.body."); i == 0 {
-			s, found = getStringPart(res.Body, tag[14:], "value")
+			s, found = GetStringPart(res.Body, tag[14:], "value")
 		} else if i := strings.Index(tag, "request.query."); i == 0 {
 			s, found = getQueryStringParam(req, tag[14:])
 		} else if i := strings.Index(tag, "request.cookie."); i == 0 {
@@ -111,9 +103,9 @@ func (fdp FakeDataParse) ParseBody(req *definition.Request, res *definition.Resp
 	if bodyAppend != "" {
 		resultBodyAppend := fdp.ReplaceVars(req, res, bodyAppend)
 
-		if isJSON(resultBody) && isJSON(resultBodyAppend) {
+		if IsJSON(resultBody) && IsJSON(resultBodyAppend) {
 			resultBody = JoinJSON(resultBody, resultBodyAppend)
-		} else if isJSON(resultBody) && !isJSON(resultBodyAppend) {
+		} else if IsJSON(resultBody) && !IsJSON(resultBodyAppend) {
 			// strip resultBodyAppend as it is not in appropriate format
 			log.Printf("BodyAppend not in JSON format : %s\n", resultBodyAppend)
 		} else {
@@ -122,46 +114,6 @@ func (fdp FakeDataParse) ParseBody(req *definition.Request, res *definition.Resp
 	}
 
 	return resultBody
-}
-
-func JoinJSON(inputs ...string) string {
-	if len(inputs) == 1 {
-		return inputs[0]
-	}
-
-	result := gabs.New()
-	for _, input := range inputs {
-		jsonParsed, _ := gabs.ParseJSON([]byte(input))
-		children, _ := jsonParsed.S().ChildrenMap()
-
-		for key, child := range children {
-			result.Set(child.Data(), key)
-		}
-	}
-
-	return result.String()
-}
-
-func getStringPart(input string, pattern string, groupName string) (string, bool) {
-	r, error := regexp.Compile(pattern)
-	if error != nil {
-		return "", false
-	}
-
-	match := r.FindStringSubmatch(input)
-	result := make(map[string]string)
-	names := r.SubexpNames()
-	if len(match) >= len(names) {
-		for i, name := range names {
-			if i != 0 {
-				result[name] = match[i]
-			}
-		}
-	}
-
-	value, present := result[groupName]
-
-	return value, present
 }
 
 func getQueryStringParam(req *definition.Request, name string) (string, bool) {

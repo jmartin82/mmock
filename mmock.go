@@ -16,6 +16,8 @@ import (
 	"github.com/jmartin82/mmock/parse"
 	"github.com/jmartin82/mmock/parse/fakedata"
 	"github.com/jmartin82/mmock/persist"
+	"github.com/jmartin82/mmock/persist/file"
+	"github.com/jmartin82/mmock/persist/mongo"
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/server"
 	"github.com/jmartin82/mmock/translate"
@@ -79,9 +81,9 @@ func startServer(ip string, port int, done chan bool, router route.Router, mLog 
 	var persister persist.BodyPersister
 
 	if strings.Index(persistPath, "mongodb://") == 0 {
-		persister = persist.NewMongoBodyPersister(persistPath, filler)
+		persister = mongo.NewMongoBodyPersister(persistPath, filler)
 	} else {
-		persister = persist.NewFileBodyPersister(persistPath, filler)
+		persister = file.NewFileBodyPersister(persistPath, filler)
 	}
 
 	sender := amqp.NewMessageSender(filler)

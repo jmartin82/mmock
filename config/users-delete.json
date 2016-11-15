@@ -9,10 +9,10 @@
         "headers": {
 			"Content-Type":["application/json"]
 		},
-		"body": "File Deleted"
+		"body": "Record deleted"
     },
     "persist" : {
-		"name" : "/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
+		"name" : "users/user-{{request.url./users/(?P<value>\\d+)}}",
         "delete": true
 	}
 }

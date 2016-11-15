@@ -1,4 +1,4 @@
-package persist
+package file
 
 import (
 	"io/ioutil"
