@@ -328,7 +328,7 @@ If you want to use that mode you need to pass the path to the folder where you w
 
 To use MongoDB persistence you need to set the url connection string to the **config-persist-path**. The format of that url should be in the following format:  
 `mongodb://[user:pass@]host1[:port1][,host2[:port2],...]/database`  
-For example if you are using localhost mongo the connection string might be **`mongodb://localhost/mmock`** In this mode the name in the [Persist](####Persist) and [Persisted](#####Persisted) configurations define in which collection and with what ID the records to be stored and retrieved from. To achieve this the names should be in the following format:  
+For example if you are using your local mongo the connection string might be **`mongodb://localhost/mmock`**. In this mode the name in the [Persist](#persist) and [Persisted](#persisted) configurations define in which collection and with what ID the records to be stored and retrieved from. To achieve this the names should be in the following format:  
 `collectionName/itemId`
 
 You can check the sample configurations for persistence in the following files:
@@ -340,7 +340,7 @@ That configurations are going to work either with [File system](#file-system) or
 
 ### Contributors
 
-- [@vtrifonov](https://github.com/vtrifonov) Persisting state feature, improved variables support and AMQP sending
+- [@vtrifonov](https://github.com/vtrifonov) [Persistence](#persistence) feature, improved variables support and AMQP sending
 
 
 ### Contributing
