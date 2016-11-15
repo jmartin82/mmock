@@ -211,43 +211,43 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 * *bodyAppend*: Additional text or json object to be appended to the body. It allows vars. If the body is in JSON format and the bodyAppend is JSON the two JSONs will be merged and bodyAppend fields will replace any field from both JSONS. If the body type is not JSON the strings will be concatenated.  
 * *persisted*: Configuration for reading the body content from file.
 
-##### Persisted
+	##### Persisted (Optional)
 
-* *name*: The relative path from config-persist-path to the file where the response body to be loaded from or the {collectionName}/{itemId} if you are using mongo. It allows vars.
-* *notFound*: The status code and body which will be returned if the file does not exist. The default values are statusCode: **404** and body: **Not Found**.
-* *notFound.statusCode*: The status code to be returned if the file is not found. The default value is **404**.
-* *notFound.body*: The body to be returned if the file is not found. It allows vars. The default value is **Not Found**.
-* *notFound.bodyAppend*: Additional text or json object to be appended to the body if the file is not found. It allows vars.
-* *bodyAppend*: Additional text or json object to be appended to the body loaded from the file. It allows vars.
-* *persisted*: Configuration for reading the body content from file.
+	* *name*: The relative path from config-persist-path to the file where the response body to be loaded from or the {collectionName}/{itemId} if you are using mongo. It allows vars.
+	* *notFound*: The status code and body which will be returned if the file does not exist. The default values are statusCode: **404** and body: **Not Found**.
+	* *notFound.statusCode*: The status code to be returned if the file is not found. The default value is **404**.
+	* *notFound.body*: The body to be returned if the file is not found. It allows vars. The default value is **Not Found**.
+	* *notFound.bodyAppend*: Additional text or json object to be appended to the body if the file is not found. It allows vars.
+	* *bodyAppend*: Additional text or json object to be appended to the body loaded from the file. It allows vars.
+	* *persisted*: Configuration for reading the body content from file.
 
-#### Persist
+#### Persist (Optional)
 
 * *name*: The relative path from config-persist-path to the file where the ressponse body will be persisted or {collectionName}/{itemId} if you are using mongo. It allows vars.
 * *delete*: True or false. This is useful for making **DELETE** verb to delete the file.
 * *amqp*: Configuration for sending message to AMQP server. If such configuration is present a message will be sent to the configured server.
 
-##### AMQP
+	##### AMQP (Optional)
+	
+	* *url*: Url to the amqp server e.g. amqp://guest:guest@localhost:5672/vhost **Mandatory**.
+	* *exchange*: The name of the exchange to post to **Mandatory**.
+	* *delay*: message send delay in seconds.
+	* *routingKey*: The routing key for posting the message.
+	* *body*: Payload of the message. It allows vars.
+	* *bodyAppend*: Text or JSON to be appended to the body. It allows vars.
+	* *contentType*: MIME content type.
+	* *contentEncoding*: MIME content encoding.
+	* *priority*: Priority from 0 to 9.
+	* *correlationId*: Correlation identifier.
+	* *replyTo*: Address to to reply to (ex: RPC).
+	* *expiration*: Message expiration spec.
+	* *messageId*: Message identifier.
+	* *timestamp*: Message timestamp.
+	* *type*: Message type name.
+	* *userId*: Creating user id - ex: "guest".
+	* *appId*: Creating application id.
 
-* *url*: Url to the amqp server e.g. amqp://guest:guest@localhost:5672/vhost **Mandatory**.
-* *exchange*: The name of the exchange to post to **Mandatory**.
-* *delay*: message send delay in seconds.
-* *routingKey*: The routing key for posting the message.
-* *body*: Payload of the message. It allows vars.
-* *bodyAppend*: Text or JSON to be appended to the body. It allows vars.
-* *contentType*: MIME content type.
-* *contentEncoding*: MIME content encoding.
-* *priority*: Priority from 0 to 9.
-* *correlationId*: Correlation identifier.
-* *replyTo*: Address to to reply to (ex: RPC).
-* *expiration*: Message expiration spec.
-* *messageId*: Message identifier.
-* *timestamp*: Message timestamp.
-* *type*: Message type name.
-* *userId*: Creating user id - ex: "guest".
-* *appId*: Creating application id.
-
-#### Control
+#### Control (Optional)
 
 * *proxyBaseURL*: If this parameter is present, it sends the request data to the BaseURL and resend the response to de client. Useful if you don't want mock a the whole service. NOTE: It's not necessary fill the response field in this case.
 * *delay*: Delay the response in seconds. Simulate bad connection or bad server performance.
