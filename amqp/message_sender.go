@@ -11,18 +11,18 @@ import (
 	"github.com/streadway/amqp"
 )
 
-//RabbitMQSender sends message to RabbitMQ
-type RabbitMQSender struct {
+//MessageSender sends message to RabbitMQ
+type MessageSender struct {
 	Parser parse.ResponseParser
 }
 
 //Send message to rabbitMQ if needed
-func (rmqs RabbitMQSender) Send(per *definition.Persist, req *definition.Request, res *definition.Response) bool {
+func (msender MessageSender) Send(per *definition.Persist, req *definition.Request, res *definition.Response) bool {
 	if per.AMQP.URL == "" {
 		return true
 	}
 
-	per.AMQP.Body = rmqs.Parser.ParseBody(req, res, per.AMQP.Body, per.AMQP.BodyAppend)
+	per.AMQP.Body = msender.Parser.ParseBody(req, res, per.AMQP.Body, per.AMQP.BodyAppend)
 
 	if per.AMQP.Delay > 0 {
 		log.Printf("Adding a delay before sending message")
@@ -32,9 +32,9 @@ func (rmqs RabbitMQSender) Send(per *definition.Persist, req *definition.Request
 	return sendMessage(per.AMQP, res)
 }
 
-//NewRabbitMQSender creates a new RabbitMQSender
-func NewRabbitMQSender(parser parse.ResponseParser) *RabbitMQSender {
-	result := RabbitMQSender{Parser: parser}
+//NewMessageSender creates a new MessageSender
+func NewMessageSender(parser parse.ResponseParser) *MessageSender {
+	result := MessageSender{Parser: parser}
 	return &result
 }
 
