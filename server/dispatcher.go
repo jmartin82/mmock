@@ -25,7 +25,7 @@ type Dispatcher struct {
 	Translator     translate.MessageTranslator
 	ResponseParser parse.ResponseParser
 	BodyPersister  persist.BodyPersister
-	AMQPSender     amqp.Sender
+	MessageSender  amqp.Sender
 	Mlog           chan definition.Match
 }
 
@@ -74,7 +74,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				di.ResponseParser.Parse(&mRequest, &mock.Response)
 			}
 			if di.BodyPersister.Persist(&mock.Persist, &mRequest, &mock.Response) {
-				go di.AMQPSender.Send(&mock.Persist, &mRequest, &mock.Response)
+				go di.MessageSender.Send(&mock.Persist, &mRequest, &mock.Response)
 			}
 
 			if mock.Control.Crazy {
