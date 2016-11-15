@@ -13,8 +13,7 @@
             "notFound": {
                 "statusCode": 404,
                 "body": "Record user-{{request.url./users/(?P<value>\\d+)}} in collection users Not Found"
-            },
-            "bodyAppend": "{ \"id\": {{request.url./users/(?P<value>\\d+)}} }"
+            }
         }
     }
 }
