@@ -10,7 +10,7 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
-const mongoTestURL = "mongodb://localhost1/mmock_test"
+const mongoTestURL = "mongodb://localhost/mmock_test"
 
 type ConnectionState string
 
@@ -129,6 +129,35 @@ func TestMongoBodyPersister_Persist_WithBodyToSave(t *testing.T) {
 	}
 }
 
+func TestMongoBodyPersister_Persist_WithBodyToSave_WrongName(t *testing.T) {
+	if !hasConnection(t) {
+		return
+	}
+	req := definition.Request{}
+	res := definition.Response{}
+	per := definition.Persist{}
+
+	res.Body = "{ \"test\": 1}"
+	per.Name = "test-testing-1"
+
+	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
+
+	persister := NewMongoBodyPersister(mongoTestURL, parser)
+	defer func() {
+		persister.Repository.dropDatabase() // cleanup database
+	}()
+	persister.Repository.dropDatabase() // make sure we are working on a clean database
+
+	persister.Persist(&per, &req, &res)
+
+	if res.StatusCode != 500 {
+		t.Error("The status code should be 500 as the persist name is in wrong format. Current status code is: ", res.StatusCode)
+	}
+	if res.Body != errWrongNameFormat.Error() {
+		t.Error("The body should contain the error message for wrong name format. Current body content is: ", res.Body)
+	}
+}
+
 func TestMongoBodyPersister_Persist_WithNonJSONBodyToSave(t *testing.T) {
 	if !hasConnection(t) {
 		return
@@ -196,6 +225,33 @@ func TestMongoBodyPersister_LoadBody(t *testing.T) {
 		if equal, err := parse.JSONSStringsAreEqual(res.Body, content); !equal || err != nil {
 			t.Error("Result body and file content should be the same", res.Body, content)
 		}
+	}
+}
+
+func TestMongoBodyPersister_LoadBody_WrongName(t *testing.T) {
+	if !hasConnection(t) {
+		return
+	}
+	req := definition.Request{}
+	res := definition.Response{}
+
+	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
+
+	persister := NewMongoBodyPersister(mongoTestURL, parser)
+	defer func() {
+		persister.Repository.dropDatabase() // cleanup database
+	}()
+	persister.Repository.dropDatabase() // make sure we are working on a clean database
+
+	res.Persisted = definition.Persisted{Name: "test-item-1"}
+
+	persister.LoadBody(&req, &res)
+
+	if res.StatusCode != 500 {
+		t.Error("The status code should be 500 as the persist name is in wrong format. Current status code is: ", res.StatusCode)
+	}
+	if res.Body != errWrongNameFormat.Error() {
+		t.Error("The body should contain the error message for wrong name format. Current body content is: ", res.Body)
 	}
 }
 
