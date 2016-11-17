@@ -32,7 +32,7 @@ func folderHasFiles(path string) (bool, error) {
 	return len(files) > 0, err
 }
 
-func TestFileBodyPersister_Persist_NoPersistName(t *testing.T) {
+func TestFilePersister_Persist_NoPersistName(t *testing.T) {
 	req := definition.Request{}
 	res := definition.Response{}
 	per := definition.Persist{}
@@ -44,7 +44,7 @@ func TestFileBodyPersister_Persist_NoPersistName(t *testing.T) {
 
 	os.RemoveAll(persistPath)
 
-	persister := NewFileBodyPersister(persistPath, parser)
+	persister := NewFilePersister(persistPath, parser)
 	persister.Persist(&per, &req, &res)
 
 	hasFiles, _ := folderHasFiles(persistPath)
@@ -54,7 +54,7 @@ func TestFileBodyPersister_Persist_NoPersistName(t *testing.T) {
 	}
 }
 
-func TestFileBodyPersister_Persist_FileNotUnderPersistPath(t *testing.T) {
+func TestFilePersister_Persist_FileNotUnderPersistPath(t *testing.T) {
 	req := definition.Request{}
 	res := definition.Response{}
 	per := definition.Persist{}
@@ -69,7 +69,7 @@ func TestFileBodyPersister_Persist_FileNotUnderPersistPath(t *testing.T) {
 
 	os.RemoveAll(persistPath)
 
-	persister := NewFileBodyPersister(persistPath, parser)
+	persister := NewFilePersister(persistPath, parser)
 	persister.Persist(&per, &req, &res)
 
 	if !strings.HasPrefix(res.Body, "File path not under the persist path.") {
@@ -79,7 +79,7 @@ func TestFileBodyPersister_Persist_FileNotUnderPersistPath(t *testing.T) {
 	}
 }
 
-func TestFileBodyPersister_Persist_WithBodyToSave(t *testing.T) {
+func TestFilePersister_Persist_WithBodyToSave(t *testing.T) {
 	req := definition.Request{}
 	res := definition.Response{}
 	per := definition.Persist{}
@@ -94,7 +94,7 @@ func TestFileBodyPersister_Persist_WithBodyToSave(t *testing.T) {
 
 	os.RemoveAll(persistPath)
 
-	persister := NewFileBodyPersister(persistPath, parser)
+	persister := NewFilePersister(persistPath, parser)
 	persister.Persist(&per, &req, &res)
 
 	hasFiles, _ := folderHasFiles(persistPath)
@@ -124,7 +124,7 @@ func TestFileBodyPersister_Persist_WithBodyToSave(t *testing.T) {
 	}
 }
 
-func TestFileBodyPersister_LoadBody(t *testing.T) {
+func TestFilePersister_LoadBody(t *testing.T) {
 	req := definition.Request{}
 	res := definition.Response{}
 
@@ -136,7 +136,7 @@ func TestFileBodyPersister_LoadBody(t *testing.T) {
 	os.RemoveAll(persistPath)
 
 	res.Persisted = definition.Persisted{Name: "testing_load.json"}
-	persister := NewFileBodyPersister(persistPath, parser)
+	persister := NewFilePersister(persistPath, parser)
 
 	filePath := path.Join(persistPath, res.Persisted.Name)
 
@@ -154,7 +154,7 @@ func TestFileBodyPersister_LoadBody(t *testing.T) {
 	}
 }
 
-func TestFileBodyPersister_LoadBody_WithAppend(t *testing.T) {
+func TestFilePersister_LoadBody_WithAppend(t *testing.T) {
 	req := definition.Request{}
 	res := definition.Response{}
 
@@ -167,7 +167,7 @@ func TestFileBodyPersister_LoadBody_WithAppend(t *testing.T) {
 
 	res.Persisted = definition.Persisted{Name: "testing_load.json"}
 	res.Persisted.BodyAppend = "Text to append"
-	persister := NewFileBodyPersister(persistPath, parser)
+	persister := NewFilePersister(persistPath, parser)
 
 	filePath := path.Join(persistPath, res.Persisted.Name)
 
@@ -185,7 +185,7 @@ func TestFileBodyPersister_LoadBody_WithAppend(t *testing.T) {
 	}
 }
 
-func TestFileBodyPersister_LoadBody_FileNotUnderPersistPath(t *testing.T) {
+func TestFilePersister_LoadBody_FileNotUnderPersistPath(t *testing.T) {
 	req := definition.Request{}
 	res := definition.Response{}
 
@@ -197,7 +197,7 @@ func TestFileBodyPersister_LoadBody_FileNotUnderPersistPath(t *testing.T) {
 	os.RemoveAll(persistPath)
 
 	res.Persisted = definition.Persisted{Name: "../../testing_load.json"}
-	persister := NewFileBodyPersister(persistPath, parser)
+	persister := NewFilePersister(persistPath, parser)
 
 	persister.LoadBody(&req, &res)
 
@@ -208,7 +208,7 @@ func TestFileBodyPersister_LoadBody_FileNotUnderPersistPath(t *testing.T) {
 	}
 }
 
-func TestFileBodyPersister_LoadBody_NotFound(t *testing.T) {
+func TestFilePersister_LoadBody_NotFound(t *testing.T) {
 	req := definition.Request{}
 	res := definition.Response{}
 
@@ -220,7 +220,7 @@ func TestFileBodyPersister_LoadBody_NotFound(t *testing.T) {
 	os.RemoveAll(persistPath)
 
 	res.Persisted = definition.Persisted{Name: "testing_load.json"}
-	persister := NewFileBodyPersister(persistPath, parser)
+	persister := NewFilePersister(persistPath, parser)
 
 	persister.LoadBody(&req, &res)
 
@@ -231,7 +231,7 @@ func TestFileBodyPersister_LoadBody_NotFound(t *testing.T) {
 	}
 }
 
-func TestFileBodyPersister_LoadBody_NotFound_CustomTextAndCode(t *testing.T) {
+func TestFilePersister_LoadBody_NotFound_CustomTextAndCode(t *testing.T) {
 	req := definition.Request{}
 	res := definition.Response{}
 
@@ -243,7 +243,7 @@ func TestFileBodyPersister_LoadBody_NotFound_CustomTextAndCode(t *testing.T) {
 	os.RemoveAll(persistPath)
 
 	res.Persisted = definition.Persisted{Name: "testing_load.json"}
-	persister := NewFileBodyPersister(persistPath, parser)
+	persister := NewFilePersister(persistPath, parser)
 
 	res.Persisted.NotFound.StatusCode = 403
 	res.Persisted.NotFound.Body = "Really not found"
@@ -258,7 +258,7 @@ func TestFileBodyPersister_LoadBody_NotFound_CustomTextAndCode(t *testing.T) {
 	}
 }
 
-func TestNewFileBodyPersister(t *testing.T) {
+func TestNewFilePersister(t *testing.T) {
 	res := definition.Response{}
 
 	parser := parse.FakeDataParse{Fake: parse.DummyDataFaker{Dummy: "AleixMG"}}
@@ -268,7 +268,7 @@ func TestNewFileBodyPersister(t *testing.T) {
 
 	os.RemoveAll(persistPath)
 
-	NewFileBodyPersister(persistPath, parser)
+	NewFilePersister(persistPath, parser)
 
 	folderExists, _ := exists(persistPath)
 

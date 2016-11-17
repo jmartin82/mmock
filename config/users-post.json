@@ -1,19 +1,22 @@
 {
     "request": {
         "method": "POST",
-        "path": "/users/*",
-        "body": "*"
+        "path": "/users/*.json"
     },
-	"response": {
+    "response": {
         "statusCode": 202,
         "headers": {
-			"Content-Type":["application/json"]
-		},
-		"body": "{{ request.body }}",
-        "bodyAppend": "{ \"id\": {{request.url./users/(?P<value>\\d+)}}, \"city\": \"{{ fake.City }}\" }"
+            "Content-Type": [
+                "application/json"
+            ]
+        },
+        "body":"{{persist.entity.content}}"
     },
-    "persist" : {
-		"name" : "/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
-        "delete": false
-	}
+    "persist": {
+        "entity": "/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
+        "actions" : {
+            "write" : "{{ request.body }}",
+            "append" : "{ \"id\": {{request.url./users/(?P<value>\\d+)}}}"
+        }
+    }
 }

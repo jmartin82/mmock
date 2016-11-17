@@ -1,0 +1,17 @@
+{
+	"request": {
+		"method": "GET",
+		"path": "/hello*",
+		"headers": {},
+		"cookies": {
+			"visit" : "true"
+		}
+	},
+	"response": {
+		"statusCode": 200,
+		"body": "Hello AGAIN! my friend!"
+	},
+	"control":{
+		"priority":1
+	}
+}
