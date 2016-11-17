@@ -48,7 +48,7 @@ func (fdp FakeDataParse) callMethod(name string) (string, bool) {
 
 //ReplaceVars relplaces variables from the request in the input
 func (fdp FakeDataParse) ReplaceVars(req *definition.Request, res *definition.Response, input string) string {
-	r := regexp.MustCompile(`\{\{\s*([^\}]+)\s*\}\}`)
+	r := regexp.MustCompile(`\{\{(.+?)\}\}`)
 
 	return r.ReplaceAllStringFunc(input, func(raw string) string {
 		found := false
