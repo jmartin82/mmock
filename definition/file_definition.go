@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
 	"sort"
 
@@ -56,19 +55,16 @@ func (fd *FileDefinition) existsConfigPath(path string) bool {
 	return true
 }
 
-func (fd *FileDefinition) getConfigFiles(path string) []os.FileInfo {
-	files, err := ioutil.ReadDir(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	cf := []os.FileInfo{}
-	for _, file := range files {
-		if file.IsDir() {
-			continue
+func (fd *FileDefinition) getConfigFiles(path string) []string {
+	filesList := []string{}
+	filepath.Walk(path, func(filePath string, fileInfo os.FileInfo, err error) error {
+		if !fileInfo.IsDir() {
+			filesList = append(filesList, filePath)
 		}
-		cf = append(cf, file)
-	}
-	return cf
+		return nil
+	})
+
+	return filesList
 }
 
 func (fd *FileDefinition) readMock(filename string) (Mock, error) {
@@ -131,9 +127,8 @@ func (fd *FileDefinition) ReadMocksDefinition() []Mock {
 	for _, file := range fd.getConfigFiles(fd.Path) {
 		for _, reader := range fd.ConfigReaders {
 			if reader.CanRead(file) {
-				filename := path.Join(fd.Path, file.Name())
-				if mockDef, err := reader.Read(filename); err == nil {
-					mockDef.Name = filepath.Base(filename)
+				if mockDef, err := reader.Read(file); err == nil {
+					mockDef.Name = filepath.Base(file)
 					mocks = append(mocks, mockDef)
 
 				}

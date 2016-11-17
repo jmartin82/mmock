@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
-	"os"
 	"path/filepath"
 )
 
@@ -13,8 +12,8 @@ type JSONReader struct {
 }
 
 //CanRead return true if is a json file
-func (jp JSONReader) CanRead(fileInfo os.FileInfo) bool {
-	return filepath.Ext(fileInfo.Name()) == ".json"
+func (jp JSONReader) CanRead(filename string) bool {
+	return filepath.Ext(filename) == ".json"
 }
 
 //Read Unmarshal a json file to Mock struct
