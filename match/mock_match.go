@@ -2,6 +2,7 @@ package match
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/jmartin82/mmock/definition"
 	"github.com/ryanuber/go-glob"
@@ -58,9 +59,17 @@ func (mm MockMatch) matchKeyAndValue(reqMap definition.Cookies, mockMap definiti
 	return true
 }
 
-func (mm MockMatch) Match(req *definition.Request, mock *definition.Request) (bool, error) {
+func mockIncludesMethod(mock *definition.Request, method string) bool {
+	for _, item := range strings.Split(mock.Method, "|") {
+		if item == method {
+			return true
+		}
+	}
+	return false
+}
 
-	if req.Method != mock.Method {
+func (mm MockMatch) Match(req *definition.Request, mock *definition.Request) (bool, error) {
+	if !mockIncludesMethod(mock, req.Method) {
 		return false, ErrMethodNotMatch
 	}
 
