@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/jmartin82/mmock/amqp"
 	"github.com/jmartin82/mmock/console"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
@@ -85,14 +86,13 @@ func getVarsProcessor(persistEngineBag *persist.PersistEngineBag) vars.VarsProce
 }
 
 func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, varsProcessor vars.VarsProcessor) {
-	//sender := amqp.NewMessageSender(filler)
 	dispatcher := server.Dispatcher{IP: ip,
 		Port:          port,
 		Router:        router,
 		Translator:    translate.HTTPTranslator{},
 		VarsProcessor: varsProcessor,
 		Mlog:          mLog,
-		//MessageSender: sender,
+		MessageSender: &amqp.MessageSender{},
 	}
 	dispatcher.Start()
 	done <- true
