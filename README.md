@@ -72,7 +72,7 @@ response:
 
 ```
 
-You can see more complex examples [here](/examples).
+You can see more complex examples [here](/config).
 
 ### Getting started
 
@@ -310,7 +310,7 @@ Fake data:
 
 ### Contributors
 
-- [@vtrifonov](https://github.com/vtrifonov) [Persistence](#persist) feature, improved variables support and [AMQP](#notify) sending
+- [@vtrifonov](https://github.com/vtrifonov) [Persistence](#persist-optional) feature, improved variables support and [AMQP](#notify-optional) sending
 
 
 ### Contributing
