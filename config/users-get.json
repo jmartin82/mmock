@@ -1,19 +1,18 @@
-{
-    "request": {
-        "method": "GET",
-        "path": "/users/*"
-    },
-	"response": {
-        "statusCode": 200,
-        "headers": {
-			"Content-Type":["application/json"]
-		},
-		"persisted": {
-            "name" : "users/user-{{request.url./users/(?P<value>\\d+)}}",
-            "notFound": {
-                "statusCode": 404,
-                "body": "Record user-{{request.url./users/(?P<value>\\d+)}} in collection users Not Found"
-            }
-        }
-    }
+{  
+   "request":{  
+      "method":"GET",
+      "path":"/users/*.json"
+   },
+   "response":{  
+      "statusCode":200,
+      "headers":{  
+         "Content-Type":[  
+            "application/json"
+         ]
+      },
+      "body":"{{persist.entity.content}}"
+   },
+   "persist":{  
+      "entity":"/users/user-{{request.url./users/(?P<value>\\d+)}}.json"
+   }
 }

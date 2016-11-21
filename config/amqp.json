@@ -1,0 +1,32 @@
+{  
+   "request":{  
+      "method":"POST",
+      "path":"/amqp/*.json"
+   },
+   "response":{  
+      "statusCode":202,
+      "headers":{  
+         "Content-Type":[  
+            "application/json"
+         ]
+      },
+      "body":"{{persist.entity.content}}"
+   },
+   "persist": {
+        "entity": "/user-{{request.url./amqp/(?P<value>\\d+)}}.json",
+        "actions" : {
+            "write" : "{{request.body}}",
+            "append" : "{ \"id\": {{request.url./amqp/(?P<value>\\d+)}}, \"city\": \"{{ fake.City }}\" }"
+        }
+   },
+   "notify":{  
+      "amqp":{  
+         "url":"amqp://guest:guest@localhost:5672/myVHost",
+         "body":"{{persist.entity.content}}",
+         "delay":2,
+         "exchange":"myExchange",
+         "type":"MockType",
+         "correlationId":"9782b88f-0c6e-4879-8c23-4699785e6a95"
+      }
+   }
+}

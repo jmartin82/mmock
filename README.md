@@ -72,7 +72,7 @@ response:
 
 ```
 
-
+You can see more complex examples [here](/config).
 
 ### Getting started
 
@@ -146,24 +146,21 @@ Mock definition:
 			"name": "value"
 		},
 		"body": "Response body",
-		"persisted": {
-            "name" : "/users/user-{{request.url./your/path/(?P<value>\\d+)}}.json",
-            "notFound": {
-                "statusCode": 404,
-                "body": "404: Not Found"
-				"bodyAppend": " File for Id : {{request.url./your/path/(?P<value>\\d+)}}"
-            },
-            "bodyAppend": "{ \"id\": {{request.url./your/path/(?P<value>\\d+)}} }"
-        }
+		
 	},
 	"persist" : {
-		"name" : "/users/user-{{request.url./your/path/(?P<value>\\d+)}}.json",
-        "delete": false,
+		"entity" : "/users/user-{{request.url./your/path/(?P<value>\\d+)}}.json",
+        "actions"{
+			"delete":"true",
+			"append":"text",
+			"write":"text"
+		}
+	},
+	"notify":{
 		"amqp": {
             "url": "amqp://guest:guest@localhost:5672/myVHost",
             "body": "{{ response.body }}",
 			"delay": 2,
-			"bodyAppend": "{ \"itemToAppend\": 5}",
             "exchange": "myExchange",
             "type": "MockType",
             "correlationId": "9782b88f-0c6e-4879-8c23-4699785e6a95",
@@ -178,7 +175,7 @@ Mock definition:
 			"userId": "",
 			"appId": "" 
         }
-	},
+	}
 	"control": {
 		"proxyBaseURL": "string (original URL endpoint)
 		"delay": "int (response delay in seconds)",
@@ -202,29 +199,20 @@ This mock definition section represents the expected input data. I the request d
 
 To do a match with queryStringParameters, headers, cookies. All defined keys in mock will be present with the exact value.
 
-#### Response
+#### Response (Optional on proxy call)
 
 * *statusCode*: Request http method.
 * *headers*: Array of headers. It allows more than one value for the same key and vars.
 * *cookies*: Array of cookies. It allows vars.
 * *body*: Body string. It allows vars.
-* *bodyAppend*: Additional text or json object to be appended to the body. It allows vars. If the body is in JSON format and the bodyAppend is JSON the two JSONs will be merged and bodyAppend fields will replace any field from both JSONS. If the body type is not JSON the strings will be concatenated.  
-* *persisted*: Configuration for reading the body content from file.
-
-	##### Persisted (Optional)
-
-	* *name*: The relative path from config-persist-path to the file where the response body to be loaded from or the {collectionName}/{itemId} if you are using mongo. It allows vars.
-	* *notFound*: The status code and body which will be returned if the file does not exist. The default values are statusCode: **404** and body: **Not Found**.
-	* *notFound.statusCode*: The status code to be returned if the file is not found. The default value is **404**.
-	* *notFound.body*: The body to be returned if the file is not found. It allows vars. The default value is **Not Found**.
-	* *notFound.bodyAppend*: Additional text or json object to be appended to the body if the file is not found. It allows vars.
-	* *bodyAppend*: Additional text or json object to be appended to the body loaded from the file. It allows vars.
-	* *persisted*: Configuration for reading the body content from file.
 
 #### Persist (Optional)
+	
+* *name*: The relative path from config-persist-path to the file where the response body to be loaded from. It allows vars.
+* *actions*: Actions to take over the entity (Append,Write,Delete)
 
-* *name*: The relative path from config-persist-path to the file where the ressponse body will be persisted or {collectionName}/{itemId} if you are using mongo. It allows vars.
-* *delete*: True or false. This is useful for making **DELETE** verb to delete the file.
+#### Notify (Optional)
+
 * *amqp*: Configuration for sending message to AMQP server. If such configuration is present a message will be sent to the configured server.
 
 	##### AMQP (Optional)
@@ -268,6 +256,8 @@ Request data:
  - request.url."regex to match value"
  - request.body."regex to match value"
  - response.body."regex to match value"
+ - persist.entity.content
+ - persist.entity.name
 
 > Regex: The regex should contain a group named **value** which will be matched and its value will be returned. E.g. if we want to match the id from this url **`/your/path/4`** the regex should look like **`/your/path/(?P<value>\\d+)`**. Note that in *golang* the named regex group match need to contain a **P** symbol after the question mark. The regex should be prefixed either with **request.url.**, **request.body.** or **response.body.** considering your input.
 
@@ -340,8 +330,7 @@ That configurations are going to work either with [File system](#file-system) or
 
 ### Contributors
 
-- [@vtrifonov](https://github.com/vtrifonov) [Persistence](#persistence) feature, improved variables support and AMQP sending
-
+- [@vtrifonov](https://github.com/vtrifonov) [Persistence](#persist-optional) feature, improved variables support and [AMQP](#notify-optional) sending
 
 ### Contributing
 

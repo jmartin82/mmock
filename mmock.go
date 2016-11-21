@@ -13,14 +13,12 @@ import (
 	"github.com/jmartin82/mmock/console"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
-	"github.com/jmartin82/mmock/parse"
-	"github.com/jmartin82/mmock/parse/fakedata"
 	"github.com/jmartin82/mmock/persist"
-	"github.com/jmartin82/mmock/persist/file"
-	"github.com/jmartin82/mmock/persist/mongo"
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/server"
 	"github.com/jmartin82/mmock/translate"
+	"github.com/jmartin82/mmock/vars"
+	"github.com/jmartin82/mmock/vars/fakedata"
 )
 
 //ErrNotFoundDefaultPath if we can't resolve the current path
@@ -76,26 +74,25 @@ func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.
 	return router
 }
 
-func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, persistPath string) {
-	filler := parse.FakeDataParse{Fake: fakedata.FakeAdapter{}}
-	var persister persist.BodyPersister
+func loadVarsProcessorEngines(persistPath string) *persist.PersistEngineBag {
+	filePersist := persist.FilePersister{PersistPath: persistPath}
+	persistBag := persist.GetNewPersistEngineBag(filePersist)
+	return persistBag
+}
 
-	if strings.Index(persistPath, "mongodb://") == 0 {
-		persister = mongo.NewMongoBodyPersister(persistPath, filler)
-	} else {
-		persister = file.NewFileBodyPersister(persistPath, filler)
-	}
+func getVarsProcessor(persistEngineBag *persist.PersistEngineBag) vars.VarsProcessor {
 
-	sender := amqp.NewMessageSender(filler)
+	return vars.VarsProcessor{FillerFactory: vars.MockFillerFactory{}, FakeAdapter: fakedata.FakeAdapter{}, PersistEngines: persistEngineBag}
+}
 
+func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, varsProcessor vars.VarsProcessor) {
 	dispatcher := server.Dispatcher{IP: ip,
-		Port:           port,
-		Router:         router,
-		Translator:     translate.HTTPTranslator{},
-		ResponseParser: filler,
-		BodyPersister:  persister,
-		Mlog:           mLog,
-		MessageSender:  sender,
+		Port:          port,
+		Router:        router,
+		Translator:    translate.HTTPTranslator{},
+		VarsProcessor: varsProcessor,
+		Mlog:          mLog,
+		MessageSender: &amqp.MessageSender{},
 	}
 	dispatcher.Start()
 	done <- true
@@ -131,32 +128,29 @@ func main() {
 	}
 
 	persistPath, _ := filepath.Abs("./data")
-	//persistPath := "mongodb://localhost/mmock"
-
 	sIP := flag.String("server-ip", outIP, "Mock server IP")
 	sPort := flag.Int("server-port", 8083, "Mock Server Port")
 	cIP := flag.String("console-ip", outIP, "Console Server IP")
 	cPort := flag.Int("cconsole-port", 8082, "Console server Port")
-	cPath := flag.String("config-path", path, "Mocks definition folder")
-	cPersistPath := flag.String("config-persist-path", persistPath, "Path to the folder where requests can be persisted or connection string to mongo database starting with mongodb:// and having database at the end /DatabaseName")
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
+	cPath := flag.String("config-path", path, "Mocks definition folder")
+	cPersistPath := flag.String("config-persist-path", persistPath, "Path to the folder where requests can be persisted")
+
 	flag.Parse()
+	path, _ = filepath.Abs(*cPath)
+	persistPath, _ = filepath.Abs(*cPersistPath)
 
 	//chanels
 	mLog := make(chan definition.Match)
 	dUpdates := make(chan []definition.Mock)
 	done := make(chan bool)
 
-	path, _ = filepath.Abs(*cPath)
-
-	if strings.Index(persistPath, "mongodb://") != 0 {
-		persistPath, _ = filepath.Abs(*cPersistPath)
-	}
-
 	mocks := getMocks(path, dUpdates)
 	router := getRouter(mocks, dUpdates)
 
-	go startServer(*sIP, *sPort, done, router, mLog, persistPath)
+	persistEngineBag := loadVarsProcessorEngines(persistPath)
+	varsProcessor := getVarsProcessor(persistEngineBag)
+	go startServer(*sIP, *sPort, done, router, mLog, varsProcessor)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	if *console {
 		go startConsole(*cIP, *cPort, done, mLog)

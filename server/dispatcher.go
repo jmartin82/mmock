@@ -10,23 +10,21 @@ import (
 
 	"github.com/jmartin82/mmock/amqp"
 	"github.com/jmartin82/mmock/definition"
-	"github.com/jmartin82/mmock/parse"
-	"github.com/jmartin82/mmock/persist"
 	"github.com/jmartin82/mmock/proxy"
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/translate"
+	"github.com/jmartin82/mmock/vars"
 )
 
 //Dispatcher is the mock http server
 type Dispatcher struct {
-	IP             string
-	Port           int
-	Router         route.Router
-	Translator     translate.MessageTranslator
-	ResponseParser parse.ResponseParser
-	BodyPersister  persist.BodyPersister
-	MessageSender  amqp.Sender
-	Mlog           chan definition.Match
+	IP            string
+	Port          int
+	Router        route.Router
+	Translator    translate.MessageTranslator
+	VarsProcessor vars.VarsProcessor
+	MessageSender amqp.Sender
+	Mlog          chan definition.Match
 }
 
 func (di Dispatcher) recordMatchData(msg definition.Match) {
@@ -68,13 +66,11 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			pr := proxy.Proxy{URL: mock.Control.ProxyBaseURL}
 			response = pr.MakeRequest(mock.Request)
 		} else {
-			if mock.Response.Persisted.Name != "" {
-				di.BodyPersister.LoadBody(&mRequest, &mock.Response)
-			} else {
-				di.ResponseParser.Parse(&mRequest, &mock.Response)
-			}
-			if di.BodyPersister.Persist(&mock.Persist, &mRequest, &mock.Response) {
-				go di.MessageSender.Send(&mock.Persist, &mRequest, &mock.Response)
+
+			di.VarsProcessor.Eval(&mRequest, mock)
+
+			if (definition.Notify{}) != mock.Notify {
+				go di.MessageSender.Send(mock)
 			}
 
 			if mock.Control.Crazy {

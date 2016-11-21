@@ -9,7 +9,6 @@ type AMQPPublishing struct {
 	Delay      int    `json:"delay"`      // message send delay in seconds
 	Exchange   string `json:"exchange"`   // the name of the exchange to post to
 	Body       string `json:"body"`       // payload of the message
-	BodyAppend string `json:"bodyAppend"` // text or JSON to be appended to the body
 
 	// Properties
 	ContentType     string    `json:"contentType"`     // MIME content type
