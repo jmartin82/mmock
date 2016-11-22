@@ -84,6 +84,8 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			response = mock.Response
 		}
 
+	} else {
+		response = mock.Response
 	}
 
 	//translate request
