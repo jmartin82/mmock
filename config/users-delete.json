@@ -3,6 +3,12 @@
       "method":"DELETE",
       "path":"/users/*.json"
    },
+   "persist":{  
+      "entity":"/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
+      "actions":{  
+         "delete":"true"
+      }
+   },
    "response":{  
       "statusCode":200,
       "headers":{  
@@ -11,11 +17,5 @@
          ]
       },
       "body":"File Deleted"
-   },
-   "persist":{  
-      "entity":"/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
-      "actions":{  
-         "delete":"true"
-      }
    }
 }
