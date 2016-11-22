@@ -3,6 +3,13 @@
         "method": "POST",
         "path": "/users/*.json"
     },
+    "persist": {
+        "entity": "/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
+        "actions" : {
+            "write" : "{{ request.body }}",
+            "append" : "{ \"id\": {{request.url./users/(?P<value>\\d+)}}}"
+        }
+    },
     "response": {
         "statusCode": 202,
         "headers": {
@@ -11,12 +18,5 @@
             ]
         },
         "body":"{{persist.entity.content}}"
-    },
-    "persist": {
-        "entity": "/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
-        "actions" : {
-            "write" : "{{ request.body }}",
-            "append" : "{ \"id\": {{request.url./users/(?P<value>\\d+)}}}"
-        }
     }
 }

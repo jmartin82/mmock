@@ -208,7 +208,7 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 
 #### Persist (Optional)
 	
-* *name*: The relative path from config-persist-path to the file where the response body to be loaded from. It allows vars.
+* *entity*: The relative path from config-persist-path to the file where the response body to be loaded from. It allows vars.
 * *actions*: Actions to take over the entity (Append,Write,Delete)
 
 #### Notify (Optional)

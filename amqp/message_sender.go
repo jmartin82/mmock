@@ -18,7 +18,7 @@ func (msender MessageSender) Send(m *definition.Mock) bool {
 		return true
 	}
 	if m.Notify.Amqp.Delay > 0 {
-		log.Printf("Adding a delay before sending message")
+		log.Printf("Adding a delay before sending message: %d\n", m.Notify.Amqp.Delay)
 		time.Sleep(time.Duration(m.Notify.Amqp.Delay) * time.Second)
 	}
 
@@ -29,7 +29,7 @@ func sendMessage(m *definition.Mock) bool {
 	conn, err := amqp.Dial(m.Notify.Amqp.URL)
 
 	if err != nil {
-		log.Println("Failed to connect to RabbitMQ")
+		log.Printf("Failed to connect to server: %s\n", err)
 		return false
 	}
 	defer conn.Close()
@@ -37,7 +37,7 @@ func sendMessage(m *definition.Mock) bool {
 	ch, err := conn.Channel()
 
 	if err != nil {
-		log.Println("Failed to open a channel")
+		log.Printf("Failed to open a channel: %s\n", err)
 		return false
 	}
 
@@ -65,7 +65,7 @@ func sendMessage(m *definition.Mock) bool {
 		})
 
 	if err != nil {
-		log.Println("Failed to publish a message")
+		log.Printf("Failed to publish a message: %s\n", err)
 		return false
 	}
 

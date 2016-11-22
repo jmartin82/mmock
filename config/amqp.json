@@ -3,6 +3,13 @@
       "method":"POST",
       "path":"/amqp/*.json"
    },
+   "persist": {
+        "entity": "/user-{{request.url./amqp/(?P<value>\\d+)}}.json",
+        "actions" : {
+            "write" : "{{request.body}}",
+            "append" : "{ \"id\": {{request.url./amqp/(?P<value>\\d+)}}, \"city\": \"{{ fake.City }}\" }"
+        }
+   },
    "response":{  
       "statusCode":202,
       "headers":{  
@@ -11,13 +18,6 @@
          ]
       },
       "body":"{{persist.entity.content}}"
-   },
-   "persist": {
-        "entity": "/user-{{request.url./amqp/(?P<value>\\d+)}}.json",
-        "actions" : {
-            "write" : "{{request.body}}",
-            "append" : "{ \"id\": {{request.url./amqp/(?P<value>\\d+)}}, \"city\": \"{{ fake.City }}\" }"
-        }
    },
    "notify":{  
       "amqp":{  
