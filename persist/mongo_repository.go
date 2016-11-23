@@ -1,4 +1,4 @@
-package mongo
+package persist
 
 import (
 	"encoding/json"
@@ -19,7 +19,7 @@ type MongoRepository struct {
 	ConnectionInfo mgo.DialInfo
 }
 
-func (mr MongoRepository) connectMongo() (session *mgo.Session, err error) {
+func (mr MongoRepository) ConnectMongo() (session *mgo.Session, err error) {
 	session, err = mgo.DialWithInfo(&mr.ConnectionInfo)
 	if err == nil {
 		// Optional. Switch the session to a monotonic behavior.
@@ -31,7 +31,7 @@ func (mr MongoRepository) connectMongo() (session *mgo.Session, err error) {
 //GetItem gets the result string rom interface
 func (mr MongoRepository) GetItem(collectionName string, id string) (string, error) {
 
-	session, err := mr.connectMongo()
+	session, err := mr.ConnectMongo()
 	if err != nil {
 		return "", err
 	}
@@ -65,7 +65,7 @@ func (mr MongoRepository) GetItem(collectionName string, id string) (string, err
 //DeleteItem deletes an item from a collection
 func (mr MongoRepository) DeleteItem(collectionName string, id string) error {
 
-	session, err := mr.connectMongo()
+	session, err := mr.ConnectMongo()
 	if err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func (mr MongoRepository) DeleteItem(collectionName string, id string) error {
 
 //UpsertItem inserts or updates item with a given id in a given collection
 func (mr MongoRepository) UpsertItem(collectionName string, id string, body string) error {
-	session, err := mr.connectMongo()
+	session, err := mr.ConnectMongo()
 	if err != nil {
 		return err
 	}
@@ -100,49 +100,6 @@ func (mr MongoRepository) UpsertItem(collectionName string, id string, body stri
 
 	_, err = collection.UpsertId(id, upsertdata)
 	return err
-}
-
-//dropDatabase drops the connected database - TO BE USED IN TESTS ONLY!!!
-func (mr MongoRepository) dropDatabase() error {
-
-	session, err := mr.connectMongo()
-	if err != nil {
-		return err
-	}
-
-	defer session.Close()
-
-	session.DB(mr.ConnectionInfo.Database).DropDatabase()
-	return nil
-}
-
-//hasCollections returns whether the database has any collections inside or not
-func (mr MongoRepository) hasCollections() (bool, error) {
-
-	session, err := mr.connectMongo()
-	if err != nil {
-		return false, err
-	}
-
-	defer session.Close()
-
-	collectionNames, err := session.DB(mr.ConnectionInfo.Database).CollectionNames()
-	return len(collectionNames) > 0, err
-}
-
-//hasCollectionsItems returns whether the a given collection has items
-func (mr MongoRepository) hasCollectionsItems(collectionName string) (bool, error) {
-
-	session, err := mr.connectMongo()
-	if err != nil {
-		return false, err
-	}
-
-	defer session.Close()
-
-	collection := session.DB(mr.ConnectionInfo.Database).C(collectionName)
-	count, err := collection.Count()
-	return count > 0, err
 }
 
 //NewMongoRepository creates a new MongoRepository
