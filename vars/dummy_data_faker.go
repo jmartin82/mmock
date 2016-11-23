@@ -1,4 +1,4 @@
-package parse
+package vars
 
 //DummyDataFaker is used in tests
 type DummyDataFaker struct {

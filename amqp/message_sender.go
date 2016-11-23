@@ -4,79 +4,72 @@ import (
 	"log"
 	"time"
 
-	"fmt"
-
 	"github.com/jmartin82/mmock/definition"
-	"github.com/jmartin82/mmock/parse"
 	"github.com/streadway/amqp"
 )
 
-//MessageSender sends message to RabbitMQ
+//MessageSender sends message
 type MessageSender struct {
-	Parser parse.ResponseParser
 }
 
-//Send message to rabbitMQ if needed
-func (msender MessageSender) Send(per *definition.Persist, req *definition.Request, res *definition.Response) bool {
-	if per.AMQP.URL == "" {
+//Send message if needed
+func (msender MessageSender) Send(m *definition.Mock) bool {
+	if m.Notify.Amqp.URL == "" {
 		return true
 	}
-
-	per.AMQP.Body = msender.Parser.ParseBody(req, res, per.AMQP.Body, per.AMQP.BodyAppend)
-
-	if per.AMQP.Delay > 0 {
-		log.Printf("Adding a delay before sending message")
-		time.Sleep(time.Duration(per.AMQP.Delay) * time.Second)
+	if m.Notify.Amqp.Delay > 0 {
+		log.Printf("Adding a delay before sending message: %d\n", m.Notify.Amqp.Delay)
+		time.Sleep(time.Duration(m.Notify.Amqp.Delay) * time.Second)
 	}
 
-	return sendMessage(per.AMQP, res)
+	return sendMessage(m)
 }
 
-//NewMessageSender creates a new MessageSender
-func NewMessageSender(parser parse.ResponseParser) *MessageSender {
-	result := MessageSender{Parser: parser}
-	return &result
-}
+func sendMessage(m *definition.Mock) bool {
+	conn, err := amqp.Dial(m.Notify.Amqp.URL)
 
-func sendMessage(publishInfo definition.AMQPPublishing, res *definition.Response) bool {
-	conn, err := amqp.Dial(publishInfo.URL)
-
-	if hasError(err, "Failed to connect to RabbitMQ", res) {
+	if err != nil {
+		log.Printf("Failed to connect to server: %s\n", err)
 		return false
 	}
 	defer conn.Close()
 
 	ch, err := conn.Channel()
-	if hasError(err, "Failed to open a channel", res) {
+
+	if err != nil {
+		log.Printf("Failed to open a channel: %s\n", err)
 		return false
 	}
+
 	defer ch.Close()
 
 	err = ch.Publish(
-		publishInfo.Exchange,   // exchange
-		publishInfo.RoutingKey, // routing key
+		m.Notify.Amqp.Exchange,   // exchange
+		m.Notify.Amqp.RoutingKey, // routing key
 		false, // mandatory
 		false, // immediate
 		amqp.Publishing{
-			Body:            []byte(publishInfo.Body),
-			ContentType:     publishInfo.ContentType,
-			ContentEncoding: publishInfo.ContentEncoding,
-			Priority:        publishInfo.Priority,
-			CorrelationId:   publishInfo.CorrelationID,
-			ReplyTo:         publishInfo.ReplyTo,
-			Expiration:      publishInfo.Expiration,
-			MessageId:       publishInfo.Expiration,
-			Timestamp:       publishInfo.Timestamp,
-			Type:            publishInfo.Type,
-			UserId:          publishInfo.UserID,
-			AppId:           publishInfo.AppID,
+			Body:            []byte(m.Notify.Amqp.Body),
+			ContentType:     m.Notify.Amqp.ContentType,
+			ContentEncoding: m.Notify.Amqp.ContentEncoding,
+			Priority:        m.Notify.Amqp.Priority,
+			CorrelationId:   m.Notify.Amqp.CorrelationID,
+			ReplyTo:         m.Notify.Amqp.ReplyTo,
+			Expiration:      m.Notify.Amqp.Expiration,
+			MessageId:       m.Notify.Amqp.Expiration,
+			Timestamp:       m.Notify.Amqp.Timestamp,
+			Type:            m.Notify.Amqp.Type,
+			UserId:          m.Notify.Amqp.UserID,
+			AppId:           m.Notify.Amqp.AppID,
 			DeliveryMode:    2,
 		})
 
-	if hasError(err, "Failed to publish a message", res) {
+	if err != nil {
+		log.Printf("Failed to publish a message: %s\n", err)
 		return false
 	}
-	log.Printf(" [x] Sent %s", publishInfo.Body)
+
+	log.Println("Notified message by AMQP")
 	return true
 }
 
@@ -84,13 +77,4 @@ func failOnError(err error, msg string) {
 	if err != nil {
 		log.Fatalf("%s: %s", msg, err)
 	}
-}
-
-func hasError(err error, msg string, res *definition.Response) bool {
-	if err != nil {
-		log.Print(err)
-		res.Body = fmt.Errorf("%s: %s", msg, err).Error()
-		res.StatusCode = 500
-	}
-	return err != nil
 }

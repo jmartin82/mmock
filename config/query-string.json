@@ -1,0 +1,23 @@
+{
+   "request":{
+      "method":"GET",
+      "path":"/search",
+      "queryStringParameters":{
+         "city":[
+            "Barcelona"
+         ],
+         "postal_code":[
+            "08902"
+         ]
+      }
+   },
+   "response":{
+      "statusCode":200,
+      "headers":{  
+         "Content-Type":[  
+            "Content-type: text/xml"
+         ]
+      },
+      "body":"<resultsSummary><fullyMatching>30</fullyMatching><estimatedHits>30</estimatedHits><currStart>1</currStart>  <currEnd>10</currEnd>  <nextStart>11</nextStart></resultsSummary>"
+   }
+}

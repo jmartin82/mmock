@@ -1,20 +1,18 @@
-{
-    "request": {
-        "method": "GET",
-        "path": "/users/*"
-    },
-	"response": {
-        "statusCode": 200,
-        "headers": {
-			"Content-Type":["application/json"]
-		},
-		"persisted": {
-            "name" : "/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
-            "notFound": {
-                "statusCode": 404,
-                "body": "File /users/user-{{request.url./users/(?P<value>\\d+)}}.json Not Found"
-            },
-            "bodyAppend": "{ \"id\": {{request.url./users/(?P<value>\\d+)}} }"
-        }
-    }
+{  
+   "request":{  
+      "method":"GET",
+      "path":"/users/*.json"
+   },
+   "persist":{  
+      "entity":"/users/user-{{request.url./users/(?P<value>\\d+)}}.json"
+   },
+   "response":{  
+      "statusCode":200,
+      "headers":{  
+         "Content-Type":[  
+            "application/json"
+         ]
+      },
+      "body":"{{persist.entity.content}}"
+   }
 }

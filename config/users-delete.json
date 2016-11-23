@@ -1,18 +1,21 @@
-{
-    "request": {
-        "method": "DELETE",
-        "path": "/users/*",
-        "body": "*"
-    },
-	"response": {
-        "statusCode": 200,
-        "headers": {
-			"Content-Type":["application/json"]
-		},
-		"body": "File Deleted"
-    },
-    "persist" : {
-		"name" : "/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
-        "delete": true
-	}
+{  
+   "request":{  
+      "method":"DELETE",
+      "path":"/users/*.json"
+   },
+   "persist":{  
+      "entity":"/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
+      "actions":{  
+         "delete":"true"
+      }
+   },
+   "response":{  
+      "statusCode":200,
+      "headers":{  
+         "Content-Type":[  
+            "application/json"
+         ]
+      },
+      "body":"File Deleted"
+   }
 }

@@ -1,19 +1,10 @@
 {
 	"request": {
 		"method": "GET",
-		"path": "/hello*",
-		"queryStringParameters": {
-			"name": ["world"]
-		},
-		"headers": {},
-		"cookies": {},
-		"body": ""
+		"path": "/hello"
 	},
 	"response": {
 		"statusCode": 200,
-		"headers": {
-			"Content-Type":["application/json"]
-		},
 		"cookies": {
 			"visit" : "true"
 		},

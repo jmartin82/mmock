@@ -1,6 +1,6 @@
 request: 
   method: GET
-  path: /users/show.json
+  path: /agenda/show.json
   queryStringParameters: 		
     user_id:
       - 123
