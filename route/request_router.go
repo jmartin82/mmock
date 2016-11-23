@@ -1,6 +1,8 @@
 package route
 
 import (
+	"bytes"
+	"encoding/gob"
 	"log"
 	"sync"
 
@@ -25,6 +27,21 @@ type RequestRouter struct {
 	sync.Mutex
 }
 
+func (rr *RequestRouter) Copy(src, dst *definition.Mock) {
+	var mod bytes.Buffer
+	enc := gob.NewEncoder(&mod)
+	dec := gob.NewDecoder(&mod)
+	err := enc.Encode(src)
+	if err != nil {
+		log.Fatal("encode error:", err)
+	}
+	err = dec.Decode(dst)
+	if err != nil {
+		log.Fatal("decode error:", err)
+	}
+
+}
+
 //Route checks the request with all available mock definitions and return the matching mock for it.
 func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, map[string]string) {
 	errors := make(map[string]string)
@@ -33,7 +50,10 @@ func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, map[s
 	for _, mock := range rr.Mocks {
 		m, err := rr.Matcher.Match(req, &mock.Request)
 		if m {
-			return &mock, nil
+			//we return a copy of it, not the definition itself because we will working on it.
+			md := definition.Mock{}
+			rr.Copy(&mock, &md)
+			return &md, nil
 		}
 		errors[mock.Name] = err.Error()
 		log.Printf("Discarting mock: %s Reason: %s\n", mock.Name, err.Error())

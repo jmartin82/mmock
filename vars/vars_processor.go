@@ -15,6 +15,8 @@ type VarsProcessor struct {
 func (fp VarsProcessor) Eval(req *definition.Request, m *definition.Mock) {
 	fp.walkAndFill(fp.FillerFactory.CreateRequestFiller(req), m)
 	fp.walkAndFill(fp.FillerFactory.CreateFakeFiller(fp.FakeAdapter), m)
+	entityActions := persist.EntityActions{fp.PersistEngines}
+	entityActions.ApplyActions(m)
 	fp.walkAndFill(fp.FillerFactory.CreatePersistFiller(fp.PersistEngines), m)
 }
 
