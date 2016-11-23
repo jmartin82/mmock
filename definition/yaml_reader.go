@@ -3,7 +3,6 @@ package definition
 import (
 	"io/ioutil"
 	"log"
-	"os"
 	"path/filepath"
 
 	"github.com/ghodss/yaml"
@@ -14,8 +13,8 @@ type YAMLReader struct {
 }
 
 //CanRead return true if is a yaml file
-func (jp YAMLReader) CanRead(filename os.FileInfo) bool {
-	return filepath.Ext(filename.Name()) == ".yaml"
+func (jp YAMLReader) CanRead(filename string) bool {
+	return filepath.Ext(filename) == ".yaml"
 }
 
 //Read Unmarshal a yaml file to Mock struct

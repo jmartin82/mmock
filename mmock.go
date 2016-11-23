@@ -75,8 +75,14 @@ func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.
 }
 
 func loadVarsProcessorEngines(persistPath string) *persist.PersistEngineBag {
-	filePersist := persist.FilePersister{PersistPath: persistPath}
-	persistBag := persist.GetNewPersistEngineBag(filePersist)
+	var persister persist.EntityPersister
+	if strings.Index(persistPath, "mongodb://") < 0 {
+		persister = persist.NewFilePersister(persistPath)
+	} else {
+		persister = persist.NewMongoPersister(persistPath)
+	}
+
+	persistBag := persist.GetNewPersistEngineBag(persister)
 	return persistBag
 }
 
@@ -128,17 +134,22 @@ func main() {
 	}
 
 	persistPath, _ := filepath.Abs("./data")
+	//persistPath := "mongodb://localhost/mmock"
+
 	sIP := flag.String("server-ip", outIP, "Mock server IP")
 	sPort := flag.Int("server-port", 8083, "Mock Server Port")
 	cIP := flag.String("console-ip", outIP, "Console Server IP")
 	cPort := flag.Int("cconsole-port", 8082, "Console server Port")
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
 	cPath := flag.String("config-path", path, "Mocks definition folder")
-	cPersistPath := flag.String("config-persist-path", persistPath, "Path to the folder where requests can be persisted")
+	cPersistPath := flag.String("config-persist-path", persistPath, "Path to the folder where requests can be persisted or connection string to mongo database starting with mongodb:// and having database at the end /DatabaseName")
 
 	flag.Parse()
 	path, _ = filepath.Abs(*cPath)
-	persistPath, _ = filepath.Abs(*cPersistPath)
+
+	if strings.Index(persistPath, "mongodb://") < 0 {
+		persistPath, _ = filepath.Abs(*cPersistPath)
+	}
 
 	//chanels
 	mLog := make(chan definition.Match)
