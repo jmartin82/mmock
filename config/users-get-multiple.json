@@ -1,18 +1,19 @@
 {  
-   "request":{  
-      "method":"GET",
-      "path":"/id-users/*"
-   },
-   "persist":{  
-      "collection":"users/user-{{request.url.(?P<value>\\d+)}}.json"
-   },
-   "response":{  
-      "statusCode":200,
-      "headers":{  
-         "Content-Type":[  
-            "application/json"
-         ]
-      },
-      "body":"{{persist.collection.content}}"
-   }
+    "description": "Getting multiple persisted entities by multiple regex match from the url e.g. /id-users/1,2,3,4,5 ",
+    "request":{  
+        "method":"GET",
+        "path":"/id-users/*"
+    },
+    "persist":{  
+        "collection":"users/user-{{request.url.(?P<value>\\d+)}}.json"
+    },
+    "response":{  
+        "statusCode":200,
+        "headers":{  
+            "Content-Type":[  
+                "application/json"
+            ]
+        },
+        "body":"{{persist.collection.content}}"
+    }
 }

@@ -1,18 +1,19 @@
-{  
-   "request":{  
-      "method":"GET",
-      "path":"/users"
-   },
-   "persist":{  
-      "collection":"users"
-   },
-   "response":{  
-      "statusCode":200,
-      "headers":{  
-         "Content-Type":[  
-            "application/json"
-         ]
-      },
-      "body":"{{persist.collection.content}}"
-   }
+{
+    "description": "Getting all the records from the 'users' collection",  
+    "request":{  
+        "method":"GET",
+        "path":"/users"
+    },
+    "persist":{  
+        "collection":"users"
+    },
+    "response":{  
+        "statusCode":200,
+        "headers":{  
+            "Content-Type":[  
+                "application/json"
+            ]
+        },
+        "body":"{{persist.collection.content}}"
+    }
 }

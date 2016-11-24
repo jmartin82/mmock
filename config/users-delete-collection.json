@@ -1,21 +1,22 @@
 {  
-   "request":{  
-      "method":"DELETE",
-      "path":"/users"
-   },
-   "persist":{  
-      "collection":"users",
-      "actions":{  
-         "delete":"true"
-      }
-   },
-   "response":{  
-      "statusCode":200,
-      "headers":{  
-         "Content-Type":[  
-            "application/json"
-         ]
-      },
-      "body":"Files Deleted"
-   }
+    "description": "Deleting all the records from the 'users' collection",
+    "request":{  
+        "method":"DELETE",
+        "path":"/users"
+    },
+    "persist":{  
+        "collection":"users",
+        "actions":{  
+            "delete":"true"
+        }
+    },
+    "response":{  
+        "statusCode":200,
+        "headers":{  
+            "Content-Type":[  
+                "application/json"
+            ]
+        },
+        "body":"Records Deleted"
+    }
 }

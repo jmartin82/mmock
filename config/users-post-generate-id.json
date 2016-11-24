@@ -1,4 +1,5 @@
 {
+    "description": "Creating a persisted entity generating id for the entity key and reuse it in the entity body",
     "request": {
         "method": "POST",
         "path": "/users"

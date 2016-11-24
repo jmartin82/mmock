@@ -1,21 +1,22 @@
 {  
-   "request":{  
-      "method":"DELETE",
-      "path":"/users/*.json"
-   },
-   "persist":{  
-      "entity":"/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
-      "actions":{  
-         "delete":"true"
-      }
-   },
-   "response":{  
-      "statusCode":200,
-      "headers":{  
-         "Content-Type":[  
-            "application/json"
-         ]
-      },
-      "body":"File Deleted"
-   }
+    "description": "Deleting a persisted entity by matching the id from the url using regex",
+    "request":{  
+        "method":"DELETE",
+        "path":"/users/*.json"
+    },
+    "persist":{  
+        "entity":"/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
+        "actions":{  
+            "delete":"true"
+        }
+    },
+    "response":{  
+        "statusCode":200,
+        "headers":{  
+            "Content-Type":[  
+                "application/json"
+            ]
+        },
+        "body":"Record Deleted"
+    }
 }

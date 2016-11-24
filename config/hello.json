@@ -1,4 +1,5 @@
 {
+	"description": "Returns 'Hello world!' and sets the 'visit' cookie",
 	"request": {
 		"method": "GET",
 		"path": "/hello"

@@ -1,18 +1,19 @@
 {  
-   "request":{  
-      "method":"GET",
-      "path":"/users/*.json"
-   },
-   "persist":{  
-      "entity":"/users/user-{{request.url./users/(?P<value>\\d+)}}.json"
-   },
-   "response":{  
-      "statusCode":200,
-      "headers":{  
-         "Content-Type":[  
-            "application/json"
-         ]
-      },
-      "body":"{{persist.entity.content}}"
-   }
+    "description": "Gets a persisted entity by matching the id from the url using regex",
+    "request":{  
+        "method":"GET",
+        "path":"/users/*.json"
+    },
+    "persist":{  
+        "entity":"/users/user-{{request.url./users/(?P<value>\\d+)}}.json"
+    },
+    "response":{  
+        "statusCode":200,
+        "headers":{  
+            "Content-Type":[  
+                "application/json"
+            ]
+        },
+        "body":"{{persist.entity.content}}"
+    }
 }
