@@ -89,11 +89,26 @@ func (fd *FileDefinition) WatchDir() {
 		log.Println("Hot mock file changing not available.")
 		return
 	}
+
 	err = watcher.Add(fd.Path)
 	if err != nil {
 		log.Printf("Hot mock file changing not available in folder: %s\n", fd.Path)
 		return
 	}
+
+	if err = filepath.Walk(fd.Path, func(path string, fileInfo os.FileInfo, err error) error {
+		if fileInfo.IsDir() {
+			err = watcher.Add(path)
+			if err != nil {
+				log.Printf("Hot mock file changing not available in folder: %s\n", fd.Path)
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		return
+	}
+
 	go func() {
 		for {
 			select {
