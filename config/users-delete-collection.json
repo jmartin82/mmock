@@ -1,0 +1,21 @@
+{  
+   "request":{  
+      "method":"DELETE",
+      "path":"/users"
+   },
+   "persist":{  
+      "collection":"users",
+      "actions":{  
+         "delete":"true"
+      }
+   },
+   "response":{  
+      "statusCode":200,
+      "headers":{  
+         "Content-Type":[  
+            "application/json"
+         ]
+      },
+      "body":"Files Deleted"
+   }
+}

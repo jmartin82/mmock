@@ -8,10 +8,12 @@ type Control struct {
 }
 
 type Actions map[string]string
+
 type Persist struct {
-	Entity  string  `json:"entity"`
-	Actions Actions `json:"actions"`
-	Engine  string  `json:"engine"`
+	Entity     string  `json:"entity"`
+	Collection string  `json:"collection"`
+	Actions    Actions `json:"actions"`
+	Engine     string  `json:"engine"`
 }
 
 type Notify struct {

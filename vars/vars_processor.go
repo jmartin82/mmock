@@ -26,19 +26,20 @@ func (fp VarsProcessor) walkAndFill(f Filler, m *definition.Mock) {
 	amqp := &m.Notify.Amqp
 	for header, values := range res.Headers {
 		for i, value := range values {
-			res.Headers[header][i] = f.Fill(m, value)
+			res.Headers[header][i] = f.Fill(m, value, false)
 		}
 
 	}
 	for cookie, value := range res.Cookies {
-		res.Cookies[cookie] = f.Fill(m, value)
+		res.Cookies[cookie] = f.Fill(m, value, false)
 	}
 
-	res.Body = f.Fill(m, res.Body)
-	amqp.Body = f.Fill(m, amqp.Body)
-	per.Entity = f.Fill(m, per.Entity)
+	res.Body = f.Fill(m, res.Body, false)
+	amqp.Body = f.Fill(m, amqp.Body, false)
+	per.Entity = f.Fill(m, per.Entity, false)
+	per.Collection = f.Fill(m, per.Collection, true)
 	for action, value := range per.Actions {
-		per.Actions[action] = f.Fill(m, value)
+		per.Actions[action] = f.Fill(m, value, false)
 	}
 
 }

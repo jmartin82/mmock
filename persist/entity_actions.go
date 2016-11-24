@@ -1,11 +1,10 @@
 package persist
 
 import (
-	"encoding/json"
 	"log"
 
-	"github.com/Jeffail/gabs"
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/utils"
 )
 
 //FilePersister persists body in file
@@ -33,14 +32,20 @@ func (ea EntityActions) ApplyActions(m *definition.Mock) {
 	}
 
 	if value, ok := m.Persist.Actions["append"]; ok {
-		content, err := engine.Read(fileName)
+		var content string
+		var err error
+		if m.Persist.Collection != "" {
+			content, err = engine.ReadCollection(m.Persist.Collection)
+		} else {
+			content, err = engine.Read(fileName)
+		}
 		if err != nil {
 			log.Println("Error reading in a entity")
 			return
 		}
-		if isJSON(content) && isJSON(value) {
-			content = joinJSON(content, value)
-		} else if isJSON(content) && !isJSON(value) {
+		if utils.IsJSON(content) && utils.IsJSON(value) {
+			content = utils.JoinJSON(content, value)
+		} else if utils.IsJSON(content) && !utils.IsJSON(value) {
 			log.Printf("There is no way to append this : %s\n", value)
 		} else {
 			content += value
@@ -51,32 +56,16 @@ func (ea EntityActions) ApplyActions(m *definition.Mock) {
 	}
 
 	if _, ok := m.Persist.Actions["delete"]; ok {
-		if err := engine.Delete(fileName); err != nil {
-			log.Println("Error deleting a entity")
-			return
+		if m.Persist.Collection != "" {
+			if err := engine.DeleteCollection(m.Persist.Collection); err != nil {
+				log.Println("Error deleting collection")
+				return
+			}
+		} else {
+			if err := engine.Delete(fileName); err != nil {
+				log.Println("Error deleting a entity")
+				return
+			}
 		}
 	}
-}
-
-func isJSON(s string) bool {
-	var js map[string]interface{}
-	return json.Unmarshal([]byte(s), &js) == nil
-}
-
-func joinJSON(inputs ...string) string {
-	if len(inputs) == 1 {
-		return inputs[0]
-	}
-
-	result := gabs.New()
-	for _, input := range inputs {
-		jsonParsed, _ := gabs.ParseJSON([]byte(input))
-		children, _ := jsonParsed.S().ChildrenMap()
-
-		for key, child := range children {
-			result.Set(child.Data(), key)
-		}
-	}
-
-	return result.String()
 }

@@ -1,0 +1,22 @@
+{  
+   "request":{  
+      "method":"DELETE",
+      "path":"/passed-ids",
+      "body": "*"
+   },
+   "persist":{  
+      "collection":"users/user-{{request.body.(?P<value>\\d+)}}.json",
+      "actions":{  
+         "delete":"true"
+      }
+   },
+   "response":{  
+      "statusCode":200,
+      "headers":{  
+         "Content-Type":[  
+            "application/json"
+         ]
+      },
+      "body":"File Deleted"
+   }
+}

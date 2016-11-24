@@ -1,0 +1,22 @@
+{
+    "request": {
+        "method": "POST",
+        "path": "/users"
+    },
+    "persist": {
+        "entity": "/users/user-{{fake.Digits}}.json",
+        "actions" : {
+            "write" : "{{ request.body }}",
+            "append" : "{ \"id\": {{persist.entity.name./users/user\\-(?P<value>\\d+)\\.json}} }"
+        }
+    },
+    "response": {
+        "statusCode": 202,
+        "headers": {
+            "Content-Type": [
+                "application/json"
+            ]
+        },
+        "body":"{{ persist.entity.content }}"
+    }
+}
