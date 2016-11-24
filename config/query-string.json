@@ -1,23 +1,24 @@
 {
-   "request":{
-      "method":"GET",
-      "path":"/search",
-      "queryStringParameters":{
-         "city":[
+    "description": "Example for checking query string parameters",
+    "request":{
+        "method":"GET",
+        "path":"/search",
+        "queryStringParameters":{
+            "city":[
             "Barcelona"
-         ],
-         "postal_code":[
+            ],
+            "postal_code":[
             "08902"
-         ]
-      }
-   },
-   "response":{
-      "statusCode":200,
-      "headers":{  
-         "Content-Type":[  
+            ]
+        }
+    },
+    "response":{
+        "statusCode":200,
+        "headers":{  
+            "Content-Type":[  
             "Content-type: text/xml"
-         ]
-      },
-      "body":"<resultsSummary><fullyMatching>30</fullyMatching><estimatedHits>30</estimatedHits><currStart>1</currStart>  <currEnd>10</currEnd>  <nextStart>11</nextStart></resultsSummary>"
-   }
+            ]
+        },
+        "body":"<resultsSummary><fullyMatching>30</fullyMatching><estimatedHits>30</estimatedHits><currStart>1</currStart>  <currEnd>10</currEnd>  <nextStart>11</nextStart></resultsSummary>"
+    }
 }
