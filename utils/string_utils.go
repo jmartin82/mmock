@@ -1,8 +1,7 @@
-package parse
+package utils
 
 import (
 	"encoding/json"
-	"regexp"
 
 	"strings"
 
@@ -35,27 +34,17 @@ func JoinJSON(inputs ...string) string {
 	return result.String()
 }
 
-//GetStringPart gets regex mached group value for a given input and regex pattern
-func GetStringPart(input string, pattern string, groupName string) (string, bool) {
-	r, error := regexp.Compile(pattern)
-	if error != nil {
-		return "", false
+//JoinContent returns two contents joined as JSON if both are JSONs otherwise concatenates them
+func JoinContent(value1 string, value2 string) string {
+	if value1 == "" {
+		return value2
+	} else if value2 == "" {
+		return value1
+	} else if (IsJSON(value1)) && IsJSON(value2) {
+		return JoinJSON(value1, value2)
+	} else {
+		return value1 + value2
 	}
-
-	match := r.FindStringSubmatch(input)
-	result := make(map[string]string)
-	names := r.SubexpNames()
-	if len(match) >= len(names) {
-		for i, name := range names {
-			if i != 0 {
-				result[name] = match[i]
-			}
-		}
-	}
-
-	value, present := result[groupName]
-
-	return value, present
 }
 
 //FormatJSON formats a JSON string

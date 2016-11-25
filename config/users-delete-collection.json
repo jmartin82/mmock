@@ -1,11 +1,11 @@
 {  
-    "description": "Deleting a persisted entity by matching the id from the url using regex",
+    "description": "Deleting all the records from the 'users' collection",
     "request":{  
         "method":"DELETE",
-        "path":"/users/*.json"
+        "path":"/users"
     },
     "persist":{  
-        "entity":"/users/user-{{request.url./users/(?P<value>\\d+)}}.json",
+        "collection":"users",
         "actions":{  
             "delete":"true"
         }
@@ -17,6 +17,6 @@
                 "application/json"
             ]
         },
-        "body":"Record Deleted"
+        "body":"Records Deleted"
     }
 }

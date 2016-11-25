@@ -59,7 +59,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		result.Errors = errs
 	}
 
-	log.Printf("Mock match found: %s\n", strconv.FormatBool(result.Found))
+	log.Printf("Mock match found: %s. Name : %s\n", strconv.FormatBool(result.Found), mock.Name)
 
 	if result.Found {
 		if len(mock.Control.ProxyBaseURL) > 0 {

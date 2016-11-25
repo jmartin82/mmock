@@ -1,4 +1,5 @@
 {
+	"description": "Checks for a given cookie in the request to match the configuration",
 	"request": {
 		"method": "GET",
 		"path": "/hello*",

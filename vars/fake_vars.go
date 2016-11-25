@@ -45,7 +45,7 @@ func (fdp FakeVars) callMethod(name string) (string, bool) {
 	return "", found
 }
 
-func (fdp FakeVars) Fill(m *definition.Mock, input string) string {
+func (fdp FakeVars) Fill(m *definition.Mock, input string, multipleMatch bool) string {
 	r := regexp.MustCompile(`\{\{\s*([a-zA-Z0-9_\.]+)\s*\}\}`)
 
 	return r.ReplaceAllStringFunc(input, func(raw string) string {

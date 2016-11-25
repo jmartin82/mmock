@@ -8,10 +8,12 @@ type Control struct {
 }
 
 type Actions map[string]string
+
 type Persist struct {
-	Entity  string  `json:"entity"`
-	Actions Actions `json:"actions"`
-	Engine  string  `json:"engine"`
+	Entity     string  `json:"entity"`
+	Collection string  `json:"collection"`
+	Actions    Actions `json:"actions"`
+	Engine     string  `json:"engine"`
 }
 
 type Notify struct {
@@ -20,10 +22,11 @@ type Notify struct {
 
 //Mock contains the user mock definition
 type Mock struct {
-	Name     string
-	Request  Request  `json:"request"`
-	Response Response `json:"response"`
-	Persist  Persist  `json:"persist"`
-	Notify   Notify   `json:"notify"`
-	Control  Control  `json:"control"`
+	Name        string
+	Description string   `json:"description"`
+	Request     Request  `json:"request"`
+	Response    Response `json:"response"`
+	Persist     Persist  `json:"persist"`
+	Notify      Notify   `json:"notify"`
+	Control     Control  `json:"control"`
 }

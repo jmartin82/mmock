@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/jmartin82/mmock/parse"
+	"github.com/jmartin82/mmock/utils"
 	"github.com/tidwall/sjson"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -29,7 +29,7 @@ func (mr MongoRepository) ConnectMongo() (session *mgo.Session, err error) {
 }
 
 //GetItem gets the result string rom interface
-func (mr MongoRepository) GetItem(collectionName string, id string) (string, error) {
+func (mr MongoRepository) GetItem(collectionName string, id string) (value string, err error) {
 
 	session, err := mr.ConnectMongo()
 	if err != nil {
@@ -46,20 +46,65 @@ func (mr MongoRepository) GetItem(collectionName string, id string) (string, err
 		return "", err
 	}
 
-	byteResult, err := json.Marshal(result)
+	_, value, err = mr.deserialize(result)
+
+	return value, err
+}
+
+func (mr MongoRepository) deserialize(input interface{}) (key string, value string, err error) {
+	byteResult, err := json.Marshal(input)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	resultString := string(byteResult)
 
+	var properties map[string]interface{}
+	if err := json.Unmarshal(byteResult, &properties); err != nil {
+		return "", "", err
+	}
+
+	key = properties["_id"].(string)
+
 	// remove _id property from the result json string
 	resultString, err = sjson.Delete(resultString, "_id")
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return parse.UnWrapNonJSONStringIfNeeded(resultString), nil
+	value = utils.UnWrapNonJSONStringIfNeeded(resultString)
+
+	return key, value, nil
+}
+
+//GetAllItems gets all the items from a given collection
+func (mr MongoRepository) GetAllItems(collectionName string) (map[string]string, error) {
+	output := map[string]string{}
+
+	session, err := mr.ConnectMongo()
+	if err != nil {
+		return output, err
+	}
+
+	defer session.Close()
+
+	collection := session.DB(mr.ConnectionInfo.Database).C(collectionName)
+
+	var results []interface{}
+	err = collection.Find(nil).All(&results)
+	if err != nil {
+		return output, err
+	}
+
+	for _, value := range results {
+		if key, value, err := mr.deserialize(value); err != nil {
+			return output, err
+		} else {
+			output[key] = value
+		}
+	}
+
+	return output, nil
 }
 
 //DeleteItem deletes an item from a collection
@@ -88,7 +133,7 @@ func (mr MongoRepository) UpsertItem(collectionName string, id string, body stri
 
 	collection := session.DB(mr.ConnectionInfo.Database).C(collectionName)
 
-	body, err = parse.WrapNonJSONStringIfNeeded(body)
+	body, err = utils.WrapNonJSONStringIfNeeded(body)
 	if err != nil {
 		return err
 	}
@@ -107,7 +152,7 @@ func NewMongoRepository(connectionString string) *MongoRepository {
 
 	dialInfo, err := mgo.ParseURL(connectionString)
 	if err != nil {
-		log.Print(err)
+		log.Println(err)
 	}
 
 	if dialInfo.Database == "" {

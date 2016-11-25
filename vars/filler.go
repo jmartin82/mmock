@@ -3,5 +3,5 @@ package vars
 import "github.com/jmartin82/mmock/definition"
 
 type Filler interface {
-	Fill(m *definition.Mock, input string) string
+	Fill(m *definition.Mock, input string, multipleMatch bool) string
 }

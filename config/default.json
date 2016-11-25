@@ -1,4 +1,5 @@
 {
+	"description": "Default endpoint for the root of the site",
 	"request": {
 		"method": "GET",
 		"path": "/"

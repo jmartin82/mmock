@@ -1,0 +1,19 @@
+{  
+    "description": "Deleting multiple persisted entities by multiple regex matches from the url and body. e.g. url: /mixed-entities/1,2 body: users,roles which will delete users/1.json, users/2.json, roles/1.json, roles/2.json",
+    "request":{  
+        "method":"DELETE",
+        "path":"/mixed-entities/*"
+    },
+    "persist":{  
+        "collection":"{{request.body.(?P<value>\\w+)}}/{{request.url.(?P<value>\\d+)}}.json"
+    },
+    "response":{  
+        "statusCode":200,
+        "headers":{  
+            "Content-Type":[  
+                "application/json"
+            ]
+        },
+        "body":"{{persist.collection.content}}"
+    }
+}
