@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/jmartin82/mmock/utils"
@@ -86,6 +87,32 @@ func (fp FilePersister) DeleteCollection(name string) error {
 		}
 	}
 	return nil
+}
+
+func (fp FilePersister) GetSequence(name string, increase int) (int, error) {
+	fileName := "_sequences/" + name + ".value"
+
+	oldValue := 0
+	if content, err := fp.Read(fileName); err == nil {
+		oldValue, err = strconv.Atoi(content)
+	}
+	newValue := oldValue + increase
+	err := fp.Write(fileName, strconv.Itoa(newValue))
+	return newValue, err
+}
+
+func (fp FilePersister) GetValue(key string) (string, error) {
+	fileName := "_keyValues/" + key + ".value"
+
+	content, err := fp.Read(fileName)
+	return content, err
+}
+
+func (fp FilePersister) SetValue(key string, value string) error {
+	fileName := "_keyValues/" + key + ".value"
+
+	err := fp.Write(fileName, value)
+	return err
 }
 
 func (fp FilePersister) getFilePath(fileName string) (pathToFile string, fileDir string) {

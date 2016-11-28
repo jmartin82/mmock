@@ -1,7 +1,9 @@
 package vars
 
 import (
+	"log"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/jmartin82/mmock/definition"
@@ -15,7 +17,7 @@ type PersistVars struct {
 }
 
 func (pv PersistVars) Fill(m *definition.Mock, input string, multipleMatch bool) string {
-	r := regexp.MustCompile(`\{\{(.+?)\}\}`)
+	r := regexp.MustCompile(`\{\{([^{]+?)\}\}`)
 
 	if !multipleMatch {
 		return r.ReplaceAllStringFunc(input, func(raw string) string {
@@ -87,19 +89,101 @@ func (pv PersistVars) replaceString(m *definition.Mock, raw string) (string, boo
 	return s, true
 }
 
-func (rp PersistVars) getPersistRegexParts(m *definition.Mock, input string) (string, string, bool) {
+func (pv PersistVars) getPersistRegexParts(m *definition.Mock, input string) (string, string, bool) {
 	if i := strings.Index(input, "persist.entity.name"); i == 0 && len(input) > len("persist.entity.name") {
 		return m.Persist.Entity, input[20:], true
 	}
 	return "", "", false
 }
 
-func (rp PersistVars) replaceRegex(m *definition.Mock, raw string) string {
+func (pv PersistVars) replaceRegex(m *definition.Mock, raw string) string {
 	tag := strings.Trim(raw[2:len(raw)-2], " ")
-	if regexInput, regexPattern, found := rp.getPersistRegexParts(m, tag); found {
-		if result, found := rp.RegexHelper.GetStringPart(regexInput, regexPattern, "value"); found {
+	if regexInput, regexPattern, found := pv.getPersistRegexParts(m, tag); found {
+		if result, found := pv.RegexHelper.GetStringPart(regexInput, regexPattern, "value"); found {
 			return result
 		}
 	}
 	return raw
+}
+
+func (pv PersistVars) callSequence(m *definition.Mock, parameters string) (string, bool) {
+	regexPattern := `\(\s*(?:'|")?(?P<name>.+?)(?:'|")?\s*,\s*(?P<increase>\d+?)\s*\)|\(\s*(?:'|")?(?P<nameOnly>.+?)(?:'|")?\s*\)`
+
+	helper := utils.RegexHelper{}
+
+	increase := "0"
+	// check first whether only name is passed to the sequence method
+	name, found := helper.GetStringPart(parameters, regexPattern, "nameOnly")
+	if name == "" || !found {
+		name, found = helper.GetStringPart(parameters, regexPattern, "name")
+		if !found {
+			return "", false
+		}
+
+		increase, found = helper.GetStringPart(parameters, regexPattern, "increase")
+		if !found {
+			return "", false
+		}
+
+		if increase == "" {
+			increase = "0"
+		}
+	}
+
+	increaseInt, err := strconv.Atoi(increase)
+	if err != nil {
+		log.Printf("Error parsing increase value: %s\n", err.Error())
+		return "", false
+	}
+
+	engine := pv.Engines.Get(m.Persist.Engine)
+
+	if sequenceValue, err := engine.GetSequence(name, increaseInt); err == nil {
+		return strconv.Itoa(sequenceValue), true
+	} else {
+		return "", false
+	}
+}
+
+func (pv PersistVars) callSetValue(m *definition.Mock, parameters string) (string, bool) {
+	regexPattern := `\(\s*(?:'|")?(?P<key>.+?)(?:'|")?\s*,\s*(?:'|")?(?P<value>.+?)(?:'|")?\s*\)`
+
+	helper := utils.RegexHelper{}
+
+	key, found := helper.GetStringPart(parameters, regexPattern, "key")
+	if !found {
+		return "", false
+	}
+
+	value, found := helper.GetStringPart(parameters, regexPattern, "value")
+	if !found {
+		return "", false
+	}
+
+	engine := pv.Engines.Get(m.Persist.Engine)
+
+	if err := engine.SetValue(key, value); err == nil {
+		return value, true
+	} else {
+		return "", false
+	}
+}
+
+func (pv PersistVars) callGetValue(m *definition.Mock, parameters string) (string, bool) {
+	regexPattern := `\(\s*(?:'|")?(?P<key>.+?)(?:'|")?\s*\)`
+
+	helper := utils.RegexHelper{}
+
+	key, found := helper.GetStringPart(parameters, regexPattern, "key")
+	if !found {
+		return "", false
+	}
+
+	engine := pv.Engines.Get(m.Persist.Engine)
+
+	if value, err := engine.GetValue(key); err == nil {
+		return value, true
+	} else {
+		return "", false
+	}
 }
