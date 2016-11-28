@@ -140,7 +140,7 @@ func TestFilePersister_Persist_WithBodyToSave(t *testing.T) {
 
 func TestFilePersister_LoadBody(t *testing.T) {
 	req := definition.Request{}
-	res := definition.Response{Body: "{{persist.entity.content}}"}
+	res := definition.Response{Body: "{{ persist.entity.content }}"}
 	per := definition.Persist{Entity: "testing_load.json"}
 
 	persistPath, _ := filepath.Abs("./test_persist")

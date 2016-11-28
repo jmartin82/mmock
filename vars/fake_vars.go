@@ -114,7 +114,7 @@ func (fv FakeVars) getMethodAndParameter(input string) (method string, parameter
 }
 
 func (fv FakeVars) Fill(m *definition.Mock, input string, multipleMatch bool) string {
-	r := regexp.MustCompile(`\{\{([^{]+?)\}\}`)
+	r := regexp.MustCompile(`\{\{\s*fake\.([^{]+?)\s*\}\}`)
 
 	return r.ReplaceAllStringFunc(input, func(raw string) string {
 		found := false

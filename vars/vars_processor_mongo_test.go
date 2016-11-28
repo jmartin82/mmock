@@ -149,7 +149,7 @@ func TestMongoPersister_Persist_WithBodyToSave(t *testing.T) {
 		return
 	}
 	req := definition.Request{}
-	res := definition.Response{Body: "{{persist.entity.content}}", StatusCode: 200}
+	res := definition.Response{Body: "{{ persist.entity.content }}", StatusCode: 200}
 
 	actions := make(map[string]string)
 	actions["write"] = "{{ request.body }}"

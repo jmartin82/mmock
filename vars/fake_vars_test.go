@@ -90,7 +90,7 @@ func TestReplaceTagWithSpace(t *testing.T) {
 	req.Cookies = cookie
 
 	res := definition.Response{}
-	res.Body = "Request {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}. Random: {{fake.UserName}}"
+	res.Body = "Request {{ request.query.param1}}. Cookie: {{request.cookie.cookie1 }}. Random: {{fake.UserName }}"
 
 	mock := definition.Mock{Request: req, Response: res}
 	varsProcessor := getProcessor("testData")

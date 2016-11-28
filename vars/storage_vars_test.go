@@ -155,7 +155,7 @@ func TestStorageVars_GetValue_WithExistingKey(t *testing.T) {
 	req := definition.Request{}
 	res := definition.Response{}
 
-	res.Body = "GetValue: {{storage.GetValue(existing)}}"
+	res.Body = "GetValue: {{storage.GetValue(existing)  }}"
 
 	mock := definition.Mock{Request: req, Response: res}
 
@@ -198,7 +198,7 @@ func TestStorageVars_SetValue(t *testing.T) {
 	req := definition.Request{}
 	res := definition.Response{}
 
-	res.Body = "SetValue: {{storage.SetValue(key, test-123)}}"
+	res.Body = "SetValue: {{ storage.SetValue(key, test-123) }}"
 
 	mock := definition.Mock{Request: req, Response: res}
 	processor.Eval(&req, &mock)

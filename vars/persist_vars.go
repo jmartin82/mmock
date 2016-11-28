@@ -17,7 +17,7 @@ type PersistVars struct {
 }
 
 func (pv PersistVars) Fill(m *definition.Mock, input string, multipleMatch bool) string {
-	r := regexp.MustCompile(`\{\{([^{]+?)\}\}`)
+	r := regexp.MustCompile(`\{\{\s*persist\.([^{]+?)\s*\}\}`)
 
 	if !multipleMatch {
 		return r.ReplaceAllStringFunc(input, func(raw string) string {
