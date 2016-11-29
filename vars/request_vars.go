@@ -14,7 +14,7 @@ type RequestVars struct {
 }
 
 func (rp RequestVars) Fill(m *definition.Mock, input string, multipleMatch bool) string {
-	r := regexp.MustCompile(`\{\{\s*request\.([^{]+?)\s*\}\}`)
+	r := regexp.MustCompile(`\{\{\s*request\.(.+?)\s*\}\}`)
 
 	if !multipleMatch {
 		return r.ReplaceAllStringFunc(input, func(raw string) string {

@@ -17,7 +17,7 @@ type StorageVars struct {
 }
 
 func (lv StorageVars) Fill(m *definition.Mock, input string, multipleMatch bool) string {
-	r := regexp.MustCompile(`\{\{\s*storage\.(.[^{]+?)\s*\}\}`)
+	r := regexp.MustCompile(`\{\{\s*storage\.([^{]+?)\s*\}\}`)
 	tries := 0
 	// we are making several passes while we have matching regex, this is useful for cases when we have nested vars like {{ storage.SetValue({{ request.body.username\\=(?P<value>.+?)(?:&|$) }}, {{ storage.Sequence(users, 1) }}) }}.json
 	for tries <= 3 && r.MatchString(input) {
