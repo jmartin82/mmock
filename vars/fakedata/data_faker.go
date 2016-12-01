@@ -5,6 +5,7 @@ type DataFaker interface {
 	Brand() string
 	Character() string
 	Characters() string
+	CharactersN(n int) string
 	City() string
 	Color() string
 	Company() string
@@ -17,6 +18,7 @@ type DataFaker interface {
 	CurrencyCode() string
 	Day() string
 	Digits() string
+	DigitsN(n int) string
 	EmailAddress() string
 	FirstName() string
 	FullName() string
@@ -30,10 +32,12 @@ type DataFaker interface {
 	MonthShort() string
 	Paragraph() string
 	Paragraphs() string
+	ParagraphsN(n int) string
 	Phone() string
 	Product() string
 	Sentence() string
 	Sentences() string
+	SentencesN(n int) string
 	SimplePassword() string
 	State() string
 	StateAbbrev() string
@@ -44,4 +48,7 @@ type DataFaker interface {
 	Word() string
 	Words() string
 	Zip() string
+	Int(n int) string
+	Float(n int) string
+	UUID() string
 }

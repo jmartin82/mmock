@@ -5,6 +5,7 @@ import (
 	"log"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/jmartin82/mmock/utils"
@@ -92,6 +93,33 @@ func (mp MongoPersister) DeleteCollection(name string) error {
 		}
 	}
 	return nil
+}
+
+func (mp MongoPersister) GetSequence(name string, increase int) (int, error) {
+	fullName := "_sequences/" + name
+
+	oldValue := 0
+	if content, err := mp.Read(fullName); err == nil {
+		oldValue, err = strconv.Atoi(content)
+	}
+
+	newValue := oldValue + increase
+	err := mp.Write(fullName, strconv.Itoa(newValue))
+	return newValue, err
+}
+
+func (mp MongoPersister) GetValue(key string) (string, error) {
+	fullName := "_keyValues/" + key
+
+	content, err := mp.Read(fullName)
+	return content, err
+}
+
+func (mp MongoPersister) SetValue(key string, value string) error {
+	fullName := "_keyValues/" + key
+
+	err := mp.Write(fullName, value)
+	return err
 }
 
 func (mp MongoPersister) getItemInfo(name string) (collectionName string, id string, err error) {

@@ -263,15 +263,19 @@ Request data:
  - persist.entity.name
  - persist.entity.name."regex to match value"
  - persist.collection.content
+ - storage.Sequence(name, increaseWith) - generates next sequence with a given name, useful when auto generating id, if no increaseWith is passed or increaseWith = 0 the sequence won't be increased but the latest value will be returned
+ - storage.SetValue(key, value) - stores a value corresponding to a given key and returns the value. This is useful if you have some entities requested by both id and name, so that you can store the mapping between than and later retrieve it. You can check the sample in [users-storage-post.json](config/users-storage-post.json), [users-storage-get-by-id.json](config/users-storage-get-by-id.json) and [users-storage-get-by-username.json](config/users-storage-get-by-username.json)
+ - storage.GetValue(key) - returns the value corresponding to the given key
 
 > Regex: The regex should contain a group named **value** which will be matched and its value will be returned. E.g. if we want to match the id from this url **`/your/path/4`** the regex should look like **`/your/path/(?P<value>\\d+)`**. Note that in *golang* the named regex group match need to contain a **P** symbol after the question mark. The regex should be prefixed either with **request.url.**, **request.body.** or **response.body.** considering your input. When setting the Persist.Collection field the regex can match multiple records from it's input, which is useful for cases like [users-delete-passingids.json](config/users-delete-passingids.json) 
 
 
-Fake data:
+[Fake](https://godoc.org/github.com/icrowley/fake) data:
 
  - fake.Brand
  - fake.Character
  - fake.Characters
+ - fake.CharactersN(n)
  - fake.City
  - fake.Color
  - fake.Company
@@ -284,6 +288,7 @@ Fake data:
  - fake.CurrencyCode
  - fake.Day
  - fake.Digits
+ - fake.DigitsN(n)
  - fake.EmailAddress
  - fake.FirstName
  - fake.FullName
@@ -296,10 +301,12 @@ Fake data:
  - fake.Year
  - fake.Paragraph
  - fake.Paragraphs
+ - fake.ParagraphsN(n)
  - fake.Phone
  - fake.Product
  - fake.Sentence
  - fake.Sentences
+ - fake.SentencesN(n)
  - fake.SimplePassword
  - fake.State
  - fake.StateAbbrev
@@ -309,7 +316,12 @@ Fake data:
  - fake.WeekDay
  - fake.Word
  - fake.Words
+ - fake.WordsN(n)
  - fake.Zip
+  
+ - fake.Int(n) - random positive integer less than or equal to n
+ - fake.Float(n) - random positive floating point number less than n
+ - fake.UUID - generates a unique id  
 
 ### Persistence
 
@@ -317,7 +329,7 @@ Currently the tool supports two persistence modes:
 
 #### File system
 
-If you want to use that mode you need to pass the path to the folder where you want to store your data to the following argument - **config-persist-path**. The default value is set to the **data** folder under your current execution path. In this mode the entity name in the [Persist](#persist-optional) defines the relative path to the file where the request data will be stored and retrive from.
+If you want to use that mode you need to pass the path to the folder where you want to store your data to the following argument - **config-persist-path**. The default value is set to the **data** folder under your current execution path. In this mode the entity name in the [Persist](#persist-optional) defines the relative path to the file where the request data will be stored and retrieved from.
 
 #### MongoDB
 

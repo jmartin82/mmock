@@ -7,4 +7,7 @@ type EntityPersister interface {
 	Delete(name string) error
 	DeleteCollection(name string) error
 	GetName() string
+	GetSequence(name string, increase int) (int, error)
+	GetValue(key string) (string, error)
+	SetValue(key string, value string) error
 }

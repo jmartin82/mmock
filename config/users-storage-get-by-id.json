@@ -1,0 +1,19 @@
+{
+    "description": "Getting the stored user by id",
+    "request": {
+        "method": "GET",
+        "path": "/storage-users-by-id/*"
+    },
+    "persist": {
+        "entity": "/storage-users/user-{{ request.url./storage-users-by-id/(?P<value>\\d+) }}.json"
+    },
+    "response": {
+        "statusCode": 202,
+        "headers": {
+            "Content-Type": [
+                "application/json"
+            ]
+        },
+        "body":"{{ persist.entity.content }}"
+    }
+}

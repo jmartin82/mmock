@@ -1,9 +1,11 @@
 package fakedata
 
 import (
+	"math/rand"
 	"strconv"
 
 	"github.com/icrowley/fake"
+	"github.com/twinj/uuid"
 )
 
 //FakeAdapter contains all available functions to create random data in the mock response.
@@ -20,9 +22,14 @@ func (fa FakeAdapter) Character() string {
 	return fake.Character()
 }
 
-//Characters returns a random Characters
+//Characters returns from 1 to 5 random Characters
 func (fa FakeAdapter) Characters() string {
 	return fake.Characters()
+}
+
+//CharactersN returns n random Characters
+func (fa FakeAdapter) CharactersN(n int) string {
+	return fake.CharactersN(n)
 }
 
 //City returns a random City
@@ -75,9 +82,14 @@ func (fa FakeAdapter) CurrencyCode() string {
 	return fake.CurrencyCode()
 }
 
-//Digits returns a random Digits
+//Digits returns from 1 to 5 random Digits
 func (fa FakeAdapter) Digits() string {
 	return fake.Digits()
+}
+
+//DigitsN returns n random Digits
+func (fa FakeAdapter) DigitsN(n int) string {
+	return fake.DigitsN(n)
 }
 
 //EmailAddress returns a random EmailAddress
@@ -125,9 +137,14 @@ func (fa FakeAdapter) Paragraph() string {
 	return fake.Paragraph()
 }
 
-//Paragraphs returns a random Paragraphs
+//Paragraphs returns from 1 to 5 random Paragraphs
 func (fa FakeAdapter) Paragraphs() string {
 	return fake.Paragraphs()
+}
+
+//ParagraphsN returns n random Paragraphs
+func (fa FakeAdapter) ParagraphsN(n int) string {
+	return fake.ParagraphsN(n)
 }
 
 //Phone returns a random Phone
@@ -145,9 +162,14 @@ func (fa FakeAdapter) Sentence() string {
 	return fake.Sentence()
 }
 
-//Sentences returns a random sentences
+//Sentences returns from 1 to 5 random sentences
 func (fa FakeAdapter) Sentences() string {
 	return fake.Sentences()
+}
+
+//SentencesN returns n random sentences
+func (fa FakeAdapter) SentencesN(n int) string {
+	return fake.SentencesN(n)
 }
 
 //SimplePassword returns a random simple password
@@ -210,12 +232,35 @@ func (fa FakeAdapter) Word() string {
 	return fake.Word()
 }
 
-//Words returns a random words
+//Words returns from 1 to 5 random words
 func (fa FakeAdapter) Words() string {
 	return fake.Words()
+}
+
+//WordsN returns n random words
+func (fa FakeAdapter) WordsN(n int) string {
+	return fake.WordsN(n)
 }
 
 //Zip returns a random zip
 func (fa FakeAdapter) Zip() string {
 	return fake.Zip()
+}
+
+//Number returns a random positive number less than or equal to n
+func (fa FakeAdapter) Int(n int) string {
+	return strconv.Itoa(rand.Intn(n + 1))
+}
+
+//Float returns a random positive floating point number less than n
+func (fa FakeAdapter) Float(n int) string {
+	f := float64(n)
+	value := rand.Float64() * f
+	return strconv.FormatFloat(value, 'f', 4, 64)
+}
+
+//UUID generates a unique id
+func (fa FakeAdapter) UUID() string {
+	u := uuid.NewV2(uuid.DomainUser)
+	return u.String()
 }
