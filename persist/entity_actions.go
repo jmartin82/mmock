@@ -32,13 +32,7 @@ func (ea EntityActions) ApplyActions(m *definition.Mock) {
 	}
 
 	if value, ok := m.Persist.Actions["append"]; ok {
-		var content string
-		var err error
-		if m.Persist.Collection != "" {
-			content, err = engine.ReadCollection(m.Persist.Collection)
-		} else {
-			content, err = engine.Read(fileName)
-		}
+		content, err := engine.Read(fileName)
 		if err != nil {
 			log.Println("Error reading in a entity")
 			return
@@ -56,16 +50,9 @@ func (ea EntityActions) ApplyActions(m *definition.Mock) {
 	}
 
 	if _, ok := m.Persist.Actions["delete"]; ok {
-		if m.Persist.Collection != "" {
-			if err := engine.DeleteCollection(m.Persist.Collection); err != nil {
-				log.Println("Error deleting collection")
-				return
-			}
-		} else {
-			if err := engine.Delete(fileName); err != nil {
-				log.Println("Error deleting a entity")
-				return
-			}
+		if err := engine.Delete(fileName); err != nil {
+			log.Println("Error deleting a entity")
+			return
 		}
 	}
 }

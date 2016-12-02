@@ -15,50 +15,32 @@ type VarsProcessor struct {
 func (fp VarsProcessor) Eval(req *definition.Request, m *definition.Mock) {
 	requestFiller := fp.FillerFactory.CreateRequestFiller(req)
 	fakeFiller := fp.FillerFactory.CreateFakeFiller(fp.FakeAdapter)
-	storageFiller := fp.FillerFactory.CreateStorageFiller(fp.PersistEngines)
 	persistFiller := fp.FillerFactory.CreatePersistFiller(fp.PersistEngines)
 	entityActions := persist.EntityActions{fp.PersistEngines}
 
-	fp.walkAndFill(requestFiller, m, true)
-	fp.walkAndFill(fakeFiller, m, true)
-	fp.walkAndFill(storageFiller, m, true)
-
-	// we need to make sure the persisted vars are filled before executing the actions - as we need to make sure the persist vars are replaced in the persist actions
-	fp.walkAndFillPersisted(persistFiller, m)
-
+	fp.walkAndFill(requestFiller, m)
+	fp.walkAndFill(fakeFiller, m)
 	entityActions.ApplyActions(m)
-
-	fp.walkAndFill(persistFiller, m, false)
-
+	fp.walkAndFill(persistFiller, m)
 }
 
-func (fp VarsProcessor) walkAndFill(f Filler, m *definition.Mock, fillPersisted bool) {
+func (fp VarsProcessor) walkAndFill(f Filler, m *definition.Mock) {
 	res := &m.Response
-	amqp := &m.Notify.Amqp
+	per := &m.Persist
 	for header, values := range res.Headers {
 		for i, value := range values {
-			res.Headers[header][i] = f.Fill(m, value, false)
+			res.Headers[header][i] = f.Fill(m, value)
 		}
 
 	}
 	for cookie, value := range res.Cookies {
-		res.Cookies[cookie] = f.Fill(m, value, false)
+		res.Cookies[cookie] = f.Fill(m, value)
 	}
 
-	amqp.Body = f.Fill(m, amqp.Body, false)
-	res.Body = f.Fill(m, res.Body, false)
-
-	if fillPersisted {
-		fp.walkAndFillPersisted(f, m)
-	}
-}
-
-func (fp VarsProcessor) walkAndFillPersisted(f Filler, m *definition.Mock) {
-	per := &m.Persist
-
-	per.Entity = f.Fill(m, per.Entity, false)
-	per.Collection = f.Fill(m, per.Collection, true)
+	res.Body = f.Fill(m, res.Body)
+	per.Entity = f.Fill(m, per.Entity)
 	for action, value := range per.Actions {
-		per.Actions[action] = f.Fill(m, value, false)
+		per.Actions[action] = f.Fill(m, value)
 	}
+
 }

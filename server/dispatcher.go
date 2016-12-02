@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jmartin82/mmock/amqp"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/proxy"
 	"github.com/jmartin82/mmock/route"
@@ -23,7 +22,6 @@ type Dispatcher struct {
 	Router        route.Router
 	Translator    translate.MessageTranslator
 	VarsProcessor vars.VarsProcessor
-	MessageSender amqp.Sender
 	Mlog          chan definition.Match
 }
 
@@ -68,11 +66,6 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		} else {
 
 			di.VarsProcessor.Eval(&mRequest, mock)
-
-			if (definition.Notify{}) != mock.Notify {
-				go di.MessageSender.Send(mock)
-			}
-
 			if mock.Control.Crazy {
 				log.Printf("Running crazy mode")
 				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)

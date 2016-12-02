@@ -113,7 +113,7 @@ func (fv FakeVars) getMethodAndParameter(input string) (method string, parameter
 	return
 }
 
-func (fv FakeVars) Fill(m *definition.Mock, input string, multipleMatch bool) string {
+func (fv FakeVars) Fill(m *definition.Mock, input string) string {
 	r := regexp.MustCompile(`\{\{\s*fake\.([^{]+?)\s*\}\}`)
 
 	return r.ReplaceAllStringFunc(input, func(raw string) string {

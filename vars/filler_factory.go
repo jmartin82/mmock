@@ -10,7 +10,6 @@ import (
 type FillerFactory interface {
 	CreateRequestFiller(req *definition.Request) Filler
 	CreateFakeFiller(Fake fakedata.DataFaker) Filler
-	CreateStorageFiller(Engines *persist.PersistEngineBag) Filler
 	CreatePersistFiller(Engines *persist.PersistEngineBag) Filler
 }
 
@@ -22,10 +21,6 @@ func (mff MockFillerFactory) CreateRequestFiller(req *definition.Request) Filler
 
 func (mff MockFillerFactory) CreateFakeFiller(fake fakedata.DataFaker) Filler {
 	return FakeVars{Fake: fake}
-}
-
-func (mff MockFillerFactory) CreateStorageFiller(engines *persist.PersistEngineBag) Filler {
-	return StorageVars{Engines: engines, RegexHelper: utils.RegexHelper{}}
 }
 
 func (mff MockFillerFactory) CreatePersistFiller(engines *persist.PersistEngineBag) Filler {

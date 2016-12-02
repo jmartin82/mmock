@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jmartin82/mmock/amqp"
 	"github.com/jmartin82/mmock/console"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
@@ -75,13 +74,7 @@ func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.
 }
 
 func loadVarsProcessorEngines(persistPath string) *persist.PersistEngineBag {
-	var persister persist.EntityPersister
-	if strings.Index(persistPath, "mongodb://") < 0 {
-		persister = persist.NewFilePersister(persistPath)
-	} else {
-		persister = persist.NewMongoPersister(persistPath)
-	}
-
+	persister := persist.NewFilePersister(persistPath)
 	persistBag := persist.GetNewPersistEngineBag(persister)
 	return persistBag
 }
@@ -98,7 +91,6 @@ func startServer(ip string, port int, done chan bool, router route.Router, mLog 
 		Translator:    translate.HTTPTranslator{},
 		VarsProcessor: varsProcessor,
 		Mlog:          mLog,
-		MessageSender: &amqp.MessageSender{},
 	}
 	dispatcher.Start()
 	done <- true
