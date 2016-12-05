@@ -56,8 +56,9 @@ func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, map[s
 			return &md, nil
 		}
 		errors[mock.Name] = err.Error()
-		log.Printf("Discarting mock: %s Reason: %s\n", mock.Name, err.Error())
-
+		if err != match.ErrPathNotMatch {
+			log.Printf("Discarding mock: %s Reason: %s\n", mock.Name, err.Error())
+		}
 	}
 
 	return &definition.Mock{Response: definition.Response{StatusCode: 404}}, errors

@@ -69,12 +69,12 @@ func mockIncludesMethod(mock *definition.Request, method string) bool {
 }
 
 func (mm MockMatch) Match(req *definition.Request, mock *definition.Request) (bool, error) {
-	if !mockIncludesMethod(mock, req.Method) {
-		return false, ErrMethodNotMatch
-	}
-
 	if !glob.Glob(mock.Path, req.Path) {
 		return false, ErrPathNotMatch
+	}
+
+	if !mockIncludesMethod(mock, req.Method) {
+		return false, ErrMethodNotMatch
 	}
 
 	if !mm.matchKeyAndValues(req.QueryStringParameters, mock.QueryStringParameters) {
