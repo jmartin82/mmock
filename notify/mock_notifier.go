@@ -21,7 +21,7 @@ func NewMockNotifier() MockNotifier {
 //Notify the needed parties
 func (notifier MockNotifier) Notify(mock *definition.Mock) bool {
 	success := notifier.Sender.Send(mock)
-	for _, request := range mock.Notify.Call {
+	for _, request := range mock.Notify.Http {
 		successfulRequest := notifier.Caller.Call(request)
 		success = success && successfulRequest
 	}

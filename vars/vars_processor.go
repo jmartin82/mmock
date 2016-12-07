@@ -57,19 +57,19 @@ func (fp VarsProcessor) walkAndFillNotify(f Filler, m *definition.Mock) {
 	amqp := &m.Notify.Amqp
 	amqp.Body = f.Fill(m, amqp.Body, false)
 
-	call := m.Notify.Call
+	http := m.Notify.Http
 
-	for index, request := range call {
-		m.Notify.Call[index].Body = f.Fill(m, request.Body, false)
-		m.Notify.Call[index].Path = f.Fill(m, request.Path, false)
+	for index, request := range http {
+		m.Notify.Http[index].Body = f.Fill(m, request.Body, false)
+		m.Notify.Http[index].Path = f.Fill(m, request.Path, false)
 		for header, values := range request.Headers {
 			for i, value := range values {
-				m.Notify.Call[index].Headers[header][i] = f.Fill(m, value, false)
+				m.Notify.Http[index].Headers[header][i] = f.Fill(m, value, false)
 			}
 		}
 
 		for cookie, value := range request.Cookies {
-			m.Notify.Call[index].Cookies[cookie] = f.Fill(m, value, false)
+			m.Notify.Http[index].Cookies[cookie] = f.Fill(m, value, false)
 		}
 	}
 }

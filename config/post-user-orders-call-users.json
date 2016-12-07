@@ -21,7 +21,7 @@
         "body":"{{persist.entity.content}}"
     },
     "notify":{  
-        "call":[{  
+        "http":[{  
             "method":"POST",
             "path":"/users/{{request.url./user-orders/(?P<value>\\d+)}}.json",
             "body":"{ \"FirstName\": \"{{fake.FirstName}}\", \"LastName\": \"{{fake.LastName}}\" }"

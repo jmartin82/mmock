@@ -177,7 +177,7 @@ Mock definition:
 			"userId": "",
 			"appId": "" 
         },
-		"call":[
+		"http":[
 			{
 				"method": "GET|POST|PUT|PATCH|...",
 				"path": "/relative/path/to/call/{{request.url./your/path/(?P<value>\\d+)}}",
@@ -262,7 +262,7 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 	* *userId*: Creating user id - ex: "guest".
 	* *appId*: Creating application id.  
 
-* *call*: An array of [requests](#request) to be made from the mock. This can be useful if you want to create more than one entity when calling an endpoint - that endpoint may call additional endpoints to init other entities related to this one. An example usage can be found in [post-user-orders-call-users.json](config/post-user-orders-call-users.json)
+* *http*: An array of [requests](#request) to be made from the mock. This can be useful if you want to create more than one entity when calling an endpoint - that endpoint may call additional endpoints to init other entities related to this one. An example usage can be found in [post-user-orders-call-users.json](config/post-user-orders-call-users.json)
 
 #### Control (Optional)
 

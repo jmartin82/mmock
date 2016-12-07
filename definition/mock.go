@@ -19,7 +19,7 @@ type Persist struct {
 
 type Notify struct {
 	Amqp AMQPPublishing `json:"amqp"`
-	Call Requests       `json:"call"`
+	Http Requests       `json:"http"`
 }
 
 //Mock contains the user mock definition
