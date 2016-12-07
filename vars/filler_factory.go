@@ -11,9 +11,14 @@ type FillerFactory interface {
 	CreateRequestFiller(req *definition.Request) Filler
 	CreateFakeFiller(Fake fakedata.DataFaker) Filler
 	CreatePersistFiller(Engines *persist.PersistEngineBag) Filler
+	CreateTransformFiller() Filler
 }
 
 type MockFillerFactory struct{}
+
+func (mff MockFillerFactory) CreateTransformFiller() Filler {
+	return TransformVars{}
+}
 
 func (mff MockFillerFactory) CreateRequestFiller(req *definition.Request) Filler {
 	return RequestVars{Request: req, RegexHelper: utils.RegexHelper{}}
