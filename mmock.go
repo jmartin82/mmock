@@ -9,14 +9,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jmartin82/mmock/amqp"
 	"github.com/jmartin82/mmock/console"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
+	"github.com/jmartin82/mmock/notify"
 	"github.com/jmartin82/mmock/persist"
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/server"
 	"github.com/jmartin82/mmock/translate"
+	"github.com/jmartin82/mmock/utils"
 	"github.com/jmartin82/mmock/vars"
 	"github.com/jmartin82/mmock/vars/fakedata"
 )
@@ -28,7 +29,7 @@ var ErrNotFoundDefaultPath = errors.New("We can't determinate the current path")
 var ErrNotFoundAnyMock = errors.New("No valid mock definition found")
 
 func banner() {
-	fmt.Println("MMock v 0.0.1")
+	fmt.Println("MMock v 1.0.1")
 	fmt.Println("")
 
 	fmt.Print(
@@ -98,7 +99,7 @@ func startServer(ip string, port int, done chan bool, router route.Router, mLog 
 		Translator:    translate.HTTPTranslator{},
 		VarsProcessor: varsProcessor,
 		Mlog:          mLog,
-		MessageSender: &amqp.MessageSender{},
+		Notifier:      notify.NewMockNotifier(),
 	}
 	dispatcher.Start()
 	done <- true
@@ -162,10 +163,13 @@ func main() {
 	persistEngineBag := loadVarsProcessorEngines(persistPath)
 	varsProcessor := getVarsProcessor(persistEngineBag)
 	go startServer(*sIP, *sPort, done, router, mLog, varsProcessor)
-	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
+
+	utils.SetServerAddress(fmt.Sprintf("http://%s:%d", *sIP, *sPort))
+
+	log.Printf("HTTP Server running at %s\n", utils.GetServerAddress())
 	if *console {
 		go startConsole(*cIP, *cPort, done, mLog)
-		log.Printf("Console running at %s:%d\n", *cIP, *cPort)
+		log.Printf("Console running at http://%s:%d\n", *cIP, *cPort)
 	}
 
 	<-done
