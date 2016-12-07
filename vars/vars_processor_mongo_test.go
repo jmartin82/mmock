@@ -1,11 +1,11 @@
 package vars
 
 import (
-	"log"
 	"testing"
 	"time"
 
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/logging"
 	"github.com/jmartin82/mmock/persist"
 	"github.com/jmartin82/mmock/utils"
 	"github.com/jmartin82/mmock/vars/fakedata"
@@ -48,7 +48,7 @@ func hasConnection(t *testing.T) bool {
 
 		session, err := mgo.DialWithInfo(dialInfo)
 		if err != nil {
-			log.Printf("Cannot connect to mongo, make sure you have installed mongo server listening on mongodb://localhost. Error: %s", err.Error())
+			logging.Printf("Cannot connect to mongo, make sure you have installed mongo server listening on mongodb://localhost. Error: %s", err.Error())
 			connectionState = fail
 			return false
 		}

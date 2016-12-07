@@ -3,10 +3,10 @@ package route
 import (
 	"bytes"
 	"encoding/gob"
-	"log"
 	"sync"
 
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/logging"
 	"github.com/jmartin82/mmock/match"
 )
 
@@ -33,11 +33,11 @@ func (rr *RequestRouter) Copy(src, dst *definition.Mock) {
 	dec := gob.NewDecoder(&mod)
 	err := enc.Encode(src)
 	if err != nil {
-		log.Fatal("encode error:", err)
+		logging.Fatal("encode error:", err)
 	}
 	err = dec.Decode(dst)
 	if err != nil {
-		log.Fatal("decode error:", err)
+		logging.Fatal("decode error:", err)
 	}
 
 }
@@ -57,7 +57,7 @@ func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, map[s
 		}
 		errors[mock.Name] = err.Error()
 		if err != match.ErrPathNotMatch {
-			log.Printf("Discarding mock: %s Reason: %s\n", mock.Name, err.Error())
+			logging.Printf("Discarding mock: %s Reason: %s\n", mock.Name, err.Error())
 		}
 	}
 
@@ -78,7 +78,7 @@ func (rr *RequestRouter) MockChangeWatch() {
 		for {
 			mocks := <-rr.DUpdates
 			rr.SetMockDefinitions(mocks)
-			log.Println("New mock definitions loaded")
+			logging.Println("New mock definitions loaded")
 		}
 
 	}()

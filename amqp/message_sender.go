@@ -1,10 +1,10 @@
 package amqp
 
 import (
-	"log"
 	"time"
 
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/logging"
 	"github.com/streadway/amqp"
 )
 
@@ -18,7 +18,7 @@ func (msender MessageSender) Send(m *definition.Mock) bool {
 		return true
 	}
 	if m.Notify.Amqp.Delay > 0 {
-		log.Printf("Adding a delay before sending message: %d\n", m.Notify.Amqp.Delay)
+		logging.Printf("Adding a delay before sending message: %d\n", m.Notify.Amqp.Delay)
 		time.Sleep(time.Duration(m.Notify.Amqp.Delay) * time.Second)
 	}
 
@@ -29,7 +29,7 @@ func sendMessage(m *definition.Mock) bool {
 	conn, err := amqp.Dial(m.Notify.Amqp.URL)
 
 	if err != nil {
-		log.Printf("Failed to connect to server: %s\n", err)
+		logging.Printf("Failed to connect to server: %s\n", err)
 		return false
 	}
 	defer conn.Close()
@@ -37,7 +37,7 @@ func sendMessage(m *definition.Mock) bool {
 	ch, err := conn.Channel()
 
 	if err != nil {
-		log.Printf("Failed to open a channel: %s\n", err)
+		logging.Printf("Failed to open a channel: %s\n", err)
 		return false
 	}
 
@@ -65,16 +65,16 @@ func sendMessage(m *definition.Mock) bool {
 		})
 
 	if err != nil {
-		log.Printf("Failed to publish a message: %s\n", err)
+		logging.Printf("Failed to publish a message: %s\n", err)
 		return false
 	}
 
-	log.Println("Notified message by AMQP")
+	logging.Println("Notified message by AMQP")
 	return true
 }
 
 func failOnError(err error, msg string) {
 	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
+		logging.Fatalf("%s: %s", msg, err)
 	}
 }

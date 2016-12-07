@@ -3,8 +3,9 @@ package definition
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"path/filepath"
+
+	"github.com/jmartin82/mmock/logging"
 )
 
 //JSONReader struct created to read json config files
@@ -22,11 +23,11 @@ func (jp JSONReader) Read(filename string) (Mock, error) {
 	if err != nil {
 		return Mock{}, err
 	}
-	log.Printf("Loading JSON config: %s\n", filename)
+	logging.Printf("Loading JSON config: %s\n", filename)
 	m := Mock{}
 	err = json.Unmarshal(buf, &m)
 	if err != nil {
-		log.Printf("Invalid mock definition in: %s\n", filename)
+		logging.Printf("Invalid mock definition in: %s\n", filename)
 		return Mock{}, err
 	}
 	return m, nil

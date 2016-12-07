@@ -2,7 +2,6 @@ package persist
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -11,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/jmartin82/mmock/logging"
 	"github.com/jmartin82/mmock/utils"
 	"github.com/ryanuber/go-glob"
 )
@@ -27,9 +27,9 @@ func (fp FilePersister) GetName() string {
 func (fp FilePersister) Read(name string) (string, error) {
 
 	pathToFile, _ := fp.getFilePath(name)
-	log.Printf("Reading entity: %s\n", pathToFile)
+	logging.Printf("Reading entity: %s\n", pathToFile)
 	if _, err := os.Stat(pathToFile); err != nil {
-		log.Printf("Error reading the entity (%s)\n", err)
+		logging.Printf("Error reading the entity (%s)\n", err)
 		return "", err
 	}
 
@@ -38,7 +38,7 @@ func (fp FilePersister) Read(name string) (string, error) {
 }
 
 func (fp FilePersister) ReadCollection(name string) (string, error) {
-	log.Printf("Reading collection: %s\n", name)
+	logging.Printf("Reading collection: %s\n", name)
 	filesInCollection := fp.getCollectionFiles(name)
 
 	contents := []string{}
@@ -77,13 +77,13 @@ func (fp FilePersister) Delete(name string) error {
 }
 
 func (fp FilePersister) DeleteCollection(name string) error {
-	log.Printf("Deleting collection: %s\n", name)
+	logging.Printf("Deleting collection: %s\n", name)
 	filesInCollection := fp.getCollectionFiles(name)
 
 	for _, file := range filesInCollection {
 		err := os.Remove(file)
 		if err != nil {
-			log.Println(err)
+			logging.Println(err)
 		}
 	}
 	return nil
@@ -125,7 +125,7 @@ func (fp FilePersister) getFilePath(fileName string) (pathToFile string, fileDir
 		return "", ""
 	}
 	if !strings.HasPrefix(pathToFile, fp.PersistPath) {
-		log.Printf("File path not under the persist path. FilePath: %s, PersistPath %s", pathToFile, fp.PersistPath)
+		logging.Printf("File path not under the persist path. FilePath: %s, PersistPath %s", pathToFile, fp.PersistPath)
 		return "", ""
 	}
 
@@ -141,7 +141,7 @@ func (fp FilePersister) getFolderPath(folderName string) (pathToFolder string) {
 		return ""
 	}
 	if !strings.HasPrefix(pathToFolder, fp.PersistPath) {
-		log.Printf("Folder path not under the persist path. FilePath: %s, PersistPath %s", pathToFolder, fp.PersistPath)
+		logging.Printf("Folder path not under the persist path. FilePath: %s, PersistPath %s", pathToFolder, fp.PersistPath)
 		return ""
 	}
 

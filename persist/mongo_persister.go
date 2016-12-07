@@ -2,12 +2,12 @@ package persist
 
 import (
 	"errors"
-	"log"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 
+	"github.com/jmartin82/mmock/logging"
 	"github.com/jmartin82/mmock/utils"
 	"github.com/ryanuber/go-glob"
 )
@@ -31,14 +31,14 @@ func (mp MongoPersister) Read(name string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	log.Printf("Reading entity %s from collection %s\n", id, collectionName)
+	logging.Printf("Reading entity %s from collection %s\n", id, collectionName)
 
 	content, err := mp.Repository.GetItem(collectionName, id)
 	return content, err
 }
 
 func (mp MongoPersister) ReadCollection(name string) (string, error) {
-	log.Printf("Reading collection: %s\n", name)
+	logging.Printf("Reading collection: %s\n", name)
 	itemsInCollection := mp.getCollectionItems(name)
 
 	contents := []string{}
@@ -66,7 +66,7 @@ func (mp MongoPersister) ReadCollection(name string) (string, error) {
 func (mp MongoPersister) Write(name, content string) error {
 	collectionName, id, err := mp.getItemInfo(name)
 	if err == nil {
-		log.Printf("Writing entity %s from collection %s\n", id, collectionName)
+		logging.Printf("Writing entity %s from collection %s\n", id, collectionName)
 		err = mp.Repository.UpsertItem(collectionName, id, content)
 	}
 	return err
@@ -75,20 +75,20 @@ func (mp MongoPersister) Write(name, content string) error {
 func (mp MongoPersister) Delete(name string) error {
 	collectionName, id, err := mp.getItemInfo(name)
 	if err == nil {
-		log.Printf("Deleting entity %s from collection %s\n", id, collectionName)
+		logging.Printf("Deleting entity %s from collection %s\n", id, collectionName)
 		err = mp.Repository.DeleteItem(collectionName, id)
 	}
 	return err
 }
 
 func (mp MongoPersister) DeleteCollection(name string) error {
-	log.Printf("Deleting collection: %s\n", name)
+	logging.Printf("Deleting collection: %s\n", name)
 	itemsInCollection := mp.getCollectionItems(name)
 
 	for key, _ := range itemsInCollection {
 		collectionName, id, err := mp.getItemInfo(key)
 		if err == nil {
-			log.Printf("Deleting entity %s from collection %s\n", id, collectionName)
+			logging.Printf("Deleting entity %s from collection %s\n", id, collectionName)
 			err = mp.Repository.DeleteItem(collectionName, id)
 		}
 	}
@@ -155,7 +155,7 @@ func (mp MongoPersister) getItemsInCollection(collectionName string) map[string]
 	dataItems, err := mp.Repository.GetAllItems(collection)
 
 	if err != nil {
-		log.Println(err)
+		logging.Println(err)
 		return items
 	}
 

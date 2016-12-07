@@ -1,9 +1,8 @@
 package persist
 
 import (
-	"log"
-
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/logging"
 	"github.com/jmartin82/mmock/utils"
 )
 
@@ -26,7 +25,7 @@ func (ea EntityActions) ApplyActions(m *definition.Mock) {
 	fileName := m.Persist.Entity
 	if value, ok := m.Persist.Actions["write"]; ok {
 		if err := engine.Write(fileName, value); err != nil {
-			log.Println("Error writing in a entity")
+			logging.Println("Error writing in a entity")
 			return
 		}
 	}
@@ -40,30 +39,30 @@ func (ea EntityActions) ApplyActions(m *definition.Mock) {
 			content, err = engine.Read(fileName)
 		}
 		if err != nil {
-			log.Println("Error reading in a entity")
+			logging.Println("Error reading in a entity")
 			return
 		}
 		if utils.IsJSON(content) && utils.IsJSON(value) {
 			content = utils.JoinJSON(content, value)
 		} else if utils.IsJSON(content) && !utils.IsJSON(value) {
-			log.Printf("There is no way to append this : %s\n", value)
+			logging.Printf("There is no way to append this : %s\n", value)
 		} else {
 			content += value
 		}
 		if err := engine.Write(fileName, content); err != nil {
-			log.Println("Error appending in a entity")
+			logging.Println("Error appending in a entity")
 		}
 	}
 
 	if _, ok := m.Persist.Actions["delete"]; ok {
 		if m.Persist.Collection != "" {
 			if err := engine.DeleteCollection(m.Persist.Collection); err != nil {
-				log.Println("Error deleting collection")
+				logging.Println("Error deleting collection")
 				return
 			}
 		} else {
 			if err := engine.Delete(fileName); err != nil {
-				log.Println("Error deleting a entity")
+				logging.Println("Error deleting a entity")
 				return
 			}
 		}

@@ -27,6 +27,12 @@
 		  	  var message = JSON.parse(event.data);
 		  	  logRequest(message);		      
 		  };
+
+			var ws = new WebSocket("ws://" + location.host + "/log");
+		  ws.onmessage = function(e) {
+					var message = JSON.parse(event.data);
+		  	  writeLog(message);		      
+		  };
 	});
 		</script>
 </head>
@@ -41,7 +47,7 @@
 					<div class="panel-heading">
 						<h3 class="panel-title">MMock Console</h3>
 					</div>
-					<div class="panel-body" style="overflow:auto">
+					<div class="panel-body" id="divGroupConsole" style="overflow:auto">
 						
 							<ul class="list-group" id="groupConsole">
 								
@@ -52,7 +58,7 @@
 						<label style="padding-top: 1%;">
 							<input type="checkbox" id="chkAutoScroll" checked="true" > Auto scroll
 						</label>
-						<button type="button" class="btn btn-primary" tabindex="0" id="btnClearLog" style="float:right;">
+						<button type="button" class="btn btn-primary" tabindex="0" id="btnClearConsole" style="float:right;">
 						<span class="glyphicon glyphicon-remove-sign"></span> Clear Console</button>
 					</div>
 				</div>
@@ -101,6 +107,30 @@
 				</div>
 			</div>
 
+		</div>
+
+		<div class="row">
+			<div class="col-md-12 col-lg-12 console">
+				<div class="panel panel-primary" >
+					<div class="panel-heading">
+						<h3 class="panel-title">Execution Logs</h3>
+					</div>
+					<div class="panel-body" id="divGroupLog" style="overflow:auto">
+						
+							<ul class="list-group" id="groupLog">
+								
+							</ul>
+						
+					</div>
+					<div class="panel-footer">
+						<label style="padding-top: 1%;">
+							<input type="checkbox" id="chkLogAutoScroll" checked="true" > Auto scroll
+						</label>
+						<button type="button" class="btn btn-primary" tabindex="0" id="btnClearLog" style="float:right;">
+						<span class="glyphicon glyphicon-remove-sign"></span> Clear Log</button>
+					</div>
+				</div>
+			</div>	
 		</div>
 	</div>
 

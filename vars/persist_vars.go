@@ -1,12 +1,12 @@
 package vars
 
 import (
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/logging"
 	"github.com/jmartin82/mmock/persist"
 	"github.com/jmartin82/mmock/utils"
 )
@@ -132,7 +132,7 @@ func (pv PersistVars) callSequence(m *definition.Mock, parameters string) (strin
 
 	increaseInt, err := strconv.Atoi(increase)
 	if err != nil {
-		log.Printf("Error parsing increase value: %s\n", err.Error())
+		logging.Printf("Error parsing increase value: %s\n", err.Error())
 		return "", false
 	}
 

@@ -2,13 +2,13 @@ package vars
 
 import (
 	"errors"
-	"log"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/logging"
 	"github.com/jmartin82/mmock/vars/fakedata"
 )
 
@@ -74,7 +74,7 @@ func (fv FakeVars) callMethod(name string) (string, bool) {
 
 					result, err := fv.call(data, method.Name)
 					if err != nil {
-						log.Printf(err.Error())
+						logging.Printf(err.Error())
 					}
 					return result, err == nil
 				}

@@ -1,8 +1,9 @@
 package persist
 
 import (
-	"log"
 	"strings"
+
+	"github.com/jmartin82/mmock/logging"
 )
 
 type PersistEngineBag struct {
@@ -26,7 +27,7 @@ func (peb *PersistEngineBag) Get(name string) EntityPersister {
 	}
 
 	def := peb.engines["default"]
-	log.Printf("Using the default persist engine: %s\n", def.GetName())
+	logging.Printf("Using the default persist engine: %s\n", def.GetName())
 	return def
 }
 
