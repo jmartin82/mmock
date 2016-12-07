@@ -2,13 +2,17 @@ var count = 0;
 var requests = [];
 
 $(document).ready(function() {
-    $("#btnClearLog").click(function() {
+    $("#btnClearConsole").click(function() {
         $("#groupConsole").empty();
         $("#tirecap").hide();
         $("#hdrequest").html("");
         $("#hdresponse").html("");
         $("#hdpersist").html("");
         $("#hdlog").html("");
+    });
+
+    $("#btnClearLog").click(function() {
+        $("#groupLog").empty();
     });
 });
 
@@ -80,6 +84,14 @@ function logRequest(json) {
     $("#groupConsole").append('<li id="row-request-' + id + '" class="list-group-item list-group-item-' + getColorByStatus(status) + '" onclick="showDetails(' + id + ');return false">' + fullLog + '</li>');
     showDetails(id)
     clearOldLogs();
+    scrollConsoleDown();
+}
+
+function writeLog(text) {
+    var datetime = getCurrentTime();
+    var fullLog = datetime + " <- " + text;
+    $("#groupLog").append('<li class="list-group-item">' + fullLog + '</li>');
+    clearOldLogs();
     scrollLogsDown();
 }
 
@@ -91,9 +103,15 @@ function clearOldLogs() {
     }
 }
 
-function scrollLogsDown() {
+function scrollConsoleDown() {
     if ($("#chkAutoScroll").is(':checked')) {
-        $("#groupConsole").scrollTop($("#groupConsole").get(0).scrollHeight);
+        $("#divGroupConsole").scrollTop($("#divGroupConsole").get(0).scrollHeight);
+    }
+}
+
+function scrollLogsDown() {
+    if ($("#chkLogAutoScroll").is(':checked')) {
+        $("#divGroupLog").scrollTop($("#divGroupLog").get(0).scrollHeight);
     }
 }
 

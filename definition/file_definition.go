@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"sort"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/jmartin82/mmock/logging"
 )
 
 //ErrNotFoundPath error from missing or configuration path
@@ -75,7 +75,7 @@ func (fd *FileDefinition) readMock(filename string) (Mock, error) {
 	m := Mock{}
 	err = json.Unmarshal(buf, &m)
 	if err != nil {
-		log.Printf("Invalid mock definition in: %s\n", filename)
+		logging.Printf("Invalid mock definition in: %s\n", filename)
 		return Mock{}, err
 	}
 	m.Name = filepath.Base(filename)
@@ -86,13 +86,13 @@ func (fd *FileDefinition) readMock(filename string) (Mock, error) {
 func (fd *FileDefinition) WatchDir() {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Println("Hot mock file changing not available.")
+		logging.Println("Hot mock file changing not available.")
 		return
 	}
 
 	err = watcher.Add(fd.Path)
 	if err != nil {
-		log.Printf("Hot mock file changing not available in folder: %s\n", fd.Path)
+		logging.Printf("Hot mock file changing not available in folder: %s\n", fd.Path)
 		return
 	}
 
@@ -100,7 +100,7 @@ func (fd *FileDefinition) WatchDir() {
 		if fileInfo.IsDir() {
 			err = watcher.Add(path)
 			if err != nil {
-				log.Printf("Hot mock file changing not available in folder: %s\n", fd.Path)
+				logging.Printf("Hot mock file changing not available in folder: %s\n", fd.Path)
 				return err
 			}
 		}
@@ -115,12 +115,12 @@ func (fd *FileDefinition) WatchDir() {
 			case event := <-watcher.Events:
 				if event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Create == fsnotify.Create || event.Op&fsnotify.Remove == fsnotify.Remove {
 
-					log.Println("Changes detected in mock definitions")
+					logging.Println("Changes detected in mock definitions")
 					fd.Updates <- fd.ReadMocksDefinition()
 
 				}
 			case err := <-watcher.Errors:
-				log.Fatal(err)
+				logging.Fatal(err)
 			}
 		}
 	}()
@@ -135,7 +135,7 @@ func (fd *FileDefinition) AddConfigReader(reader ConfigReader) {
 func (fd *FileDefinition) ReadMocksDefinition() []Mock {
 
 	if !fd.existsConfigPath(fd.Path) {
-		log.Fatalf(ErrNotFoundPath.Error())
+		logging.Fatalf(ErrNotFoundPath.Error())
 	}
 
 	mocks := []Mock{}

@@ -3,10 +3,10 @@ package proxy
 import (
 	"bytes"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/logging"
 )
 
 // Proxy calls to real service
@@ -17,7 +17,7 @@ type Proxy struct {
 // MakeRequest creates a real request to the desired service using data from the original request
 func (pr *Proxy) MakeRequest(request definition.Request) definition.Response {
 
-	log.Println("Proxy to URL:>", pr.URL)
+	logging.Println("Proxy to URL:>", pr.URL)
 
 	req, err := http.NewRequest(request.Method, pr.URL, bytes.NewBufferString(request.Body))
 	for h, values := range request.Headers {

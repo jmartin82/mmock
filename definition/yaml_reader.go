@@ -2,10 +2,10 @@ package definition
 
 import (
 	"io/ioutil"
-	"log"
 	"path/filepath"
 
 	"github.com/ghodss/yaml"
+	"github.com/jmartin82/mmock/logging"
 )
 
 //YAMLReader struct created to read yaml config files
@@ -23,12 +23,12 @@ func (jp YAMLReader) Read(filename string) (Mock, error) {
 	if err != nil {
 		return Mock{}, err
 	}
-	log.Printf("Loading YAML config: %s\n", filename)
+	logging.Printf("Loading YAML config: %s\n", filename)
 	m := Mock{}
 	err = yaml.Unmarshal(buf, &m)
 	if err != nil {
-		log.Printf("Invalid mock definition in: %s\n", filename)
-		log.Printf(err.Error())
+		logging.Printf("Invalid mock definition in: %s\n", filename)
+		logging.Printf(err.Error())
 		return Mock{}, err
 	}
 	return m, nil

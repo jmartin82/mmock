@@ -3,9 +3,9 @@ package persist
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"time"
 
+	"github.com/jmartin82/mmock/logging"
 	"github.com/jmartin82/mmock/utils"
 	"github.com/tidwall/sjson"
 	"gopkg.in/mgo.v2"
@@ -152,7 +152,7 @@ func NewMongoRepository(connectionString string) *MongoRepository {
 
 	dialInfo, err := mgo.ParseURL(connectionString)
 	if err != nil {
-		log.Println(err)
+		logging.Println(err)
 	}
 
 	if dialInfo.Database == "" {
