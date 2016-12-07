@@ -1,0 +1,30 @@
+{  
+    "description": "Sends a message to an AMQP server after the content is persisted",
+    "request":{  
+        "method":"POST",
+        "path":"/user-orders/*.json"
+    },
+    "persist": {
+        "entity": "/orders/user-orders-{{request.url./user-orders/(?P<value>\\d+)}}.json",
+        "actions" : {
+            "write" : "{{request.body}}",
+            "append" : "{ \"user_id\": {{request.url./user-orders/(?P<value>\\d+)}}, \"order\": \"{{ fake.Digits }}\" }"
+        }
+    },
+    "response":{  
+        "statusCode":202,
+        "headers":{  
+            "Content-Type":[  
+            "application/json"
+            ]
+        },
+        "body":"{{persist.entity.content}}"
+    },
+    "notify":{  
+        "http":[{  
+            "method":"POST",
+            "path":"/users/{{request.url./user-orders/(?P<value>\\d+)}}.json",
+            "body":"{ \"FirstName\": \"{{fake.FirstName}}\", \"LastName\": \"{{fake.LastName}}\" }"
+        }]
+    }
+}

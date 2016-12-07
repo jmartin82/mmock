@@ -8,6 +8,7 @@ type Control struct {
 }
 
 type Actions map[string]string
+type Requests []Request
 
 type Persist struct {
 	Entity     string  `json:"entity"`
@@ -18,6 +19,7 @@ type Persist struct {
 
 type Notify struct {
 	Amqp AMQPPublishing `json:"amqp"`
+	Http Requests       `json:"http"`
 }
 
 //Mock contains the user mock definition

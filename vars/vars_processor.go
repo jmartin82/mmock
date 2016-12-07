@@ -34,7 +34,6 @@ func (fp VarsProcessor) Eval(req *definition.Request, m *definition.Mock) {
 
 func (fp VarsProcessor) walkAndFill(f Filler, m *definition.Mock, fillPersisted bool) {
 	res := &m.Response
-	amqp := &m.Notify.Amqp
 	for header, values := range res.Headers {
 		for i, value := range values {
 			res.Headers[header][i] = f.Fill(m, value, false)
@@ -45,11 +44,33 @@ func (fp VarsProcessor) walkAndFill(f Filler, m *definition.Mock, fillPersisted 
 		res.Cookies[cookie] = f.Fill(m, value, false)
 	}
 
-	amqp.Body = f.Fill(m, amqp.Body, false)
 	res.Body = f.Fill(m, res.Body, false)
+
+	fp.walkAndFillNotify(f, m)
 
 	if fillPersisted {
 		fp.walkAndFillPersisted(f, m)
+	}
+}
+
+func (fp VarsProcessor) walkAndFillNotify(f Filler, m *definition.Mock) {
+	amqp := &m.Notify.Amqp
+	amqp.Body = f.Fill(m, amqp.Body, false)
+
+	http := m.Notify.Http
+
+	for index, request := range http {
+		m.Notify.Http[index].Body = f.Fill(m, request.Body, false)
+		m.Notify.Http[index].Path = f.Fill(m, request.Path, false)
+		for header, values := range request.Headers {
+			for i, value := range values {
+				m.Notify.Http[index].Headers[header][i] = f.Fill(m, value, false)
+			}
+		}
+
+		for cookie, value := range request.Cookies {
+			m.Notify.Http[index].Cookies[cookie] = f.Fill(m, value, false)
+		}
 	}
 }
 

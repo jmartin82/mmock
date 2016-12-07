@@ -176,7 +176,31 @@ Mock definition:
 			"timestamp": "2016-01-01T00:00:00Z",
 			"userId": "",
 			"appId": "" 
-        }
+        },
+		"http":[
+			{
+				"method": "GET|POST|PUT|PATCH|...",
+				"path": "/relative/path/to/call/{{request.url./your/path/(?P<value>\\d+)}}",
+				"headers": {
+					"name": ["value"]
+				},
+				"cookies": {
+					"name": "value"
+				},
+				"body": "body in request"
+			},
+			{
+				"method": "GET|POST|PUT|PATCH|...",
+				"path": "http://absolute.path/to/call/{{request.url./your/path/(?P<value>\\d+)}}",
+				"headers": {
+					"name": ["value"]
+				},
+				"cookies": {
+					"name": "value"
+				},
+				"body": "body in request"
+			},
+		]
 	}
 	"control": {
 		"proxyBaseURL": "string (original URL endpoint)
@@ -236,7 +260,9 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 	* *timestamp*: Message timestamp.
 	* *type*: Message type name.
 	* *userId*: Creating user id - ex: "guest".
-	* *appId*: Creating application id.
+	* *appId*: Creating application id.  
+
+* *http*: An array of [requests](#request) to be made from the mock. This can be useful if you want to create more than one entity when calling an endpoint - that endpoint may call additional endpoints to init other entities related to this one. An example usage can be found in [post-user-orders-call-users.json](config/post-user-orders-call-users.json)
 
 #### Control (Optional)
 
@@ -346,7 +372,7 @@ You can check the sample configurations for persistence in the following files:
 That configurations are going to work either with [File system](#file-system) or [MongoDB](#mongodb) modes.
 
 ### Contributors
-- [@vtrifonov](https://github.com/vtrifonov) [Persistence](#persist-optional) feature, improved variables support and [AMQP](#notify-optional) sending
+- [@vtrifonov](https://github.com/vtrifonov) [Persistence](#persist-optional) and [Notification](#notify-optional) features and improved variables support
 
 ### Contributing
 

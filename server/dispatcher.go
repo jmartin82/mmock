@@ -8,8 +8,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jmartin82/mmock/amqp"
+	"reflect"
+
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/notify"
 	"github.com/jmartin82/mmock/proxy"
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/translate"
@@ -23,7 +25,7 @@ type Dispatcher struct {
 	Router        route.Router
 	Translator    translate.MessageTranslator
 	VarsProcessor vars.VarsProcessor
-	MessageSender amqp.Sender
+	Notifier      notify.Notifier
 	Mlog          chan definition.Match
 }
 
@@ -69,8 +71,8 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 			di.VarsProcessor.Eval(&mRequest, mock)
 
-			if (definition.Notify{}) != mock.Notify {
-				go di.MessageSender.Send(mock)
+			if !reflect.DeepEqual(definition.Notify{}, mock.Notify) {
+				go di.Notifier.Notify(mock)
 			}
 
 			if mock.Control.Crazy {
