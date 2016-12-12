@@ -1,51 +1,39 @@
 package vars
 
 import (
-	"regexp"
 	"strings"
 
 	urlmatcher "github.com/azer/url-router"
 	"github.com/jmartin82/mmock/definition"
-	"github.com/jmartin82/mmock/utils"
 )
 
 type RequestVars struct {
-	Request     *definition.Request
-	RegexHelper utils.RegexHelper
+	Mock    *definition.Mock
+	Request *definition.Request
 }
 
-func (rp RequestVars) Fill(m *definition.Mock, input string) string {
-	r := regexp.MustCompile(`\{\{\s*request\.(.+?)\s*\}\}`)
+func (rp RequestVars) Fill(holders []string) map[string]string {
 
-	return r.ReplaceAllStringFunc(input, func(raw string) string {
-		// replace the strings
-		if r, found := rp.replaceString(m, raw); found {
-			return r
+	vars := make(map[string]string)
+	for _, tag := range holders {
+		found := false
+		s := ""
+		if tag == "request.body" {
+			s = rp.Request.Body
+		} else if i := strings.Index(tag, "request.query."); i == 0 {
+			s, found = rp.getQueryStringParam(rp.Request, tag[14:])
+		} else if i := strings.Index(tag, "request.path."); i == 0 {
+			s, found = rp.getPathParm(rp.Mock, rp.Request, tag[13:])
+		} else if i := strings.Index(tag, "request.cookie."); i == 0 {
+			s, found = rp.getCookieParam(rp.Request, tag[15:])
 		}
-		// replace regexes
-		return raw
-	})
 
-}
+		if found {
+			vars[tag] = s
+		}
 
-func (rp RequestVars) replaceString(m *definition.Mock, raw string) (string, bool) {
-	found := false
-	s := ""
-	tag := strings.Trim(raw[2:len(raw)-2], " ")
-	if tag == "request.body" {
-		s = rp.Request.Body
-		found = true
-	} else if i := strings.Index(tag, "request.query."); i == 0 {
-		s, found = rp.getQueryStringParam(rp.Request, tag[14:])
-	} else if i := strings.Index(tag, "request.path."); i == 0 {
-		s, found = rp.getPathParm(m, rp.Request, tag[13:])
-	} else if i := strings.Index(tag, "request.cookie."); i == 0 {
-		s, found = rp.getCookieParam(rp.Request, tag[15:])
 	}
-	if !found {
-		return raw, false
-	}
-	return s, true
+	return vars
 }
 
 func (rp RequestVars) getPathParm(m *definition.Mock, req *definition.Request, name string) (string, bool) {

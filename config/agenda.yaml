@@ -12,6 +12,7 @@ response:
   body: >
     {  
       "id":"{{request.query.user_id}}",
+      "full_name":"{{transform.merge(fake.FirstName,"  ",fake.LastName)}}",
       "first_name":"{{fake.FirstName}}",
       "last_name":"{{fake.LastName}}",
       "gender":"{{fake.Gender}}",

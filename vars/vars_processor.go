@@ -2,13 +2,14 @@ package vars
 
 import (
 	"regexp"
-
-	"log"
+	"strings"
 
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/persist"
 	"github.com/jmartin82/mmock/vars/fakedata"
 )
+
+var varsRegex = regexp.MustCompile(`\{\{\s*(.+?)\s*\}\}`)
 
 type VarsProcessor struct {
 	FillerFactory  FillerFactory
@@ -17,66 +18,79 @@ type VarsProcessor struct {
 }
 
 func (fp VarsProcessor) Eval(req *definition.Request, m *definition.Mock) {
-	requestFiller := fp.FillerFactory.CreateRequestFiller(req)
+	requestFiller := fp.FillerFactory.CreateRequestFiller(req, m)
 	fakeFiller := fp.FillerFactory.CreateFakeFiller(fp.FakeAdapter)
-	persistFiller := fp.FillerFactory.CreatePersistFiller(fp.PersistEngines)
 	transformFiller := fp.FillerFactory.CreateTransformFiller()
-	entityActions := persist.EntityActions{fp.PersistEngines}
 
-	log.Fatalln(fp.walkAndGet(m.Response))
+	//get var holders
+	holders := fp.walkAndGet(m.Response)
+	inputParams := transformFiller.GetFunctionVars(holders)
+	holders = append(holders, inputParams...)
 
-	fp.walkAndFill(requestFiller, m)
-	fp.walkAndFill(fakeFiller, m)
-	entityActions.ApplyActions(m)
-	fp.walkAndFill(persistFiller, m)
-	fp.walkAndFill(transformFiller, m)
+	//fill vars
+	vars := requestFiller.Fill(holders)
+	fp.mergeVars(vars, fakeFiller.Fill(holders))
+	fp.mergeVars(vars, transformFiller.Operate(holders, vars))
 
+	//replace vars
+	fp.walkAndFill(m, vars)
 }
 
 func (fp VarsProcessor) walkAndGet(res definition.Response) []string {
-	r := regexp.MustCompile(`\{\{\s*(.+?)\s*\}\}`)
+
 	vars := []string{}
 	for _, header := range res.Headers {
 		for _, value := range header {
-			m := r.FindStringSubmatch(value)
-			if len(m) > 1 {
-				vars = append(vars, m[1:]...)
-			}
+			fp.extractVars(value, &vars)
 		}
 
 	}
 	for _, value := range res.Cookies {
-
-		m := r.FindStringSubmatch(value)
-		if len(m) > 1 {
-			vars = append(vars, m[1:]...)
-		}
+		fp.extractVars(value, &vars)
 	}
 
-	if m := r.FindAllString(res.Body, -1); m != nil {
-		vars = append(vars, m[1])
-	}
-
+	fp.extractVars(res.Body, &vars)
 	return vars
 }
 
-func (fp VarsProcessor) walkAndFill(f Filler, m *definition.Mock) {
+func (fp VarsProcessor) walkAndFill(m *definition.Mock, vars map[string]string) {
 	res := &m.Response
-	per := &m.Persist
 	for header, values := range res.Headers {
 		for i, value := range values {
-			res.Headers[header][i] = f.Fill(m, value)
+			res.Headers[header][i] = fp.replaceVars(value, vars)
 		}
 
 	}
 	for cookie, value := range res.Cookies {
-		res.Cookies[cookie] = f.Fill(m, value)
+		res.Cookies[cookie] = fp.replaceVars(value, vars)
 	}
 
-	res.Body = f.Fill(m, res.Body)
-	per.Entity = f.Fill(m, per.Entity)
-	for action, value := range per.Actions {
-		per.Actions[action] = f.Fill(m, value)
-	}
+	res.Body = fp.replaceVars(res.Body, vars)
+}
 
+func (fp VarsProcessor) replaceVars(input string, vars map[string]string) string {
+	return varsRegex.ReplaceAllStringFunc(input, func(value string) string {
+		varName := strings.Trim(value, "{} ")
+		// replace the strings
+		if r, found := vars[varName]; found {
+			return r
+		}
+		// replace regexes
+		return value
+	})
+}
+
+func (fp VarsProcessor) extractVars(input string, vars *[]string) {
+	if m := varsRegex.FindAllString(input, -1); m != nil {
+		for _, v := range m {
+			varName := strings.Trim(v, "{} ")
+			*vars = append(*vars, varName)
+		}
+	}
+}
+
+func (fp VarsProcessor) mergeVars(org map[string]string, vals map[string]string) {
+	for k, v := range vals {
+		org[k] = v
+	}
 }

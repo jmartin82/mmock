@@ -1,48 +1,64 @@
 package vars
 
 import (
+	"bytes"
 	"regexp"
 	"strings"
-
-	"github.com/jmartin82/mmock/definition"
 )
 
 type TransformVars struct {
 }
 
-func (tv TransformVars) Fill(m *definition.Mock, input string) string {
-	r := regexp.MustCompile(`\{\{\s*transform\.(.+?)\s*\}\}`)
+func (tv TransformVars) Operate(holders []string, vars map[string]string) map[string]string {
 
-	return r.ReplaceAllStringFunc(input, func(raw string) string {
-		// replace the strings
-		if r, found := tv.replaceString(m, raw); found {
-			return r
+	result := make(map[string]string)
+
+	for _, tag := range holders {
+		found := false
+		s := ""
+		if i := strings.Index(tag, "transform.merge"); i == 0 {
+			s, found = tv.mergeContent(tag[15:], vars)
 		}
-		// replace regexes
-		return raw
-	})
 
+		if found {
+			result[tag] = s
+		}
+	}
+	return result
 }
 
-func (tv TransformVars) replaceString(m *definition.Mock, raw string) (string, bool) {
-	found := false
-	s := ""
-	tag := strings.Trim(raw[2:len(raw)-2], " ")
-	if i := strings.Index(tag, "transform.merge"); i == 0 {
-		s, found = tv.mergeContent(m, tag[15:])
+func (tv TransformVars) GetFunctionVars(vars []string) []string {
+	var result = []string{}
+	for _, name := range vars {
+		parms := tv.getParams(name)
+		result = append(result, parms...)
 	}
-
-	if !found {
-		return raw, false
-	}
-	return s, true
+	return result
 }
 
-func (tv TransformVars) mergeContent(m *definition.Mock, name string) (string, bool) {
+func (tv TransformVars) getParams(name string) []string {
 	r := regexp.MustCompile(`\((.*)\)`)
-	if len(r.FindStringSubmatch(name)) > 0 {
-		parts := strings.Split(r.FindStringSubmatch(name)[1], ",")
-		return strings.Join(parts, "#"), true
+	if m := r.FindStringSubmatch(name); len(m) > 0 {
+		return strings.Split(m[1], ",")
 	}
-	return "", false
+	return []string{}
+}
+
+func (tv TransformVars) mergeContent(name string, value map[string]string) (string, bool) {
+	found := false
+	parms := tv.getParams(name)
+	var buffer bytes.Buffer
+
+	for _, param := range parms {
+		if v, f := value[param]; f {
+			buffer.WriteString(v)
+			found = true
+		} else {
+			//regular string
+			buffer.WriteString(strings.Trim(param, "\"'"))
+		}
+
+	}
+	return buffer.String(), found
+
 }

@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/vars/fakedata"
 )
 
@@ -113,20 +112,20 @@ func (fv FakeVars) getMethodAndParameter(input string) (method string, parameter
 	return
 }
 
-func (fv FakeVars) Fill(m *definition.Mock, input string) string {
-	r := regexp.MustCompile(`\{\{\s*fake\.([^{]+?)\s*\}\}`)
+func (fv FakeVars) Fill(holders []string) map[string]string {
 
-	return r.ReplaceAllStringFunc(input, func(raw string) string {
+	vars := make(map[string]string)
+	for _, tag := range holders {
 		found := false
 		s := ""
-		tag := strings.Trim(raw[2:len(raw)-2], " ")
 		if i := strings.Index(tag, "fake."); i == 0 {
 			s, found = fv.callMethod(tag[5:])
 		}
 
-		if !found {
-			return raw
+		if found {
+			vars[tag] = s
 		}
-		return s
-	})
+
+	}
+	return vars
 }
