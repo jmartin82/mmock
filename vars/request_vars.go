@@ -20,6 +20,7 @@ func (rp RequestVars) Fill(holders []string) map[string]string {
 		s := ""
 		if tag == "request.body" {
 			s = rp.Request.Body
+			found = true
 		} else if i := strings.Index(tag, "request.query."); i == 0 {
 			s, found = rp.getQueryStringParam(rp.Request, tag[14:])
 		} else if i := strings.Index(tag, "request.path."); i == 0 {

@@ -1,11 +1,11 @@
-{
-    "description": "Getting all the records from the 'users' collection",  
+{  
+    "description": "Gets a persisted entity by matching the id from the url using regex",
     "request":{  
         "method":"GET",
-        "path":"/users"
+        "path":"/users/:userid.json"
     },
     "persist":{  
-        "collection":"users"
+        "entity":"/users/user-{{request.path.userid)}}.json"
     },
     "response":{  
         "statusCode":200,
@@ -14,6 +14,6 @@
                 "application/json"
             ]
         },
-        "body":"{{persist.collection.content}}"
+        "body":"{{persist.entity.content}}"
     }
 }

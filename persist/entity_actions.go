@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/jmartin82/mmock/definition"
-	"github.com/jmartin82/mmock/utils"
 )
 
 //FilePersister persists body in file
@@ -28,24 +27,6 @@ func (ea EntityActions) ApplyActions(m *definition.Mock) {
 		if err := engine.Write(fileName, value); err != nil {
 			log.Println("Error writing in a entity")
 			return
-		}
-	}
-
-	if value, ok := m.Persist.Actions["append"]; ok {
-		content, err := engine.Read(fileName)
-		if err != nil {
-			log.Println("Error reading in a entity")
-			return
-		}
-		if utils.IsJSON(content) && utils.IsJSON(value) {
-			content = utils.JoinJSON(content, value)
-		} else if utils.IsJSON(content) && !utils.IsJSON(value) {
-			log.Printf("There is no way to append this : %s\n", value)
-		} else {
-			content += value
-		}
-		if err := engine.Write(fileName, content); err != nil {
-			log.Println("Error appending in a entity")
 		}
 	}
 

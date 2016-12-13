@@ -1,11 +1,11 @@
 {  
-    "description": "Deleting multiple persisted entities by multiple regex match from the url e.g. /id-users/1,2,3,4,5 ",    
+    "description": "Deleting a persisted entity by matching the id from the url using regex",
     "request":{  
         "method":"DELETE",
-        "path":"/id-users/*"
+        "path":"/users/:userid.json"
     },
     "persist":{  
-        "collection":"users/user-{{request.url.(?P<value>\\d+)}}.json",
+        "entity":"/users/user-{{request.path.userid}}.json",
         "actions":{  
             "delete":"true"
         }
@@ -17,6 +17,6 @@
                 "application/json"
             ]
         },
-        "body":"Records Deleted"
+        "body":"Record Deleted"
     }
 }
