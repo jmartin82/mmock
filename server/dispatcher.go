@@ -85,7 +85,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	di.Translator.WriteHTTPResponseFromDefinition(&response, w)
 
 	//log to console
-	m := definition.Match{Request: mRequest, Response: response, Result: result, Persist: mock.Persist}
+	m := definition.Match{Request: mRequest, Response: response, Result: result}
 	go di.recordMatchData(m)
 }
 

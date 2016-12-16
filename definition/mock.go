@@ -1,18 +1,17 @@
 package definition
 
-type Control struct {
-	Priority     int    `json:"priority"`
-	Delay        int    `json:"delay"`
-	Crazy        bool   `json:"crazy"`
-	ProxyBaseURL string `json:"proxyBaseURL"`
+type Scenario struct {
+	Name          string   `json:"name"`
+	RequiredState []string `json:"requiredState"`
+	NewState      string   `json:"newState"`
 }
 
-type Actions map[string]string
-
-type Persist struct {
-	Entity  string  `json:"entity"`
-	Actions Actions `json:"actions"`
-	Engine  string  `json:"engine"`
+type Control struct {
+	Priority     int      `json:"priority"`
+	Delay        int      `json:"delay"`
+	Crazy        bool     `json:"crazy"`
+	Scenario     Scenario `json:"scenario"`
+	ProxyBaseURL string   `json:"proxyBaseURL"`
 }
 
 //Mock contains the user mock definition
@@ -21,6 +20,5 @@ type Mock struct {
 	Description string   `json:"description"`
 	Request     Request  `json:"request"`
 	Response    Response `json:"response"`
-	Persist     Persist  `json:"persist"`
 	Control     Control  `json:"control"`
 }

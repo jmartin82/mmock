@@ -4,14 +4,11 @@ import (
 	"testing"
 
 	"github.com/jmartin82/mmock/definition"
-	"github.com/jmartin82/mmock/persist"
 	"github.com/jmartin82/mmock/vars/fakedata"
 )
 
-func getProcessor(persistPath string) VarsProcessor {
-	filePersist := persist.FilePersister{PersistPath: persistPath}
-	persistBag := persist.GetNewPersistEngineBag(filePersist)
-	return VarsProcessor{FillerFactory: MockFillerFactory{}, FakeAdapter: fakedata.NewDummyDataFaker("AleixMG"), PersistEngines: persistBag}
+func getProcessor() VarsProcessor {
+	return VarsProcessor{FillerFactory: MockFillerFactory{}, FakeAdapter: fakedata.NewDummyDataFaker("AleixMG")}
 }
 
 func TestReplaceTags(t *testing.T) {

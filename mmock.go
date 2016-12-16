@@ -12,7 +12,7 @@ import (
 	"github.com/jmartin82/mmock/console"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
-	"github.com/jmartin82/mmock/persist"
+
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/server"
 	"github.com/jmartin82/mmock/translate"
@@ -73,15 +73,9 @@ func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.
 	return router
 }
 
-func loadVarsProcessorEngines(persistPath string) *persist.PersistEngineBag {
-	persister := persist.NewFilePersister(persistPath)
-	persistBag := persist.GetNewPersistEngineBag(persister)
-	return persistBag
-}
+func getVarsProcessor() vars.VarsProcessor {
 
-func getVarsProcessor(persistEngineBag *persist.PersistEngineBag) vars.VarsProcessor {
-
-	return vars.VarsProcessor{FillerFactory: vars.MockFillerFactory{}, FakeAdapter: fakedata.FakeAdapter{}, PersistEngines: persistEngineBag}
+	return vars.VarsProcessor{FillerFactory: vars.MockFillerFactory{}, FakeAdapter: fakedata.FakeAdapter{}}
 }
 
 func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, varsProcessor vars.VarsProcessor) {
@@ -125,23 +119,15 @@ func main() {
 		panic(ErrNotFoundDefaultPath)
 	}
 
-	persistPath, _ := filepath.Abs("./data")
-	//persistPath := "mongodb://localhost/mmock"
-
 	sIP := flag.String("server-ip", outIP, "Mock server IP")
 	sPort := flag.Int("server-port", 8083, "Mock Server Port")
 	cIP := flag.String("console-ip", outIP, "Console Server IP")
 	cPort := flag.Int("cconsole-port", 8082, "Console server Port")
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
 	cPath := flag.String("config-path", path, "Mocks definition folder")
-	cPersistPath := flag.String("config-persist-path", persistPath, "Path to the folder where requests can be persisted or connection string to mongo database starting with mongodb:// and having database at the end /DatabaseName")
 
 	flag.Parse()
 	path, _ = filepath.Abs(*cPath)
-
-	if strings.Index(persistPath, "mongodb://") < 0 {
-		persistPath, _ = filepath.Abs(*cPersistPath)
-	}
 
 	//chanels
 	mLog := make(chan definition.Match)
@@ -150,9 +136,8 @@ func main() {
 
 	mocks := getMocks(path, dUpdates)
 	router := getRouter(mocks, dUpdates)
+	varsProcessor := getVarsProcessor()
 
-	persistEngineBag := loadVarsProcessorEngines(persistPath)
-	varsProcessor := getVarsProcessor(persistEngineBag)
 	go startServer(*sIP, *sPort, done, router, mLog, varsProcessor)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	if *console {

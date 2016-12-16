@@ -1,22 +1,31 @@
-{  
+{
     "description": "Deleting a persisted entity by matching the id from the url using regex",
-    "request":{  
-        "method":"DELETE",
-        "path":"/users/:userid.json"
+    "request": {
+        "method": "DELETE",
+        "path": "/users/:userid.json"
     },
-    "persist":{  
-        "entity":"/users/user-{{request.path.userid}}.json",
-        "actions":{  
-            "delete":"true"
+    "persist": {
+        "entity": "/users/user-{{request.path.userid}}.json",
+        "actions": {
+            "delete": "true"
         }
     },
-    "response":{  
-        "statusCode":200,
-        "headers":{  
-            "Content-Type":[  
+    "response": {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": [
                 "application/json"
             ]
         },
-        "body":"Record Deleted"
+        "body": "Record Deleted"
+    },
+    "control": {
+        "scenario": {
+            "name": "user_{{request.path.userid}}",
+            "requiredState": [
+                "created"
+            ],
+            "newState": "deleted"
+        }
     }
 }

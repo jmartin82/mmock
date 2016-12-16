@@ -18,7 +18,6 @@ Built with Go - Mmock runs without installation on multiple platforms.
 
 * Easy mock definition via JSON or YAML
 * Variables in response (fake or request data, including regex support)
-* Persist request body and load response from file or MongoDB
 * Ability to send message to AMQP server
 * Glob matching ( /a/b/* )
 * Match request by method, URL params, headers, cookies and bodies.
@@ -104,8 +103,6 @@ To configure Mmock, use command line flags described in help.
           Console server Port (default 8082)
       -config-path string
           Mocks definition folder (default "execution_path/config")
-      -config-persist-path
-          Path to the folder where requests can be persisted or connection string to mongo database starting with mongodb:// and having database at the end /DatabaseName (default "execution_path/data") 
       -console
           Console enabled  (true/false) (default true)
       -console-ip string
@@ -148,15 +145,6 @@ Mock definition:
 		},
 		"body": "Response body",
 		
-	},
-	"persist" : {
-		"entity" : "/users/user-{{request.url./your/path/(?P<value>\\d+)}}.json",
-		"collection" : "users",
-        "actions"{
-			"delete":"true",
-			"append":"text",
-			"write":"text"
-		}
 	},
 	"notify":{
 		"amqp": {
@@ -208,36 +196,6 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 * *cookies*: Array of cookies. It allows vars.
 * *body*: Body string. It allows vars.
 
-#### Persist (Optional)
-	
-* *entity*: The relative path from config-persist-path to the file where the response body to be loaded from or the collection name and id if you are using MongoDB. It allows vars.
-* *collection*: Used for returning or deleting more than one record. Represents the relative path from config-persist-path to the folder or the name of the mongo collection from where the records should be selected. Regex or glob can be used for filtering entities as well. Examples for the usage of collections can be found [here](/config).
-* *actions*: Actions to take over the entity (Append,Write,Delete)
-
-#### Notify (Optional)
-
-* *amqp*: Configuration for sending message to AMQP server. If such configuration is present a message will be sent to the configured server.
-
-	##### AMQP (Optional)
-	
-	* *url*: Url to the amqp server e.g. amqp://guest:guest@localhost:5672/vhost **Mandatory**.
-	* *exchange*: The name of the exchange to post to **Mandatory**.
-	* *delay*: message send delay in seconds.
-	* *routingKey*: The routing key for posting the message.
-	* *body*: Payload of the message. It allows vars.
-	* *bodyAppend*: Text or JSON to be appended to the body. It allows vars.
-	* *contentType*: MIME content type.
-	* *contentEncoding*: MIME content encoding.
-	* *priority*: Priority from 0 to 9.
-	* *correlationId*: Correlation identifier.
-	* *replyTo*: Address to to reply to (ex: RPC).
-	* *expiration*: Message expiration spec.
-	* *messageId*: Message identifier.
-	* *timestamp*: Message timestamp.
-	* *type*: Message type name.
-	* *userId*: Creating user id - ex: "guest".
-	* *appId*: Creating application id.
-
 #### Control (Optional)
 
 * *proxyBaseURL*: If this parameter is present, it sends the request data to the BaseURL and resend the response to de client. Useful if you don't want mock a the whole service. NOTE: It's not necessary fill the response field in this case.
@@ -252,22 +210,11 @@ You can use variable data (random data or request data) in response. The variabl
 Request data:
 
  - request.query."*key*"
+ - request.path."*key*"
  - request.cookie."*key*"
  - request.url
  - request.body
  - response.body
- - request.url."regex to match value"
- - request.body."regex to match value"
- - response.body."regex to match value"
- - persist.entity.content
- - persist.entity.name
- - persist.entity.name."regex to match value"
- - persist.collection.content
- - storage.Sequence(name, increaseWith) - generates next sequence with a given name, useful when auto generating id, if no increaseWith is passed or increaseWith = 0 the sequence won't be increased but the latest value will be returned
- - storage.SetValue(key, value) - stores a value corresponding to a given key and returns the value. This is useful if you have some entities requested by both id and name, so that you can store the mapping between than and later retrieve it. You can check the sample in [users-storage-post.json](config/users-storage-post.json), [users-storage-get-by-id.json](config/users-storage-get-by-id.json) and [users-storage-get-by-username.json](config/users-storage-get-by-username.json)
- - storage.GetValue(key) - returns the value corresponding to the given key
-
-> Regex: The regex should contain a group named **value** which will be matched and its value will be returned. E.g. if we want to match the id from this url **`/your/path/4`** the regex should look like **`/your/path/(?P<value>\\d+)`**. Note that in *golang* the named regex group match need to contain a **P** symbol after the question mark. The regex should be prefixed either with **request.url.**, **request.body.** or **response.body.** considering your input. When setting the Persist.Collection field the regex can match multiple records from it's input, which is useful for cases like [users-delete-passingids.json](config/users-delete-passingids.json) 
 
 
 [Fake](https://godoc.org/github.com/icrowley/fake) data:
@@ -323,30 +270,10 @@ Request data:
  - fake.Float(n) - random positive floating point number less than n
  - fake.UUID - generates a unique id  
 
-### Persistence
 
-Currently the tool supports two persistence modes:
-
-#### File system
-
-If you want to use that mode you need to pass the path to the folder where you want to store your data to the following argument - **config-persist-path**. The default value is set to the **data** folder under your current execution path. In this mode the entity name in the [Persist](#persist-optional) defines the relative path to the file where the request data will be stored and retrieved from.
-
-#### MongoDB
-
-To use MongoDB persistence you need to set the url connection string to the **config-persist-path**. The format of that url should be in the following format:  
-`mongodb://[user:pass@]host1[:port1][,host2[:port2],...]/database`  
-For example if you are using your local mongo the connection string might be **`mongodb://localhost/mmock`**. In this mode the entity name in the [Persist](#persist-optional) define in which collection and with what ID the records to be stored and retrieved from. To achieve this the names should be in the following format:  
-`collectionName/itemId`
-
-You can check the sample configurations for persistence in the following files:
- * [users-get.json](config/users-get.json)
- * [users-post.json](config/users-post.json)
- * [users-delete.json](config/users-delete.json)
-
-That configurations are going to work either with [File system](#file-system) or [MongoDB](#mongodb) modes.
 
 ### Contributors
-- [@vtrifonov](https://github.com/vtrifonov) [Persistence](#persist-optional) feature, improved variables support and [AMQP](#notify-optional) sending
+- [@vtrifonov](https://github.com/vtrifonov)
 
 ### Contributing
 

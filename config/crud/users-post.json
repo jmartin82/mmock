@@ -4,18 +4,22 @@
         "method": "POST",
         "path": "/users/:userid.json"
     },
-    "persist": {
-        "entity": "/users/user-{{request.path.userid)}}.json",
-        "content": "{{transform.join('{ \"id\":',request.path.userid,'}',request.body)}}",
-        "action" : "write" 
-    },
     "response": {
         "statusCode": 202,
         "headers": {
             "Content-Type": [
                 "application/json"
             ]
-        },
-        "body":"{{persist.entity.content}}"
+        }
+    },
+    "control": {
+        "scenario": {
+            "name": "user_{{request.path.userid}}",
+            "requiredState": [
+                "not_started",
+                "deleted"
+            ],
+            "newState": "created"
+        }
     }
 }

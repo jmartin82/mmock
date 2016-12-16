@@ -5,34 +5,23 @@ import (
 	"strings"
 
 	"github.com/jmartin82/mmock/definition"
-	"github.com/jmartin82/mmock/persist"
 	"github.com/jmartin82/mmock/vars/fakedata"
 )
 
 var varsRegex = regexp.MustCompile(`\{\{\s*(.+?)\s*\}\}`)
 
 type VarsProcessor struct {
-	FillerFactory  FillerFactory
-	FakeAdapter    fakedata.DataFaker
-	PersistEngines *persist.PersistEngineBag
+	FillerFactory FillerFactory
+	FakeAdapter   fakedata.DataFaker
 }
 
 func (fp VarsProcessor) Eval(req *definition.Request, m *definition.Mock) {
 	requestFiller := fp.FillerFactory.CreateRequestFiller(req, m)
 	fakeFiller := fp.FillerFactory.CreateFakeFiller(fp.FakeAdapter)
-	transformFiller := fp.FillerFactory.CreateTransformFiller()
-
-	//get var holders
 	holders := fp.walkAndGet(m.Response)
-	inputParams := transformFiller.GetFunctionVars(holders)
-	holders = append(holders, inputParams...)
 
-	//fill vars
 	vars := requestFiller.Fill(holders)
 	fp.mergeVars(vars, fakeFiller.Fill(holders))
-	fp.mergeVars(vars, transformFiller.Operate(holders, vars))
-
-	//replace vars
 	fp.walkAndFill(m, vars)
 }
 

@@ -10,11 +10,29 @@ response:
     Content-Type: 
       - "application/json"
   body: >
-    {  
-      "id":"{{request.query.user_id}}",
-      "full_name":"{{transform.joinText(fake.FirstName,"  ",fake.LastName)}}",
-      "first_name":"{{fake.FirstName}}",
-      "last_name":"{{fake.LastName}}",
-      "gender":"{{fake.Gender}}",
-      "email":"{{fake.EmailAddress}}"
-    }
+    [
+      {  
+        "id":"{{request.query.user_id}}",
+        "full_name":"{{transform.joinText(fake.FirstName,"  ",fake.LastName)}}",
+        "first_name":"{{fake.FirstName}}",
+        "last_name":"{{fake.LastName}}",
+        "gender":"{{fake.Gender}}",
+        "email":"{{fake.EmailAddress}}"
+      },
+      {  
+        "id":"{{request.query.user_id}}",
+        "full_name":"{{transform.joinText(fake.FirstName,"  ",fake.LastName)}}",
+        "first_name":"{{fake.FirstName}}",
+        "last_name":"{{fake.LastName}}",
+        "gender":"{{fake.Gender}}",
+        "email":"{{fake.EmailAddress}}"
+      },
+      {  
+        "id":"{{request.query.user_id}}",
+        "full_name":"{{transform.joinText(fake.FirstName,"  ",fake.LastName)}}",
+        "first_name":"{{fake.FirstName}}",
+        "last_name":"{{fake.LastName}}",
+        "gender":"{{fake.Gender}}",
+        "email":"{{fake.EmailAddress}}"
+      }
+    ]
