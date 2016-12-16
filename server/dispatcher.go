@@ -11,6 +11,7 @@ import (
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/proxy"
 	"github.com/jmartin82/mmock/route"
+	"github.com/jmartin82/mmock/scenario"
 	"github.com/jmartin82/mmock/translate"
 	"github.com/jmartin82/mmock/vars"
 )
@@ -22,6 +23,7 @@ type Dispatcher struct {
 	Router        route.Router
 	Translator    translate.MessageTranslator
 	VarsProcessor vars.VarsProcessor
+	Scenario      scenario.ScenarioManager
 	Mlog          chan definition.Match
 }
 
@@ -81,6 +83,10 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		response = mock.Response
 	}
 
+	//set new scenario
+	if mock.Control.Scenario.NewState != "" {
+		di.Scenario.SetState(mock.Control.Scenario.Name, mock.Control.Scenario.NewState)
+	}
 	//translate request
 	di.Translator.WriteHTTPResponseFromDefinition(&response, w)
 

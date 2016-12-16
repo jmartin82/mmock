@@ -14,7 +14,7 @@ import (
 func NewRouter(mocks []definition.Mock, matcher match.Matcher, dUpdates chan []definition.Mock) *RequestRouter {
 	return &RequestRouter{
 		Mocks:    mocks,
-		Matcher:  match.MockMatch{},
+		Matcher:  matcher,
 		DUpdates: dUpdates,
 	}
 }

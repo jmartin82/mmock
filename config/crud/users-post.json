@@ -14,7 +14,7 @@
     },
     "control": {
         "scenario": {
-            "name": "user_{{request.path.userid}}",
+            "name": "user",
             "requiredState": [
                 "not_started",
                 "deleted"

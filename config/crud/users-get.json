@@ -15,7 +15,7 @@
     },
     "control": {
         "scenario": {
-            "name": "user_{{request.path.userid}}",
+            "name": "user",
             "requiredState": [
                 "created"
             ]

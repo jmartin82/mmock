@@ -4,6 +4,8 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/jmartin82/mmock/scenario"
+
 	urlmatcher "github.com/azer/url-router"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/ryanuber/go-glob"
@@ -16,9 +18,11 @@ var (
 	ErrHeadersNotMatch  = errors.New("Headers not match")
 	ErrCookiesNotMatch  = errors.New("Cookies not match")
 	ErrBodyNotMatch     = errors.New("Body not match")
+	ErrScenarioNotMatch = errors.New("Scenario state not match")
 )
 
 type MockMatch struct {
+	Scenario scenario.ScenarioManager
 }
 
 func (mm MockMatch) matchKeyAndValues(reqMap definition.Values, mockMap definition.Values) bool {
@@ -69,6 +73,16 @@ func (mm MockMatch) mockIncludesMethod(mock *definition.Request, method string) 
 	return false
 }
 func (mm MockMatch) matchScenarioState(scenario *definition.Scenario) bool {
+	if scenario.Name == "" {
+		return true
+	}
+
+	currentState := mm.Scenario.GetState(scenario.Name)
+	for _, r := range scenario.RequiredState {
+		if r == currentState {
+			return true
+		}
+	}
 
 	return false
 }
@@ -102,7 +116,7 @@ func (mm MockMatch) Match(req *definition.Request, mock *definition.Mock) (bool,
 	}
 
 	if !mm.matchScenarioState(&mock.Control.Scenario) {
-		return false, ErrBodyNotMatch
+		return false, ErrScenarioNotMatch
 	}
 
 	return true, nil

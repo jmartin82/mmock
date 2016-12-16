@@ -12,8 +12,8 @@ import (
 	"github.com/jmartin82/mmock/console"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
-
 	"github.com/jmartin82/mmock/route"
+	"github.com/jmartin82/mmock/scenario"
 	"github.com/jmartin82/mmock/server"
 	"github.com/jmartin82/mmock/translate"
 	"github.com/jmartin82/mmock/vars"
@@ -66,9 +66,9 @@ func getOutboundIP() string {
 	return localAddr[0:idx]
 }
 
-func getRouter(mocks []definition.Mock, dUpdates chan []definition.Mock) *route.RequestRouter {
+func getRouter(mocks []definition.Mock, scenario scenario.ScenarioManager, dUpdates chan []definition.Mock) *route.RequestRouter {
 	log.Printf("Loding router with %d definitions\n", len(mocks))
-	router := route.NewRouter(mocks, match.MockMatch{}, dUpdates)
+	router := route.NewRouter(mocks, match.MockMatch{Scenario: scenario}, dUpdates)
 	router.MockChangeWatch()
 	return router
 }
@@ -78,12 +78,13 @@ func getVarsProcessor() vars.VarsProcessor {
 	return vars.VarsProcessor{FillerFactory: vars.MockFillerFactory{}, FakeAdapter: fakedata.FakeAdapter{}}
 }
 
-func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, varsProcessor vars.VarsProcessor) {
+func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, scenario scenario.ScenarioManager, varsProcessor vars.VarsProcessor) {
 	dispatcher := server.Dispatcher{IP: ip,
 		Port:          port,
 		Router:        router,
 		Translator:    translate.HTTPTranslator{},
 		VarsProcessor: varsProcessor,
+		Scenario:      scenario,
 		Mlog:          mLog,
 	}
 	dispatcher.Start()
@@ -134,11 +135,12 @@ func main() {
 	dUpdates := make(chan []definition.Mock)
 	done := make(chan bool)
 
+	scenario := scenario.NewInMemmoryScenarion()
 	mocks := getMocks(path, dUpdates)
-	router := getRouter(mocks, dUpdates)
+	router := getRouter(mocks, scenario, dUpdates)
 	varsProcessor := getVarsProcessor()
 
-	go startServer(*sIP, *sPort, done, router, mLog, varsProcessor)
+	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	if *console {
 		go startConsole(*cIP, *cPort, done, mLog)
