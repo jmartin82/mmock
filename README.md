@@ -122,7 +122,7 @@ Mock definition:
 	"description": "Some text that describes the intended usage of the current configuration",
 	"request": {
 		"method": "GET|POST|PUT|PATCH|...",
-		"path": "/your/path/*",
+		"path": "/your/path/:variable",
 		"queryStringParameters": {
 			"name": ["value"],
 			"name": ["value", "value"]
@@ -168,8 +168,8 @@ Mock definition:
 
 A core feature of Mmock is the ability to return canned HTTP responses for requests matching criteria. 
 
-* *method*: Request http method. **Mandatory**
-* *path*: Resource identifier. It allows * pattern. **Mandatory**
+* *method*: Request http method. It allows more than one separated by pipes "|" **Mandatory**
+* *path*: Resource identifier. It allows :value matching. **Mandatory**
 * *queryStringParameters*: Array of query strings. It allows more than one value for the same key.
 * *headers*: Array of headers. It allows more than one value for the same key.
 * *cookies*: Array of cookies.
@@ -222,7 +222,7 @@ Example of REST services using scenarios:
 +----------------------------------------------------------------------------------------+
 ```
 
-Working examples [here](/config/crud) 
+Working examples [here].(/config/crud) 
 
 ### Variable tags
 
