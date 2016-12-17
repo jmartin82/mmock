@@ -198,28 +198,26 @@ With the scenarios you can simulate a stateful service. It's useful to create te
 
 A scenario is a state machine and you can assign an arbitrarily state.
 
-When mmock recieve a new request and one scenario is defined in the matching mock it checks if the mock is valid for the current state.
-
-When mmock return a new mock we can set the state value for the scenario.
+When mmock recieve a new request and there is an scenario defined in the matching mock, mmock checks if the mock is valid for the current state. Also a new scenario state can be set after the mock match.
 
 By default all scenarios has the state "not_started" until some mock triggers a new one.
 
 Example of REST services using scenarios:
 
 ```
-+----------------------------------------------------------------------------------------+
-|                                                                                        |
-|   GET /user                  POST /user                     GET /user                  |
-|   StatusCode: 404            StatusCode: 201                StatusCode: 200            |
-|                                                                                        |
-|                                                                                        |
-|  +----------------------+   +--------------------------+   +------------------------+  |
-|  |                      |   |                          |   |                        |  |
-|  | matchStatus: created +-> | matchStatus: not_started +-> |  matchStatus: created  |  |
-|  |                      |   | nextStatus: created      |   |                        |  |
-|  +----------------------+   +--------------------------+   +------------------------+  |
-|                                                                                        |
-+----------------------------------------------------------------------------------------+
++---------------------------------------------------------------------------------------------+
+|                                                                                             |
+|   GET /user                     POST /user                     GET /user                    |
+|   StatusCode: 404               StatusCode: 201                StatusCode: 200              |
+|                                                                                             |
+|  +-------------------------+   +---------------------------+   +-------------------------+  |
+|  |                         |   |                           |   |                         |  |
+|  | requiredState:created   +-> | requiredState:not_started +-> |  requiredState: created |  |
+|  |                         |   | newState: created         |   |                         |  |
+|  |                         |   |                           |   |                         |  |
+|  +-------------------------+   +---------------------------+   +-------------------------+  |
+|                                                                                             |
++---------------------------------------------------------------------------------------------+
 ```
 
 Working examples [here].(/config/crud) 
