@@ -18,11 +18,11 @@ Built with Go - Mmock runs without installation on multiple platforms.
 
 * Easy mock definition via JSON or YAML
 * Variables in response (fake or request data, including regex support)
-* Ability to send message to AMQP server
 * Glob matching ( /a/b/* )
-* Match request by method, URL params, headers, cookies and bodies.
+* Match request by method, URL params, query string, headers, cookies and bodies.
 * Mock definitions hot replace (edit your mocks without restart)
 * Web interface to view requests data (method,path,headers,cookies,body,etc..)
+* Stateful behaviour with scenarios
 * Proxy mode
 * Fine grain log info in web interface
 * Real-time updates using WebSockets
@@ -146,27 +146,15 @@ Mock definition:
 		"body": "Response body",
 		
 	},
-	"notify":{
-		"amqp": {
-            "url": "amqp://guest:guest@localhost:5672/myVHost",
-            "body": "{{ response.body }}",
-			"delay": 2,
-            "exchange": "myExchange",
-            "type": "MockType",
-            "correlationId": "9782b88f-0c6e-4879-8c23-4699785e6a95",
-			"routingKey": "routing",
-			"contentType": "application/json",
-			"contentEncoding": "",
-			"priority": 0,
-			"replyTo": "",
-			"expiration": "",
-			"messageId": "",
-			"timestamp": "2016-01-01T00:00:00Z",
-			"userId": "",
-			"appId": "" 
-        }
-	}
 	"control": {
+		"scenario": {
+			"name": "string (scenario name)",
+            "requiredState": [
+				"not_started (default state)",
+                "another_state_name"
+            ],
+            "newState": "new_stat_neme"
+        },
 		"proxyBaseURL": "string (original URL endpoint)
 		"delay": "int (response delay in seconds)",
 		"crazy": "bool (return random 5xx)",
@@ -178,7 +166,7 @@ Mock definition:
 
 #### Request
 
-This mock definition section represents the expected input data. I the request data match with mock request section, the server will response the mock response data.  
+A core feature of Mmock is the ability to return canned HTTP responses for requests matching criteria. 
 
 * *method*: Request http method. **Mandatory**
 * *path*: Resource identifier. It allows * pattern. **Mandatory**
@@ -187,7 +175,7 @@ This mock definition section represents the expected input data. I the request d
 * *cookies*: Array of cookies.
 * *body*: Body string. It allows * pattern.
 
-To do a match with queryStringParameters, headers, cookies. All defined keys in mock will be present with the exact value.
+In case of queryStringParameters, headers and cookies, the request can be matched only if all defined keys in mock will be present with the exact value.
 
 #### Response (Optional on proxy call)
 
@@ -198,10 +186,43 @@ To do a match with queryStringParameters, headers, cookies. All defined keys in 
 
 #### Control (Optional)
 
+* *scenario*; A scenario is essentially a state machine whose states can be arbitrarily assigned.
 * *proxyBaseURL*: If this parameter is present, it sends the request data to the BaseURL and resend the response to de client. Useful if you don't want mock a the whole service. NOTE: It's not necessary fill the response field in this case.
 * *delay*: Delay the response in seconds. Simulate bad connection or bad server performance.
 * *crazy*: Return random server errors (5xx) in some request. Simulate server problems.
 * *priority*: Set the priority to avoid match in less restrictive mocks.
+
+### Scenarios 
+
+With the scenarios you can simulate a stateful service. It's useful to create test doubles.
+
+A scenario is a state machine and you can assign an arbitrarily state.
+
+When mmock recieve a new request and one scenario is defined in the matching mock it checks if the mock is valid for the current state.
+
+When mmock return a new mock we can set the state value for the scenario.
+
+By default all scenarios has the state "not_started" until some mock triggers a new one.
+
+Example of REST services using scenarios:
+
+```
++----------------------------------------------------------------------------------------+
+|                                                                                        |
+|   GET /user                  POST /user                     GET /user                  |
+|   StatusCode: 404            StatusCode: 201                StatusCode: 200            |
+|                                                                                        |
+|                                                                                        |
+|  +----------------------+   +--------------------------+   +------------------------+  |
+|  |                      |   |                          |   |                        |  |
+|  | matchStatus: created +-> | matchStatus: not_started +-> |  matchStatus: created  |  |
+|  |                      |   | nextStatus: created      |   |                        |  |
+|  +----------------------+   +--------------------------+   +------------------------+  |
+|                                                                                        |
++----------------------------------------------------------------------------------------+
+```
+
+Working examples [here](/config/crud) 
 
 ### Variable tags
 
@@ -214,7 +235,6 @@ Request data:
  - request.cookie."*key*"
  - request.url
  - request.body
- - response.body
 
 
 [Fake](https://godoc.org/github.com/icrowley/fake) data:
@@ -265,7 +285,6 @@ Request data:
  - fake.Words
  - fake.WordsN(n)
  - fake.Zip
-  
  - fake.Int(n) - random positive integer less than or equal to n
  - fake.Float(n) - random positive floating point number less than n
  - fake.UUID - generates a unique id  
@@ -279,12 +298,12 @@ Request data:
 
 Clone this repository to ```$GOPATH/src/github.com/jmartin82/mmock``` and type ```go get .```.
 
-Requires Go 1.4+ to build.
+Requires Go 1.6+ to build.
 
 If you make any changes, run ```go fmt ./...``` before submitting a pull request.
 
 ### Licence
 
-Copyright ©‎ 2016 - 2017, Jordi Martín (http://jordi.io)
+Copyright ©‎ 2016 - 2018, Jordi Martín (http://jordi.io)
 
 Released under MIT license, see [LICENSE](LICENSE.md) for details.
