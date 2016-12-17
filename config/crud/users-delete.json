@@ -4,12 +4,6 @@
         "method": "DELETE",
         "path": "/users/:userid.json"
     },
-    "persist": {
-        "entity": "/users/user-{{request.path.userid}}.json",
-        "actions": {
-            "delete": "true"
-        }
-    },
     "response": {
         "statusCode": 200,
         "headers": {
