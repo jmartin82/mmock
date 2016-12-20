@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/scenario"
 )
 
 func TestMatchMethod(t *testing.T) {
@@ -164,6 +165,23 @@ func TestMatchIgnoreMissingBodyDefinition(t *testing.T) {
 	mm := MockMatch{}
 	if b, _ := mm.Match(&req, &m); !b {
 		t.Error("Not expected match")
+	}
+}
+
+func TestSceneMatchingDefinition(t *testing.T) {
+	req := definition.Request{}
+	req.Body = "HelloWorld"
+	m := definition.Mock{}
+	m.Control.Scenario.Name = "uSEr"
+	m.Control.Scenario.RequiredState = []string{"created"}
+	s := scenario.NewInMemmoryScenarion()
+	mm := MockMatch{Scenario: s}
+	if b, _ := mm.Match(&req, &m); b {
+		t.Error("Scenario doesn't match")
+	}
+	s.SetState("user", "created")
+	if b, _ := mm.Match(&req, &m); !b {
+		t.Error("Scenario match")
 	}
 }
 
