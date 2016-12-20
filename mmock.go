@@ -75,7 +75,7 @@ func getRouter(mocks []definition.Mock, scenario scenario.ScenarioManager, dUpda
 
 func getVarsProcessor() vars.VarsProcessor {
 
-	return vars.VarsProcessor{FillerFactory: vars.MockFillerFactory{}, FakeAdapter: fakedata.FakeAdapter{}}
+	return vars.VarsProcessor{FillerFactory: vars.MockFillerFactory{FakeAdapter: fakedata.FakeAdapter{}}}
 }
 
 func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, scenario scenario.ScenarioManager, varsProcessor vars.VarsProcessor) {

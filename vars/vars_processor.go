@@ -5,19 +5,17 @@ import (
 	"strings"
 
 	"github.com/jmartin82/mmock/definition"
-	"github.com/jmartin82/mmock/vars/fakedata"
 )
 
 var varsRegex = regexp.MustCompile(`\{\{\s*(.+?)\s*\}\}`)
 
 type VarsProcessor struct {
 	FillerFactory FillerFactory
-	FakeAdapter   fakedata.DataFaker
 }
 
 func (fp VarsProcessor) Eval(req *definition.Request, m *definition.Mock) {
 	requestFiller := fp.FillerFactory.CreateRequestFiller(req, m)
-	fakeFiller := fp.FillerFactory.CreateFakeFiller(fp.FakeAdapter)
+	fakeFiller := fp.FillerFactory.CreateFakeFiller()
 	holders := fp.walkAndGet(m.Response)
 
 	vars := requestFiller.Fill(holders)
