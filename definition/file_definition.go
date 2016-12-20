@@ -1,9 +1,7 @@
 package definition
 
 import (
-	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -65,21 +63,6 @@ func (fd *FileDefinition) getConfigFiles(path string) []string {
 	})
 
 	return filesList
-}
-
-func (fd *FileDefinition) readMock(filename string) (Mock, error) {
-	buf, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return Mock{}, err
-	}
-	m := Mock{}
-	err = json.Unmarshal(buf, &m)
-	if err != nil {
-		log.Printf("Invalid mock definition in: %s\n", filename)
-		return Mock{}, err
-	}
-	m.Name = filepath.Base(filename)
-	return m, nil
 }
 
 //WatchDir start the watching process to detect any change on defintions
