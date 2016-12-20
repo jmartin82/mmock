@@ -17,8 +17,9 @@ Built with Go - Mmock runs without installation on multiple platforms.
 ### Features
 
 * Easy mock definition via JSON or YAML
-* Variables in response (fake or request data, including regex support)
-* Glob matching ( /a/b/* )
+* Variables in response (fake or request data)
+* Route patterns may include named parameters (/hello/:name)
+* Glob matching ( * hello * )
 * Match request by method, URL params, query string, headers, cookies and bodies.
 * Mock definitions hot replace (edit your mocks without restart)
 * Web interface to view requests data (method,path,headers,cookies,body,etc..)
@@ -143,8 +144,7 @@ Mock definition:
 		"cookies": {
 			"name": "value"
 		},
-		"body": "Response body",
-		
+		"body": "Response body"
 	},
 	"control": {
 		"scenario": {
@@ -155,7 +155,7 @@ Mock definition:
             ],
             "newState": "new_stat_neme"
         },
-		"proxyBaseURL": "string (original URL endpoint)
+		"proxyBaseURL": "string (original URL endpoint)",
 		"delay": "int (response delay in seconds)",
 		"crazy": "bool (return random 5xx)",
 		"priority": "int (matching priority)"

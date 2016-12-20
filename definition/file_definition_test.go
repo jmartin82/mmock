@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 var updatesCh = make(chan []Mock)
@@ -25,7 +25,7 @@ func (mr *mockReader) CanRead(filename string) bool {
 	return false
 }
 
-func (mr *mockReader) Read(filename string) (Mock, error) {
+func (mr *mockReader) Read(content []byte) (Mock, error) {
 	if mr.readOk > 0 {
 		mr.readOk--
 
@@ -67,7 +67,7 @@ func TestReadMocksDefinition(t *testing.T) {
 func TestPriority(t *testing.T) {
 
 	content := []byte("temporary file's content")
-	dir, err := ioutil.TempDir("", "mmock")
+	dir, err := ioutil.TempDir("", "mmock1")
 	if err != nil {
 		t.Errorf("Error creating temporary folder")
 	}
@@ -94,9 +94,8 @@ func TestPriority(t *testing.T) {
 }
 
 func TestHotReplace(t *testing.T) {
-
 	content := []byte("temporary file's content")
-	dir, err := ioutil.TempDir("", "mmock")
+	dir, err := ioutil.TempDir("", "mmock2")
 	if err != nil {
 		t.Errorf("Error creating temporary folder")
 	}
@@ -116,8 +115,21 @@ func TestHotReplace(t *testing.T) {
 		t.Errorf("Error updating temporary file")
 	}
 
-	log.Println("Wating definition updates")
-	<-updatesCh
+	timeout := make(chan bool, 1)
+	go func() {
+		time.Sleep(5 * time.Second)
+		timeout <- true
+	}()
+	select {
+	case <-updatesCh:
+		t.Logf("New channel definition")
+	case <-timeout:
+		t.Fail()
+	}
+
+	fileDef.UnWatchDir()
+	close(updatesCh)
+
 }
 
 /*

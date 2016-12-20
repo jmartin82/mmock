@@ -47,3 +47,18 @@ func TestUUID(t *testing.T) {
 		}
 	}
 }
+
+func TestBasicFakeVars(t *testing.T) {
+	faker := FakeAdapter{}
+	if faker.Brand() == "" {
+		t.Error("Brand fake doesn't work")
+	}
+	if faker.Character() == "" && len(faker.Character()) != 1 {
+		t.Error("Character fake doesn't work")
+	}
+
+	if faker.CharactersN(5) == "" && len(faker.Character()) != 5 {
+		t.Error("CharactersN fake doesn't work")
+	}
+
+}

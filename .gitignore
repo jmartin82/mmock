@@ -3,3 +3,4 @@ debug
 debug.test
 data/*
 /vendor
+coverage.out

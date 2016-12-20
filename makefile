@@ -26,11 +26,12 @@ fmt:
 lint:
 	golint ./...
 
-dev:
-	DEBUG=* go get && go install && gin -p 8911 -i
-
 test:
 	go test ./...
+
+coverage:
+	goverage -v -covermode count -coverprofile=coverage.out
+	go tool cover -html=coverage.out
 
 # Runs benchmarks
 bench:
