@@ -18,7 +18,7 @@ func (rp RequestVars) Fill(holders []string) map[string]string {
 	for _, tag := range holders {
 		found := false
 		s := ""
-		if tag == "request.body" {
+		if tag == "request.body" && rp.Request.Body != "" {
 			s = rp.Request.Body
 			found = true
 		} else if i := strings.Index(tag, "request.query."); i == 0 {
