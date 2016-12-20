@@ -2,11 +2,10 @@
 	"ImportPath": "github.com/jmartin82/mmock",
 	"GoVersion": "go1.7",
 	"GodepVersion": "v75",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
-		{
-			"ImportPath": "github.com/Jeffail/gabs",
-			"Rev": "855034b6b7a3b7144977efcaefe72d2c64b0d039"
-		},
 		{
 			"ImportPath": "github.com/azer/url-router",
 			"Rev": "1a0aa252538c21ad85fb4041c0df3d648ab813a1"

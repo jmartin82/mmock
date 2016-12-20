@@ -42,7 +42,10 @@ vet:
 	go vet ./...
 
 godep:
-	godep save ./...all: run
+	godep save ./...
+
+get-deps:
+	godep restore
 
 release:
 	docker build -t $(NS)/$(PKG_NAME):$(VERSION) .
