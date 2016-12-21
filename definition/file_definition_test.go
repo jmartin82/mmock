@@ -128,7 +128,7 @@ func TestHotReplace(t *testing.T) {
 	}
 
 	fileDef.UnWatchDir()
-	close(updatesCh)
+	//close(updatesCh)
 
 }
 

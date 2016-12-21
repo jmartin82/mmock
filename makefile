@@ -19,33 +19,28 @@ doc:
 	godoc -http=:6060
 
 fmt:
-	go fmt ./...
+	go-ls -exec="go fmt" ./...
 
 # https://github.com/golang/lint
 # go get github.com/golang/lint/golint
 lint:
-	golint ./...
+	go-ls -exec="golint" ./...
 
 test:
-	go test ./...
-
+	go-ls -exec="go test -v" ./...
+	
 coverage:
 	goverage -v -covermode count -coverprofile=coverage.out
 	go tool cover -html=coverage.out
 
-# Runs benchmarks
-bench:
-	go test ./... -bench=.
 
 # https://godoc.org/golang.org/x/tools/cmd/vet
 vet:
-	go vet ./...
-
-godep:
-	godep save ./...
+	go-ls -exec="go vet -v"
 
 get-deps:
-	godep restore
+	go get github.com/laher/gols/cmd/go-ls
+	glide install
 
 release:
 	docker build -t $(NS)/$(PKG_NAME):$(VERSION) .
