@@ -15,6 +15,12 @@ Easy and fast HTTP mock server.
 
 Built with Go - Mmock runs without installation on multiple platforms.
 
+### Version
+
+|  Current version |  v2.0.0 |
+|------------------|---------|
+* Potentially breaking changes from 1.x
+
 ### Features
 
 * Easy mock definition via JSON or YAML
