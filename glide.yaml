@@ -1,0 +1,12 @@
+package: github.com/jmartin82/mmock
+import:
+- package: github.com/azer/url-router
+- package: github.com/elazarl/go-bindata-assetfs
+- package: github.com/fsnotify/fsnotify
+- package: github.com/ghodss/yaml
+- package: github.com/icrowley/fake
+- package: github.com/ryanuber/go-glob
+- package: github.com/twinj/uuid
+- package: golang.org/x/net
+  subpackages:
+  - websocket

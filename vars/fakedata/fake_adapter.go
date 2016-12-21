@@ -261,6 +261,6 @@ func (fa FakeAdapter) Float(n int) string {
 
 //UUID generates a unique id
 func (fa FakeAdapter) UUID() string {
-	u := uuid.NewV2(uuid.DomainUser)
+	u := uuid.NewV4()
 	return u.String()
 }
