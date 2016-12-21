@@ -1,0 +1,14 @@
+language: go
+go: 
+ - 1.6
+ - 1.7.x
+
+before_install:
+ - go get github.com/tools/godep
+
+install:
+  - export GOPATH="${TRAVIS_BUILD_DIR}/Godeps/_workspace:$GOPATH"
+  - export PATH="${TRAVIS_BUILD_DIR}/Godeps/_workspace/bin:$PATH"
+  - make get-deps
+script:
+ - go test -v ./...

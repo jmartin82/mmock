@@ -14,7 +14,7 @@ import (
 func NewRouter(mocks []definition.Mock, matcher match.Matcher, dUpdates chan []definition.Mock) *RequestRouter {
 	return &RequestRouter{
 		Mocks:    mocks,
-		Matcher:  match.MockMatch{},
+		Matcher:  matcher,
 		DUpdates: dUpdates,
 	}
 }
@@ -48,7 +48,7 @@ func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, map[s
 	rr.Lock()
 	defer rr.Unlock()
 	for _, mock := range rr.Mocks {
-		m, err := rr.Matcher.Match(req, &mock.Request)
+		m, err := rr.Matcher.Match(req, &mock)
 		if m {
 			//we return a copy of it, not the definition itself because we will working on it.
 			md := definition.Mock{}

@@ -4,188 +4,209 @@ import (
 	"testing"
 
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/scenario"
 )
 
 func TestMatchMethod(t *testing.T) {
-	hreq := &definition.Request{}
-	hreq.Method = "GET"
-	mreq := &definition.Request{}
-	mreq.Method = "GET"
-	m := MockMatch{}
+	req := definition.Request{}
+	req.Method = "GET"
 
-	if m, err := m.Match(hreq, mreq); !m {
+	m := definition.Mock{}
+	m.Request.Method = "GET"
+
+	mm := MockMatch{}
+	if b, err := mm.Match(&req, &m); !b {
 		t.Error(err)
 	}
 
-	mreq.Method = "POST"
-	if m, _ := m.Match(hreq, mreq); m {
-		t.Error("Not expected match")
+	req.Method = "POST"
+	if b, err := mm.Match(&req, &m); b {
+		t.Error(err)
 	}
 }
 
 func TestMatchPath(t *testing.T) {
-	hreq := &definition.Request{}
-	hreq.Path = "/a/b/c"
-	mreq := &definition.Request{}
-	mreq.Path = "/a/b/c"
-	m := MockMatch{}
 
-	if m, err := m.Match(hreq, mreq); !m {
+	req := definition.Request{}
+	req.Path = "/a/b/c"
+
+	m := definition.Mock{}
+	m.Request.Path = "/a/b/c"
+
+	mm := MockMatch{}
+	if b, err := mm.Match(&req, &m); !b {
 		t.Error(err)
 	}
 
-	mreq.Path = "/a/b/d"
-	if m, _ := m.Match(hreq, mreq); m {
-		t.Error("Not expected match")
+	req.Path = "/a/b/d"
+	if b, err := mm.Match(&req, &m); b {
+		t.Error(err)
 	}
 }
 
 func TestGlobPath(t *testing.T) {
-	hreq := &definition.Request{}
-	hreq.Path = "/a/b/c"
-	mreq := &definition.Request{}
-	mreq.Path = "/a/b/*"
-	m := MockMatch{}
+	req := definition.Request{}
+	req.Path = "/a/b/c"
 
-	if m, err := m.Match(hreq, mreq); !m {
+	m := definition.Mock{}
+	m.Request.Path = "/a/:b/:c"
+
+	mm := MockMatch{}
+
+	if b, err := mm.Match(&req, &m); !b {
 		t.Error(err)
 	}
 }
 
 func TestMatchQueryString(t *testing.T) {
+	rval := make(definition.Values)
+	rval["test"] = []string{"test"}
+	req := definition.Request{}
+	req.QueryStringParameters = rval
 
-	hreq := &definition.Request{}
-	hval := make(definition.Values)
-	hval["test"] = []string{"test"}
-	hreq.QueryStringParameters = hval
-
-	mreq := &definition.Request{}
+	m := definition.Mock{}
 	mval := make(definition.Values)
 	mval["test"] = []string{"test"}
-	mreq.QueryStringParameters = mval
+	m.Request.QueryStringParameters = mval
 
-	m := MockMatch{}
-
-	if m, err := m.Match(hreq, mreq); !m {
+	mm := MockMatch{}
+	if b, err := mm.Match(&req, &m); !b {
 		t.Error(err)
 	}
 
 	mval["test2"] = []string{"test2"}
-	if m, _ := m.Match(hreq, mreq); m {
-		t.Error("Not expected match")
+	if b, err := mm.Match(&req, &m); b {
+		t.Error(err)
 	}
 
 }
 
 func TestMatchCookies(t *testing.T) {
-	hreq := &definition.Request{}
-	hval := make(definition.Cookies)
-	hval["cookie"] = "val"
-	hreq.Cookies = hval
+	rval := make(definition.Cookies)
+	rval["test"] = "test"
+	req := definition.Request{}
+	req.Cookies = rval
 
-	mreq := &definition.Request{}
+	m := definition.Mock{}
 	mval := make(definition.Cookies)
-	mval["cookie"] = "val"
-	mreq.Cookies = mval
+	mval["test"] = "test"
+	m.Request.Cookies = mval
 
-	m := MockMatch{}
-
-	if m, err := m.Match(hreq, mreq); !m {
+	mm := MockMatch{}
+	if b, err := mm.Match(&req, &m); !b {
 		t.Error(err)
 	}
 
-	mval["cookie2"] = "val2"
-	if m, _ := m.Match(hreq, mreq); m {
-		t.Error("Not expected match")
+	mval["test2"] = "test2"
+	if b, err := mm.Match(&req, &m); b {
+		t.Error(err)
 	}
 }
 
 func TestMatchHeaders(t *testing.T) {
-	hreq := &definition.Request{}
-	hval := make(definition.Values)
-	hval["test"] = []string{"test"}
-	hreq.Headers = hval
+	rval := make(definition.Values)
+	rval["test"] = []string{"test"}
+	req := definition.Request{}
+	req.Headers = rval
 
-	mreq := &definition.Request{}
+	m := definition.Mock{}
 	mval := make(definition.Values)
 	mval["test"] = []string{"test"}
-	mreq.Headers = mval
+	m.Request.Headers = mval
 
-	m := MockMatch{}
-
-	if m, err := m.Match(hreq, mreq); !m {
+	mm := MockMatch{}
+	if b, err := mm.Match(&req, &m); !b {
 		t.Error(err)
 	}
 
-	mval["test"] = []string{"test2"}
-	if m, _ := m.Match(hreq, mreq); m {
-		t.Error("Not expected match")
+	mval["test2"] = []string{"test2"}
+	if b, err := mm.Match(&req, &m); b {
+		t.Error(err)
 	}
 }
 
 func TestMatchBody(t *testing.T) {
-	hreq := &definition.Request{}
-	hreq.Body = "HelloWorld"
-	mreq := &definition.Request{}
-	mreq.Body = "HelloWorld"
-	m := MockMatch{}
 
-	if m, err := m.Match(hreq, mreq); !m {
+	req := definition.Request{}
+	req.Body = "HelloWorld"
+
+	m := definition.Mock{}
+	m.Request.Body = "HelloWorld"
+
+	mm := MockMatch{}
+	if b, err := mm.Match(&req, &m); !b {
 		t.Error(err)
 	}
 
-	mreq.Body = "ByeWorld"
-	if m, _ := m.Match(hreq, mreq); m {
-		t.Error("Not expected match")
+	req.Path = "ByeBye"
+	if b, err := mm.Match(&req, &m); b {
+		t.Error(err)
 	}
 }
 
 func TestGlobBody(t *testing.T) {
-	hreq := &definition.Request{}
-	hreq.Body = "Hello World From Test"
-	mreq := &definition.Request{}
-	mreq.Body = "*World*"
-	m := MockMatch{}
+	req := definition.Request{}
+	req.Body = "Hello World From Test"
 
-	if m, err := m.Match(hreq, mreq); !m {
+	m := definition.Mock{}
+	m.Request.Body = "*World*"
+
+	mm := MockMatch{}
+	if b, err := mm.Match(&req, &m); !b {
 		t.Error(err)
 	}
 
 }
 
 func TestMatchIgnoreMissingBodyDefinition(t *testing.T) {
-	hreq := &definition.Request{}
-	hreq.Body = "HelloWorld"
-	mreq := &definition.Request{}
-	m := MockMatch{}
+	req := definition.Request{}
+	req.Body = "HelloWorld"
+	m := definition.Mock{}
+	mm := MockMatch{}
+	if b, _ := mm.Match(&req, &m); !b {
+		t.Error("Not expected match")
+	}
+}
 
-	if m, err := m.Match(hreq, mreq); !m {
-		t.Error(err)
+func TestSceneMatchingDefinition(t *testing.T) {
+	req := definition.Request{}
+	req.Body = "HelloWorld"
+	m := definition.Mock{}
+	m.Control.Scenario.Name = "uSEr"
+	m.Control.Scenario.RequiredState = []string{"created"}
+	s := scenario.NewInMemmoryScenarion()
+	mm := MockMatch{Scenario: s}
+	if b, _ := mm.Match(&req, &m); b {
+		t.Error("Scenario doesn't match")
+	}
+	s.SetState("user", "created")
+	if b, _ := mm.Match(&req, &m); !b {
+		t.Error("Scenario match")
 	}
 }
 
 func TestMatchIgnoreUnexpectedHeadersAndQuery(t *testing.T) {
-	hreq := &definition.Request{}
-	hreq.Method = "GET"
-	hreq.Path = "/a/b/c"
+	req := definition.Request{}
+	req.Method = "GET"
+	req.Path = "/a/b/c"
 	hval := make(definition.Values)
 	hval["test"] = []string{"test"}
 	hval["test2"] = []string{"test"}
 	hval["test3"] = []string{"test"}
-	hreq.QueryStringParameters = hval
-	hreq.Headers = hval
+	req.QueryStringParameters = hval
+	req.Headers = hval
 
-	mreq := &definition.Request{}
-	mreq.Method = "GET"
-	mreq.Path = "/a/b/c"
+	m := definition.Mock{}
+	m.Request.Method = "GET"
+	m.Request.Path = "/a/b/c"
 	mval := make(definition.Values)
 	mval["test"] = []string{"test"}
-	mreq.QueryStringParameters = mval
-	mreq.Headers = mval
+	m.Request.QueryStringParameters = mval
+	m.Request.Headers = mval
 
-	m := MockMatch{}
+	mm := MockMatch{}
 
-	if m, err := m.Match(hreq, mreq); !m {
-		t.Error(err)
+	if b, _ := mm.Match(&req, &m); !b {
+		t.Error("Not expected match")
 	}
 }

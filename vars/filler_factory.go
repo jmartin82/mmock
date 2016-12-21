@@ -2,32 +2,23 @@ package vars
 
 import (
 	"github.com/jmartin82/mmock/definition"
-	"github.com/jmartin82/mmock/persist"
-	"github.com/jmartin82/mmock/utils"
 	"github.com/jmartin82/mmock/vars/fakedata"
 )
 
 type FillerFactory interface {
-	CreateRequestFiller(req *definition.Request) Filler
-	CreateFakeFiller(Fake fakedata.DataFaker) Filler
-	CreateStorageFiller(Engines *persist.PersistEngineBag) Filler
-	CreatePersistFiller(Engines *persist.PersistEngineBag) Filler
+	CreateRequestFiller(req *definition.Request, mock *definition.Mock) Filler
+	CreateFakeFiller() Filler
 }
 
-type MockFillerFactory struct{}
-
-func (mff MockFillerFactory) CreateRequestFiller(req *definition.Request) Filler {
-	return RequestVars{Request: req, RegexHelper: utils.RegexHelper{}}
+type MockFillerFactory struct {
+	FakeAdapter fakedata.DataFaker
 }
 
-func (mff MockFillerFactory) CreateFakeFiller(fake fakedata.DataFaker) Filler {
-	return FakeVars{Fake: fake}
+func (mff MockFillerFactory) CreateRequestFiller(req *definition.Request, mock *definition.Mock) Filler {
+	return RequestVars{Mock: mock, Request: req}
 }
 
-func (mff MockFillerFactory) CreateStorageFiller(engines *persist.PersistEngineBag) Filler {
-	return StorageVars{Engines: engines, RegexHelper: utils.RegexHelper{}}
-}
+func (mff MockFillerFactory) CreateFakeFiller() Filler {
 
-func (mff MockFillerFactory) CreatePersistFiller(engines *persist.PersistEngineBag) Filler {
-	return PersistVars{Engines: engines, RegexHelper: utils.RegexHelper{}}
+	return FakeVars{Fake: mff.FakeAdapter}
 }

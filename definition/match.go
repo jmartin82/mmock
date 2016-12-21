@@ -11,5 +11,4 @@ type Match struct {
 	Request  Request  `json:"request"`
 	Response Response `json:"response"`
 	Result   Result   `json:"result"`
-	Persist  Persist  `json:"persist"`
 }

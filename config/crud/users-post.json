@@ -1,0 +1,25 @@
+{
+    "description": "Creating a persisted entity by matching the id from the url using regex and adding it in the persisted entity",
+    "request": {
+        "method": "POST",
+        "path": "/users/:userid.json"
+    },
+    "response": {
+        "statusCode": 202,
+        "headers": {
+            "Content-Type": [
+                "application/json"
+            ]
+        }
+    },
+    "control": {
+        "scenario": {
+            "name": "user",
+            "requiredState": [
+                "not_started",
+                "deleted"
+            ],
+            "newState": "created"
+        }
+    }
+}

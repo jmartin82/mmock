@@ -1,0 +1,24 @@
+{
+    "description": "Gets a persisted entity by matching the id from the url using regex",
+    "request": {
+        "method": "GET",
+        "path": "/users/:userid.json"
+    },
+    "response": {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": [
+                "application/json"
+            ]
+        },
+        "body": "{\"id\":\"{{request.path.userid}}\",\"name\":\"Leanne Graham\",\"username\":\"Bret\",\"email\": \"Sincere@april.biz\",\"address\":{\"street\": \"Kulas Light\",\"suite\": \"Apt. 556\",\"city\": \"Gwenborough\",\"zipcode\": \"92998-3874\"}}}"
+    },
+    "control": {
+        "scenario": {
+            "name": "user",
+            "requiredState": [
+                "created"
+            ]
+        }
+    }
+}

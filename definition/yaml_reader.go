@@ -1,9 +1,8 @@
 package definition
 
 import (
-	"io/ioutil"
-	"log"
 	"path/filepath"
+	"strings"
 
 	"github.com/ghodss/yaml"
 )
@@ -14,21 +13,15 @@ type YAMLReader struct {
 
 //CanRead return true if is a yaml file
 func (jp YAMLReader) CanRead(filename string) bool {
-	return filepath.Ext(filename) == ".yaml"
+	upperExt := strings.ToUpper(filepath.Ext(filename))
+	return ".YAML" == upperExt || ".YML" == upperExt
 }
 
 //Read Unmarshal a yaml file to Mock struct
-func (jp YAMLReader) Read(filename string) (Mock, error) {
-	buf, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return Mock{}, err
-	}
-	log.Printf("Loading YAML config: %s\n", filename)
+func (jp YAMLReader) Read(buf []byte) (Mock, error) {
 	m := Mock{}
-	err = yaml.Unmarshal(buf, &m)
+	err := yaml.Unmarshal(buf, &m)
 	if err != nil {
-		log.Printf("Invalid mock definition in: %s\n", filename)
-		log.Printf(err.Error())
 		return Mock{}, err
 	}
 	return m, nil

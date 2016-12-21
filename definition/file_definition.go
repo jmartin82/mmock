@@ -1,7 +1,6 @@
 package definition
 
 import (
-	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"log"
@@ -14,6 +13,12 @@ import (
 
 //ErrNotFoundPath error from missing or configuration path
 var ErrNotFoundPath = errors.New("Configuration path not found")
+
+//ErrNotValidConfigReaderFound we don't have any config reader valid for this file
+var ErrNotValidConfigReaderFound = errors.New("Not valid config reader found")
+
+//ErrInvalidMockDefinition the file contains an invalid mock definition
+var ErrInvalidMockDefinition = errors.New("Invalid mock definition")
 
 //NewFileDefinition file definition constructor
 func NewFileDefinition(path string, updatesCh chan []Mock) *FileDefinition {
@@ -29,6 +34,7 @@ type FileDefinition struct {
 	Path          string
 	Updates       chan []Mock
 	ConfigReaders []ConfigReader
+	watcher       *fsnotify.Watcher
 }
 
 //PrioritySort mock array sorted by priority
@@ -67,30 +73,22 @@ func (fd *FileDefinition) getConfigFiles(path string) []string {
 	return filesList
 }
 
-func (fd *FileDefinition) readMock(filename string) (Mock, error) {
-	buf, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return Mock{}, err
+func (fd *FileDefinition) UnWatchDir() {
+	if fd.watcher != nil {
+		fd.watcher.Close()
 	}
-	m := Mock{}
-	err = json.Unmarshal(buf, &m)
-	if err != nil {
-		log.Printf("Invalid mock definition in: %s\n", filename)
-		return Mock{}, err
-	}
-	m.Name = filepath.Base(filename)
-	return m, nil
 }
 
 //WatchDir start the watching process to detect any change on defintions
 func (fd *FileDefinition) WatchDir() {
-	watcher, err := fsnotify.NewWatcher()
+	var err error
+	fd.watcher, err = fsnotify.NewWatcher()
 	if err != nil {
 		log.Println("Hot mock file changing not available.")
 		return
 	}
 
-	err = watcher.Add(fd.Path)
+	err = fd.watcher.Add(fd.Path)
 	if err != nil {
 		log.Printf("Hot mock file changing not available in folder: %s\n", fd.Path)
 		return
@@ -98,7 +96,7 @@ func (fd *FileDefinition) WatchDir() {
 
 	if err = filepath.Walk(fd.Path, func(path string, fileInfo os.FileInfo, err error) error {
 		if fileInfo.IsDir() {
-			err = watcher.Add(path)
+			err = fd.watcher.Add(path)
 			if err != nil {
 				log.Printf("Hot mock file changing not available in folder: %s\n", fd.Path)
 				return err
@@ -112,15 +110,13 @@ func (fd *FileDefinition) WatchDir() {
 	go func() {
 		for {
 			select {
-			case event := <-watcher.Events:
+			case event := <-fd.watcher.Events:
 				if event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Create == fsnotify.Create || event.Op&fsnotify.Remove == fsnotify.Remove {
 
 					log.Println("Changes detected in mock definitions")
 					fd.Updates <- fd.ReadMocksDefinition()
 
 				}
-			case err := <-watcher.Errors:
-				log.Fatal(err)
 			}
 		}
 	}()
@@ -129,6 +125,21 @@ func (fd *FileDefinition) WatchDir() {
 //AddConfigReader allows append new readers to able load different config files
 func (fd *FileDefinition) AddConfigReader(reader ConfigReader) {
 	fd.ConfigReaders = append(fd.ConfigReaders, reader)
+}
+
+func (fd *FileDefinition) getMockFromFile(filename string) (Mock, error) {
+	for _, reader := range fd.ConfigReaders {
+		if reader.CanRead(filename) {
+			buf, err := ioutil.ReadFile(filename)
+			if err != nil {
+				log.Printf("Invalid mock definition in: %s\n", filename)
+				return Mock{}, ErrInvalidMockDefinition
+			}
+			return reader.Read(buf)
+		}
+
+	}
+	return Mock{}, ErrNotValidConfigReaderFound
 }
 
 //ReadMocksDefinition reads all definitions and return an array of valid mocks
@@ -140,18 +151,10 @@ func (fd *FileDefinition) ReadMocksDefinition() []Mock {
 
 	mocks := []Mock{}
 	for _, file := range fd.getConfigFiles(fd.Path) {
-		for _, reader := range fd.ConfigReaders {
-			if reader.CanRead(file) {
-				if mockDef, err := reader.Read(file); err == nil {
-					mockDef.Name = filepath.Base(file)
-					mocks = append(mocks, mockDef)
-
-				}
-				break
-			}
-
+		if mockDef, err := fd.getMockFromFile(file); err == nil {
+			mockDef.Name = filepath.Base(file)
+			mocks = append(mocks, mockDef)
 		}
-
 	}
 
 	sort.Sort(PrioritySort(mocks))

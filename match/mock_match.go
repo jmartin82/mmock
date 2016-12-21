@@ -4,6 +4,9 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/jmartin82/mmock/scenario"
+
+	urlmatcher "github.com/azer/url-router"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/ryanuber/go-glob"
 )
@@ -15,9 +18,11 @@ var (
 	ErrHeadersNotMatch  = errors.New("Headers not match")
 	ErrCookiesNotMatch  = errors.New("Cookies not match")
 	ErrBodyNotMatch     = errors.New("Body not match")
+	ErrScenarioNotMatch = errors.New("Scenario state not match")
 )
 
 type MockMatch struct {
+	Scenario scenario.ScenarioManager
 }
 
 func (mm MockMatch) matchKeyAndValues(reqMap definition.Values, mockMap definition.Values) bool {
@@ -59,7 +64,7 @@ func (mm MockMatch) matchKeyAndValue(reqMap definition.Cookies, mockMap definiti
 	return true
 }
 
-func mockIncludesMethod(mock *definition.Request, method string) bool {
+func (mm MockMatch) mockIncludesMethod(mock *definition.Request, method string) bool {
 	for _, item := range strings.Split(mock.Method, "|") {
 		if item == method {
 			return true
@@ -67,30 +72,51 @@ func mockIncludesMethod(mock *definition.Request, method string) bool {
 	}
 	return false
 }
+func (mm MockMatch) matchScenarioState(scenario *definition.Scenario) bool {
+	if scenario.Name == "" {
+		return true
+	}
 
-func (mm MockMatch) Match(req *definition.Request, mock *definition.Request) (bool, error) {
-	if !glob.Glob(mock.Path, req.Path) {
+	currentState := mm.Scenario.GetState(scenario.Name)
+	for _, r := range scenario.RequiredState {
+		if r == currentState {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (mm MockMatch) Match(req *definition.Request, mock *definition.Mock) (bool, error) {
+
+	routes := urlmatcher.New(mock.Request.Path)
+
+	if routes.Match(req.Path) == nil {
 		return false, ErrPathNotMatch
 	}
 
-	if !mockIncludesMethod(mock, req.Method) {
+	if !mm.mockIncludesMethod(&mock.Request, req.Method) {
 		return false, ErrMethodNotMatch
 	}
 
-	if !mm.matchKeyAndValues(req.QueryStringParameters, mock.QueryStringParameters) {
+	if !mm.matchKeyAndValues(req.QueryStringParameters, mock.Request.QueryStringParameters) {
 		return false, ErrQueryStringMatch
 	}
 
-	if !mm.matchKeyAndValue(req.Cookies, mock.Cookies) {
+	if !mm.matchKeyAndValue(req.Cookies, mock.Request.Cookies) {
 		return false, ErrCookiesNotMatch
 	}
 
-	if !mm.matchKeyAndValues(req.Headers, mock.Headers) {
+	if !mm.matchKeyAndValues(req.Headers, mock.Request.Headers) {
 		return false, ErrHeadersNotMatch
 	}
 
-	if len(mock.Body) > 0 && !glob.Glob(mock.Body, req.Body) {
+	if len(mock.Request.Body) > 0 && !glob.Glob(mock.Request.Body, req.Body) {
 		return false, ErrBodyNotMatch
+	}
+
+	if !mm.matchScenarioState(&mock.Control.Scenario) {
+		return false, ErrScenarioNotMatch
 	}
 
 	return true, nil

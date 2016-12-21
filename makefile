@@ -26,11 +26,12 @@ fmt:
 lint:
 	golint ./...
 
-dev:
-	DEBUG=* go get && go install && gin -p 8911 -i
-
 test:
 	go test ./...
+
+coverage:
+	goverage -v -covermode count -coverprofile=coverage.out
+	go tool cover -html=coverage.out
 
 # Runs benchmarks
 bench:
@@ -41,7 +42,10 @@ vet:
 	go vet ./...
 
 godep:
-	godep save ./...all: run
+	godep save ./...
+
+get-deps:
+	godep restore
 
 release:
 	docker build -t $(NS)/$(PKG_NAME):$(VERSION) .

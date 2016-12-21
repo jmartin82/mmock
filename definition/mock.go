@@ -1,23 +1,17 @@
 package definition
 
+type Scenario struct {
+	Name          string   `json:"name"`
+	RequiredState []string `json:"requiredState"`
+	NewState      string   `json:"newState"`
+}
+
 type Control struct {
-	Priority     int    `json:"priority"`
-	Delay        int    `json:"delay"`
-	Crazy        bool   `json:"crazy"`
-	ProxyBaseURL string `json:"proxyBaseURL"`
-}
-
-type Actions map[string]string
-
-type Persist struct {
-	Entity     string  `json:"entity"`
-	Collection string  `json:"collection"`
-	Actions    Actions `json:"actions"`
-	Engine     string  `json:"engine"`
-}
-
-type Notify struct {
-	Amqp AMQPPublishing `json:"amqp"`
+	Priority     int      `json:"priority"`
+	Delay        int      `json:"delay"`
+	Crazy        bool     `json:"crazy"`
+	Scenario     Scenario `json:"scenario"`
+	ProxyBaseURL string   `json:"proxyBaseURL"`
 }
 
 //Mock contains the user mock definition
@@ -26,7 +20,5 @@ type Mock struct {
 	Description string   `json:"description"`
 	Request     Request  `json:"request"`
 	Response    Response `json:"response"`
-	Persist     Persist  `json:"persist"`
-	Notify      Notify   `json:"notify"`
 	Control     Control  `json:"control"`
 }

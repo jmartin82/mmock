@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jmartin82/mmock/amqp"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/proxy"
 	"github.com/jmartin82/mmock/route"
+	"github.com/jmartin82/mmock/scenario"
 	"github.com/jmartin82/mmock/translate"
 	"github.com/jmartin82/mmock/vars"
 )
@@ -23,7 +23,7 @@ type Dispatcher struct {
 	Router        route.Router
 	Translator    translate.MessageTranslator
 	VarsProcessor vars.VarsProcessor
-	MessageSender amqp.Sender
+	Scenario      scenario.ScenarioManager
 	Mlog          chan definition.Match
 }
 
@@ -68,11 +68,6 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		} else {
 
 			di.VarsProcessor.Eval(&mRequest, mock)
-
-			if (definition.Notify{}) != mock.Notify {
-				go di.MessageSender.Send(mock)
-			}
-
 			if mock.Control.Crazy {
 				log.Printf("Running crazy mode")
 				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)
@@ -88,11 +83,15 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		response = mock.Response
 	}
 
+	//set new scenario
+	if mock.Control.Scenario.NewState != "" {
+		di.Scenario.SetState(mock.Control.Scenario.Name, mock.Control.Scenario.NewState)
+	}
 	//translate request
 	di.Translator.WriteHTTPResponseFromDefinition(&response, w)
 
 	//log to console
-	m := definition.Match{Request: mRequest, Response: response, Result: result, Persist: mock.Persist}
+	m := definition.Match{Request: mRequest, Response: response, Result: result}
 	go di.recordMatchData(m)
 }
 

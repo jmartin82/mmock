@@ -1,0 +1,25 @@
+{
+    "description": "Deleting a persisted entity by matching the id from the url using regex",
+    "request": {
+        "method": "DELETE",
+        "path": "/users/:userid.json"
+    },
+    "response": {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": [
+                "application/json"
+            ]
+        },
+        "body": "Record Deleted"
+    },
+    "control": {
+        "scenario": {
+            "name": "user",
+            "requiredState": [
+                "created"
+            ],
+            "newState": "deleted"
+        }
+    }
+}

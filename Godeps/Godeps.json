@@ -2,10 +2,13 @@
 	"ImportPath": "github.com/jmartin82/mmock",
 	"GoVersion": "go1.7",
 	"GodepVersion": "v75",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
-			"ImportPath": "github.com/Jeffail/gabs",
-			"Rev": "855034b6b7a3b7144977efcaefe72d2c64b0d039"
+			"ImportPath": "github.com/azer/url-router",
+			"Rev": "1a0aa252538c21ad85fb4041c0df3d648ab813a1"
 		},
 		{
 			"ImportPath": "github.com/elazarl/go-bindata-assetfs",
@@ -30,22 +33,6 @@
 			"Rev": "572520ed46dbddaed19ea3d9541bdd0494163693"
 		},
 		{
-			"ImportPath": "github.com/streadway/amqp",
-			"Rev": "2e25825abdbd7752ff08b270d313b93519a0a232"
-		},
-		{
-			"ImportPath": "github.com/tidwall/gjson",
-			"Rev": "72b0cad1c18345c48d7ddf5ade1f2c45af35b442"
-		},
-		{
-			"ImportPath": "github.com/tidwall/match",
-			"Rev": "173748da739a410c5b0b813b956f89ff94730b4c"
-		},
-		{
-			"ImportPath": "github.com/tidwall/sjson",
-			"Rev": "ed74e8aec806f62f5247b014e5e757576b547ece"
-		},
-		{
 			"ImportPath": "github.com/twinj/uuid",
 			"Comment": "0.10.0-96-g7bbe408",
 			"Rev": "7bbe408d339787c56ec15568c947c0959db1b275"
@@ -59,33 +46,8 @@
 			"Rev": "b699b7032584f0953262cb2788a0ca19bb494703"
 		},
 		{
-			"ImportPath": "gopkg.in/mgo.v2",
-			"Comment": "r2016.08.01-5-g3f83fa5",
-			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
-		},
-		{
-			"ImportPath": "gopkg.in/mgo.v2/bson",
-			"Comment": "r2016.08.01-5-g3f83fa5",
-			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
-		},
-		{
-			"ImportPath": "gopkg.in/mgo.v2/internal/json",
-			"Comment": "r2016.08.01-5-g3f83fa5",
-			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
-		},
-		{
-			"ImportPath": "gopkg.in/mgo.v2/internal/sasl",
-			"Comment": "r2016.08.01-5-g3f83fa5",
-			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
-		},
-		{
-			"ImportPath": "gopkg.in/mgo.v2/internal/scram",
-			"Comment": "r2016.08.01-5-g3f83fa5",
-			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
-		},
-		{
 			"ImportPath": "gopkg.in/yaml.v2",
-			"Rev": "a5b47d31c556af34a302ce5d659e6fea44d90de0"
+			"Rev": "e4d366fc3c7938e2958e662b4258c7a89e1f0e3e"
 		}
 	]
 }

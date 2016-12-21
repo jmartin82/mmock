@@ -4,19 +4,17 @@ import (
 	"testing"
 
 	"github.com/jmartin82/mmock/definition"
-	"github.com/jmartin82/mmock/persist"
 	"github.com/jmartin82/mmock/vars/fakedata"
 )
 
-func getProcessor(persistPath string) VarsProcessor {
-	filePersist := persist.FilePersister{PersistPath: persistPath}
-	persistBag := persist.GetNewPersistEngineBag(filePersist)
-	return VarsProcessor{FillerFactory: MockFillerFactory{}, FakeAdapter: fakedata.NewDummyDataFaker("AleixMG"), PersistEngines: persistBag}
+func getProcessor() VarsProcessor {
+	return VarsProcessor{FillerFactory: MockFillerFactory{FakeAdapter: fakedata.NewDummyDataFaker("AleixMG")}}
 }
 
 func TestReplaceTags(t *testing.T) {
 
 	req := definition.Request{}
+	req.Body = "hi!"
 	val := make(definition.Values)
 	val["param1"] = []string{"valParam"}
 	req.QueryStringParameters = val
@@ -26,7 +24,7 @@ func TestReplaceTags(t *testing.T) {
 	req.Cookies = cookie
 
 	res := definition.Response{}
-	res.Body = "Request {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}. Random: {{fake.UserName}}"
+	res.Body = "Request Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}. Random: {{fake.UserName}}"
 
 	cookie = make(definition.Cookies)
 	cookie["cookie1"] = "valCookie"
@@ -40,10 +38,10 @@ func TestReplaceTags(t *testing.T) {
 	res.Headers = val
 
 	mock := definition.Mock{Request: req, Response: res}
-	varsProcessor := getProcessor("testData")
+	varsProcessor := getProcessor()
 	varsProcessor.Eval(&req, &mock)
 
-	if mock.Response.Body != "Request valParam. Cookie: valCookie. Random: AleixMG" {
+	if mock.Response.Body != "Request Body hi!. Query valParam. Cookie: valCookie. Random: AleixMG" {
 		t.Error("Replaced tags in body not match", res.Body)
 	}
 
@@ -70,7 +68,7 @@ func TestReplaceUndefinedFakeTag(t *testing.T) {
 	res.Body = "Request {{request.query.param2}}. Cookie: {{request.cookie.cookie2}}. Random: {{fake.otherOption}}"
 
 	mock := definition.Mock{Request: req, Response: res}
-	varsProcessor := getProcessor("testData")
+	varsProcessor := getProcessor()
 	varsProcessor.Eval(&req, &mock)
 
 	if mock.Response.Body != "Request {{request.query.param2}}. Cookie: {{request.cookie.cookie2}}. Random: {{fake.otherOption}}" {
@@ -93,7 +91,7 @@ func TestReplaceTagWithSpace(t *testing.T) {
 	res.Body = "Request {{ request.query.param1}}. Cookie: {{request.cookie.cookie1 }}. Random: {{fake.UserName }}"
 
 	mock := definition.Mock{Request: req, Response: res}
-	varsProcessor := getProcessor("testData")
+	varsProcessor := getProcessor()
 	varsProcessor.Eval(&req, &mock)
 
 	if mock.Response.Body != "Request valParam. Cookie: valCookie. Random: AleixMG" {
@@ -101,36 +99,22 @@ func TestReplaceTagWithSpace(t *testing.T) {
 	}
 }
 
-func TestReplaceUrlRegex(t *testing.T) {
-	req := definition.Request{}
-	res := definition.Response{}
+func TestReplaceUrlPathVars(t *testing.T) {
 
+	mockReq := definition.Request{}
+	mockReq.Path = "/users/:id"
+	res := definition.Response{}
+	res.Body = "{ \"id\": {{request.path.id}} }"
+
+	mock := definition.Mock{Request: mockReq, Response: res}
+	varsProcessor := getProcessor()
+
+	req := definition.Request{}
 	req.Path = "/users/15"
-	res.Body = "{ \"id\": {{request.url./users/(?P<value>\\d+)}} }"
-
-	mock := definition.Mock{Request: req, Response: res}
-	varsProcessor := getProcessor("testData")
 	varsProcessor.Eval(&req, &mock)
 
 	if mock.Response.Body != "{ \"id\": 15 }" {
-		t.Error("Replaced url regex in body not match", mock.Response.Body)
-	}
-}
-
-func TestReplaceBodyRegex(t *testing.T) {
-	req := definition.Request{}
-	res := definition.Response{}
-
-	req.Path = "/"
-	req.Body = "/users/15"
-	res.Body = "{ \"id\": {{request.body.users/(?P<value>\\d+)}} }"
-
-	mock := definition.Mock{Request: req, Response: res}
-	varsProcessor := getProcessor("testData")
-	varsProcessor.Eval(&req, &mock)
-
-	if mock.Response.Body != "{ \"id\": 15 }" {
-		t.Error("Replaced body regex in body not match", mock.Response.Body)
+		t.Error("Replaced url param in body not match", mock.Response.Body)
 	}
 }
 
@@ -141,7 +125,7 @@ func TestReplaceTagWithParameter(t *testing.T) {
 	res.Body = "Random: {{fake.CharactersN(15)}}"
 
 	mock := definition.Mock{Request: req, Response: res}
-	varsProcessor := getProcessor("testData")
+	varsProcessor := getProcessor()
 	varsProcessor.Eval(&req, &mock)
 
 	if mock.Response.Body != "Random: AleixMG15" {
@@ -156,10 +140,25 @@ func TestReplaceTagWithParameterNoParameterPassed(t *testing.T) {
 	res.Body = "Random: {{fake.CharactersN}}"
 
 	mock := definition.Mock{Request: req, Response: res}
-	varsProcessor := getProcessor("testData")
+	varsProcessor := getProcessor()
 	varsProcessor.Eval(&req, &mock)
 
 	if mock.Response.Body != "Random: {{fake.CharactersN}}" {
 		t.Error("Replaced tags in body not match", mock.Response.Body)
+	}
+}
+
+func TestReplaceMissingTags(t *testing.T) {
+	req := definition.Request{}
+
+	res := definition.Response{}
+	res.Body = "Request Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}."
+
+	mock := definition.Mock{Request: req, Response: res}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != "Request Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}." {
+		t.Error("Replaced missing tags not match", mock.Response.Body)
 	}
 }

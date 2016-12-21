@@ -1,64 +1,83 @@
 package vars
 
 import (
+	"regexp"
+	"strings"
+
 	"github.com/jmartin82/mmock/definition"
-	"github.com/jmartin82/mmock/persist"
-	"github.com/jmartin82/mmock/vars/fakedata"
 )
 
+var varsRegex = regexp.MustCompile(`\{\{\s*(.+?)\s*\}\}`)
+
 type VarsProcessor struct {
-	FillerFactory  FillerFactory
-	FakeAdapter    fakedata.DataFaker
-	PersistEngines *persist.PersistEngineBag
+	FillerFactory FillerFactory
 }
 
 func (fp VarsProcessor) Eval(req *definition.Request, m *definition.Mock) {
-	requestFiller := fp.FillerFactory.CreateRequestFiller(req)
-	fakeFiller := fp.FillerFactory.CreateFakeFiller(fp.FakeAdapter)
-	storageFiller := fp.FillerFactory.CreateStorageFiller(fp.PersistEngines)
-	persistFiller := fp.FillerFactory.CreatePersistFiller(fp.PersistEngines)
-	entityActions := persist.EntityActions{fp.PersistEngines}
+	requestFiller := fp.FillerFactory.CreateRequestFiller(req, m)
+	fakeFiller := fp.FillerFactory.CreateFakeFiller()
+	holders := fp.walkAndGet(m.Response)
 
-	fp.walkAndFill(requestFiller, m, true)
-	fp.walkAndFill(fakeFiller, m, true)
-	fp.walkAndFill(storageFiller, m, true)
-
-	// we need to make sure the persisted vars are filled before executing the actions - as we need to make sure the persist vars are replaced in the persist actions
-	fp.walkAndFillPersisted(persistFiller, m)
-
-	entityActions.ApplyActions(m)
-
-	fp.walkAndFill(persistFiller, m, false)
-
+	vars := requestFiller.Fill(holders)
+	fp.mergeVars(vars, fakeFiller.Fill(holders))
+	fp.walkAndFill(m, vars)
 }
 
-func (fp VarsProcessor) walkAndFill(f Filler, m *definition.Mock, fillPersisted bool) {
+func (fp VarsProcessor) walkAndGet(res definition.Response) []string {
+
+	vars := []string{}
+	for _, header := range res.Headers {
+		for _, value := range header {
+			fp.extractVars(value, &vars)
+		}
+
+	}
+	for _, value := range res.Cookies {
+		fp.extractVars(value, &vars)
+	}
+
+	fp.extractVars(res.Body, &vars)
+	return vars
+}
+
+func (fp VarsProcessor) walkAndFill(m *definition.Mock, vars map[string]string) {
 	res := &m.Response
-	amqp := &m.Notify.Amqp
 	for header, values := range res.Headers {
 		for i, value := range values {
-			res.Headers[header][i] = f.Fill(m, value, false)
+			res.Headers[header][i] = fp.replaceVars(value, vars)
 		}
 
 	}
 	for cookie, value := range res.Cookies {
-		res.Cookies[cookie] = f.Fill(m, value, false)
+		res.Cookies[cookie] = fp.replaceVars(value, vars)
 	}
 
-	amqp.Body = f.Fill(m, amqp.Body, false)
-	res.Body = f.Fill(m, res.Body, false)
+	res.Body = fp.replaceVars(res.Body, vars)
+}
 
-	if fillPersisted {
-		fp.walkAndFillPersisted(f, m)
+func (fp VarsProcessor) replaceVars(input string, vars map[string]string) string {
+	return varsRegex.ReplaceAllStringFunc(input, func(value string) string {
+		varName := strings.Trim(value, "{} ")
+		// replace the strings
+		if r, found := vars[varName]; found {
+			return r
+		}
+		// replace regexes
+		return value
+	})
+}
+
+func (fp VarsProcessor) extractVars(input string, vars *[]string) {
+	if m := varsRegex.FindAllString(input, -1); m != nil {
+		for _, v := range m {
+			varName := strings.Trim(v, "{} ")
+			*vars = append(*vars, varName)
+		}
 	}
 }
 
-func (fp VarsProcessor) walkAndFillPersisted(f Filler, m *definition.Mock) {
-	per := &m.Persist
-
-	per.Entity = f.Fill(m, per.Entity, false)
-	per.Collection = f.Fill(m, per.Collection, true)
-	for action, value := range per.Actions {
-		per.Actions[action] = f.Fill(m, value, false)
+func (fp VarsProcessor) mergeVars(org map[string]string, vals map[string]string) {
+	for k, v := range vals {
+		org[k] = v
 	}
 }
