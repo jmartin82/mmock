@@ -135,6 +135,7 @@ func (fd *FileDefinition) getMockFromFile(filename string) (Mock, error) {
 				log.Printf("Invalid mock definition in: %s\n", filename)
 				return Mock{}, ErrInvalidMockDefinition
 			}
+			log.Printf("Loading config file: %s\n", filename)
 			return reader.Read(buf)
 		}
 
