@@ -1,20 +1,3 @@
-body {
-    line-height: 1.6em; /* fix for thai font*/
-}
-
-
-html, body {
-    height: 100%;
-}
-
-.container-fluid{
-	min-height: 100%;
-}
-
-.panel-body {
- height: 320px; 
-}
-
 ::-webkit-scrollbar {
     width: 12px;
 }
@@ -42,3 +25,8 @@ pre{
 .boolean { color: blue; }
 .null { color: magenta; }
 .key { color: red; }
+
+
+.hiddenRow {
+    padding: 0 !important;
+}

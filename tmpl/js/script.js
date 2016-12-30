@@ -59,6 +59,8 @@ function logRequest(json) {
     var id = incrementCount();
     var datetime = getCurrentTime();
     var fullLog = datetime + " <- " + json.request.method + " " + json.request.path;
+
+
     requests[id] = json;
     $("#groupConsole").append('<li id="row-request-' + id + '" class="list-group-item list-group-item-' + getColorByStatus(status) + '" onclick="showDetails(' + id + ');return false">' + fullLog + '</li>');
     showDetails(id)

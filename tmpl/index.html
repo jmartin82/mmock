@@ -4,8 +4,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>MMock Console</title>
 
-	<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
-	<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+	<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+	<script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
 	<!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
@@ -33,72 +33,97 @@
 
 
 <body>
-	<!-- Stack the columns on mobile by making one full-width and the other half-width -->
-	<div class="container-fluid content" style="padding: 15px;">
-		<div class="row">
-			<div class="col-md-12 col-lg-12 console">
-				<div class="panel panel-primary" >
-					<div class="panel-heading">
-						<h3 class="panel-title">MMock Console</h3>
-					</div>
-					<div class="panel-body" style="overflow:auto">
-						
-							<ul class="list-group" id="groupConsole">
-								
-							</ul>
-						
-					</div>
-					<div class="panel-footer">
-						<label style="padding-top: 1%;">
-							<input type="checkbox" id="chkAutoScroll" checked="true" > Auto scroll
-						</label>
-						<button type="button" class="btn btn-primary" tabindex="0" id="btnClearLog" style="float:right;">
-						<span class="glyphicon glyphicon-remove-sign"></span> Clear Console</button>
-					</div>
-				</div>
-			</div>	
-		</div>
-		<div class="row">
-			<div class="alert alert-info" style="display:none" id="alertMessenge">Welcome.</div>
-		</div>
-		<div class="row" >
-			<div class="col-md-12 col-lg-12 status">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">HTTP Details</h3>
-					</div>
-					<div class="panel-body">
 
-						<div id="tirecap" style="display:none" class="alert alert-success" >
-						  <strong><span id="tistatus"> </span></strong> <span id="tirequest"> </span>
-						</div>
-						
-						<ul class="nav nav-tabs">
-						  <li class="active" ><a href="#tabrequest" data-toggle="tab">Request</a></li>
-						  <li><a href="#tabresponse" data-toggle="tab">Response</a></li>
-						  <li><a href="#tablog" data-toggle="tab">Log</a></li>
-						</ul>
+  <hr>
+  
+  
+  <div class="container">
+    <h1>MMock Console</h1>
+  
+        <div class="row">
+        <aside class="col-md-2 pad-right-0">
+            <ul class="nav nav-pills nav-stacked">
+              <li class="active"><a href="javascript:;"><span class="badge pull-right">2</span> Requests </a></li>
+              <li><a href="javascript:;"><span class="badge pull-right">3</span>Mocks</a></li>
+							<li><a href="javascript:;">About</a></li>
+            </ul>
+        </aside>
+        <div class="col-md-10">
+            <!--inbox toolbar-->
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="pull-right">
+                        <a class="btn btn-default btn-xs" title="Refresh" id="btnClearLog">
+                      		<span class="glyphicon glyphicon-remove-sign"> </span>
+                    		</a>
+                    </div>
+                </div><!--/col-->
+                <div class="col-xs-12 spacer5"></div>
+            </div><!--/row-->
+            <!--/inbox toolbar-->
+            <div class="panel panel-default requestLog" id="requestLogPanel">
+                <!--message list-->
+                <div class="table-responsive">
+                    <table class="table table-hover refresh-container pull-down">
+                        <thead class="hidden-xs">
+													<tr>
+															<td class="col-sm-2"><strong>Date</strong></td>
+															<td class="col-sm-1"><strong>Code</strong></td>
+															<td class="col-sm-1"><strong>CMD</strong></td>
+															<td class="col-sm-8"><strong>Url</strong></td>
+													</tr>
+												</thead>
+                          <tbody>
+														<tr data-toggle="collapse" data-target="#demo1" class="accordion-toggle">
+															<td class="col-sm-2">Date</td>
+															<td class="col-sm-1">Code</td>
+															<td class="col-sm-1">CMD</td>
+															<td class="col-sm-8">Url</td>
+												   </tr>
+													 <tr >
+            									<td colspan="4" class="hiddenRow">
+																<div class="accordian-body collapse" id="demo1"> 
+																				<h3>HTTP Details</h3>
+																				
+																				<ul class="nav nav-tabs">
+																					<li class="active" ><a href="#tabrequest" data-toggle="tab">Request</a></li>
+																					<li><a href="#tabresponse" data-toggle="tab">Response</a></li>
+																					<li><a href="#tablog" data-toggle="tab">Log</a></li>
+																				</ul>
 
 
-						<div class="tab-content">
-						  <div id="tabrequest" class="tab-pane fade in active">
-						    <pre id="hdrequest"></pre>
-						  </div>
-						  <div id="tabresponse" class="tab-pane fade">
-						    <pre id="hdresponse"></pre>
-						  </div>
-						  <div id="tablog" class="tab-pane fade">
-						    <pre id="hdlog"></pre>
-						  </div >
-						</div>
-						
-					</div>
+																				<div class="tab-content">
+																					<div id="tabrequest" class="tab-pane fade in active">
+																						<pre id="hdrequest"></pre>
+																					</div>
+																					<div id="tabresponse" class="tab-pane fade">
+																						<pre id="hdresponse"></pre>
+																					</div>
+																					<div id="tablog" class="tab-pane fade">
+																						<pre id="hdlog"></pre>
+																					</div >
+																				</div>
+																				
+																			</div>
+																</div>
+														</td>
+        									</tr>
+                        </tbody>
+                    </table>
 
-				</div>
-			</div>
+                </div>
+              
+            </div><!--/inbox panel-->
+            <div class="well well-s text-right"><em>Inbox last updated: <span id="lastUpdated">{{date | date:'MM-dd-yyyy HH:mm:ss'}}</span></em></div>
+        </div><!--/col-9-->
+       
+    <div>
+      
+  	</div>
+  
+  </div>
 
-		</div>
-	</div>
+  </div>
 
 
 
