@@ -7,8 +7,9 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"time"
 
-	"github.com/fsnotify/fsnotify"
+	"github.com/radovskyb/watcher"
 )
 
 //ErrNotFoundPath error from missing or configuration path
@@ -34,7 +35,7 @@ type FileDefinition struct {
 	Path          string
 	Updates       chan []Mock
 	ConfigReaders []ConfigReader
-	watcher       *fsnotify.Watcher
+	watcher       *watcher.Watcher
 }
 
 //PrioritySort mock array sorted by priority
@@ -81,45 +82,34 @@ func (fd *FileDefinition) UnWatchDir() {
 
 //WatchDir start the watching process to detect any change on defintions
 func (fd *FileDefinition) WatchDir() {
-	var err error
-	fd.watcher, err = fsnotify.NewWatcher()
-	if err != nil {
-		log.Println("Hot mock file changing not available.")
-		return
-	}
+	fd.watcher = watcher.New()
 
-	err = fd.watcher.Add(fd.Path)
-	if err != nil {
-		log.Printf("Hot mock file changing not available in folder: %s\n", fd.Path)
-		return
-	}
-
-	if err = filepath.Walk(fd.Path, func(path string, fileInfo os.FileInfo, err error) error {
-		if fileInfo.IsDir() {
-			err = fd.watcher.Add(path)
-			if err != nil {
-				log.Printf("Hot mock file changing not available in folder: %s\n", fd.Path)
-				return err
+	// SetMaxEvents to 1 to allow at most 1 Event to be received
+	fd.watcher.SetMaxEvents(1)
+	go func() {
+		for {
+			select {
+			case event := <-fd.watcher.Event:
+				log.Println("Changes detected in mock definitions ", event.String())
+				fd.Updates <- fd.ReadMocksDefinition()
+			case err := <-fd.watcher.Error:
+				log.Println("File monitor error", err)
 			}
 		}
-		return nil
-	}); err != nil {
+	}()
+
+	// Watch test_folder recursively for changes.
+	if err := fd.watcher.Add(fd.Path); err != nil {
+		log.Println("Impossible bind the config folder to the files monitor: ", err)
 		return
 	}
 
 	go func() {
-		for {
-			select {
-			case event := <-fd.watcher.Events:
-				if event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Create == fsnotify.Create || event.Op&fsnotify.Remove == fsnotify.Remove {
-
-					log.Println("Changes detected in mock definitions")
-					fd.Updates <- fd.ReadMocksDefinition()
-
-				}
-			}
+		if err := fd.watcher.Start(time.Millisecond * 100); err != nil {
+			log.Println("Impossible to start the config files monitor: ", err)
 		}
 	}()
+
 }
 
 //AddConfigReader allows append new readers to able load different config files

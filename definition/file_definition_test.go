@@ -94,6 +94,7 @@ func TestPriority(t *testing.T) {
 }
 
 func TestHotReplace(t *testing.T) {
+
 	content := []byte("temporary file's content")
 	dir, err := ioutil.TempDir("", "mmock2")
 	if err != nil {
@@ -101,9 +102,6 @@ func TestHotReplace(t *testing.T) {
 	}
 
 	tmpfn := filepath.Join(dir, "tmpfile")
-	if err := ioutil.WriteFile(tmpfn, content, 0666); err != nil {
-		t.Errorf("Error creating temporary file")
-	}
 
 	defer os.RemoveAll(dir) // clean up
 
@@ -111,15 +109,19 @@ func TestHotReplace(t *testing.T) {
 	fileDef.AddConfigReader(&mockReader{canRead: 5, readOk: 5})
 	fileDef.WatchDir()
 
-	if err := ioutil.WriteFile(tmpfn, content, 0666); err != nil {
-		t.Errorf("Error updating temporary file")
-	}
-
 	timeout := make(chan bool, 1)
 	go func() {
 		time.Sleep(5 * time.Second)
 		timeout <- true
 	}()
+
+	go func() {
+		time.Sleep(1 * time.Second)
+		if err := ioutil.WriteFile(tmpfn, content, 0666); err != nil {
+			t.Errorf("Error updating temporary file")
+		}
+	}()
+
 	select {
 	case <-updatesCh:
 		t.Logf("New channel definition")
@@ -128,7 +130,7 @@ func TestHotReplace(t *testing.T) {
 	}
 
 	fileDef.UnWatchDir()
-	//close(updatesCh)
+	close(updatesCh)
 
 }
 
