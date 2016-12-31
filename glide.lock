@@ -1,16 +1,16 @@
-hash: dc498b8d522d47d1baf5f59937851d8593a1f4ae24f47fd86f1f4aed7f02cc27
-updated: 2016-12-21T23:15:49.972337978+01:00
+hash: 5bb703c4ae8c92866eba3c04863a046773ff0005a49de62cf25bc75aa6c517ba
+updated: 2016-12-31T13:22:17.331847499+01:00
 imports:
 - name: github.com/azer/url-router
   version: 1a0aa252538c21ad85fb4041c0df3d648ab813a1
 - name: github.com/elazarl/go-bindata-assetfs
   version: 9a6736ed45b44bf3835afeebb3034b57ed329f3e
-- name: github.com/fsnotify/fsnotify
-  version: 629574ca2a5df945712d3079857300b5e4da0236
 - name: github.com/ghodss/yaml
   version: 04f313413ffd65ce25f2541bfd2b2ceec5c0908c
 - name: github.com/icrowley/fake
   version: 84bff6d01560fb0b5a396ba29534e93fd00d09c6
+- name: github.com/radovskyb/watcher
+  version: 1925df70dcfd7eeb5085fc45c40f1e53759f5e3f
 - name: github.com/ryanuber/go-glob
   version: 572520ed46dbddaed19ea3d9541bdd0494163693
 - name: github.com/twinj/uuid
@@ -19,10 +19,6 @@ imports:
   version: 45e771701b814666a7eb299e6c7a57d0b1799e91
   subpackages:
   - websocket
-- name: golang.org/x/sys
-  version: d75a52659825e75fff6158388dddc6a5b04f9ba5
-  subpackages:
-  - unix
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 testImports: []
