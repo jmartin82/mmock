@@ -125,6 +125,25 @@ func TestMatchHeaders(t *testing.T) {
 	}
 }
 
+func TestMatchHost(t *testing.T) {
+
+	req := definition.Request{}
+	req.Host = "domain.com"
+
+	m := definition.Mock{}
+	m.Request.Host = "domain.com"
+
+	mm := MockMatch{}
+	if b, err := mm.Match(&req, &m); !b {
+		t.Error(err)
+	}
+
+	req.Host = "error.com"
+	if b, err := mm.Match(&req, &m); b {
+		t.Error(err)
+	}
+}
+
 func TestMatchBody(t *testing.T) {
 
 	req := definition.Request{}
