@@ -104,7 +104,7 @@ func (mm MockMatch) Match(req *definition.Request, mock *definition.Mock) (bool,
 		return false, ErrHostNotMatch
 	}
 
-	if routes.Match(req.Path) == nil {
+	if !glob.Glob(mock.Request.Path, req.Path) && routes.Match(req.Path) == nil {
 		return false, ErrPathNotMatch
 	}
 
