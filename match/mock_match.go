@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	ErrHostNotMatch     = errors.New("Host not match")
 	ErrMethodNotMatch   = errors.New("Method not match")
 	ErrPathNotMatch     = errors.New("Path not match")
 	ErrQueryStringMatch = errors.New("Query string not match")
@@ -64,14 +65,22 @@ func (mm MockMatch) matchKeyAndValue(reqMap definition.Cookies, mockMap definiti
 	return true
 }
 
-func (mm MockMatch) mockIncludesMethod(mock *definition.Request, method string) bool {
+func (mm MockMatch) mockMatchHost(host string, mock *definition.Request) bool {
+	if len(mock.Host) == 0 {
+		return true
+	}
+	return strings.ToLower(host) == strings.ToLower(mock.Host)
+}
+
+func (mm MockMatch) mockIncludesMethod(method string, mock *definition.Request) bool {
 	for _, item := range strings.Split(mock.Method, "|") {
-		if item == method {
+		if strings.ToLower(item) == strings.ToLower(method) {
 			return true
 		}
 	}
 	return false
 }
+
 func (mm MockMatch) matchScenarioState(scenario *definition.Scenario) bool {
 	if scenario.Name == "" {
 		return true
@@ -91,11 +100,15 @@ func (mm MockMatch) Match(req *definition.Request, mock *definition.Mock) (bool,
 
 	routes := urlmatcher.New(mock.Request.Path)
 
+	if !mm.mockMatchHost(req.Host, &mock.Request) {
+		return false, ErrHostNotMatch
+	}
+
 	if routes.Match(req.Path) == nil {
 		return false, ErrPathNotMatch
 	}
 
-	if !mm.mockIncludesMethod(&mock.Request, req.Method) {
+	if !mm.mockIncludesMethod(req.Method, &mock.Request) {
 		return false, ErrMethodNotMatch
 	}
 

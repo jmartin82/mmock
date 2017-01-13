@@ -18,6 +18,7 @@ type HTTPTranslator struct {
 func (t HTTPTranslator) BuildRequestDefinitionFromHTTP(req *http.Request) definition.Request {
 
 	res := definition.Request{}
+	res.Host = strings.Split(req.Host, ":")[0]
 	res.Method = req.Method
 	res.Path = req.URL.Path
 	res.Headers = make(definition.Values)
