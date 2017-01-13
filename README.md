@@ -229,7 +229,8 @@ Example of REST services using scenarios:
 +---------------------------------------------------------------------------------------------+
 ```
 
-Working examples [here].(/config/crud) 
+Working examples [here](/config/crud) 
+
 
 ### Variable tags
 
