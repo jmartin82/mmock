@@ -44,12 +44,26 @@ func TestMatchPath(t *testing.T) {
 	}
 }
 
-func TestGlobPath(t *testing.T) {
+func TestPathVars(t *testing.T) {
 	req := definition.Request{}
 	req.Path = "/a/b/c"
 
 	m := definition.Mock{}
 	m.Request.Path = "/a/:b/:c"
+
+	mm := MockMatch{}
+
+	if b, err := mm.Match(&req, &m); !b {
+		t.Error(err)
+	}
+}
+
+func TestPathGlob(t *testing.T) {
+	req := definition.Request{}
+	req.Path = "/a/b/c"
+
+	m := definition.Mock{}
+	m.Request.Path = "/a/*"
 
 	mm := MockMatch{}
 
@@ -120,6 +134,25 @@ func TestMatchHeaders(t *testing.T) {
 	}
 
 	mval["test2"] = []string{"test2"}
+	if b, err := mm.Match(&req, &m); b {
+		t.Error(err)
+	}
+}
+
+func TestMatchHost(t *testing.T) {
+
+	req := definition.Request{}
+	req.Host = "domain.com"
+
+	m := definition.Mock{}
+	m.Request.Host = "domain.com"
+
+	mm := MockMatch{}
+	if b, err := mm.Match(&req, &m); !b {
+		t.Error(err)
+	}
+
+	req.Host = "error.com"
 	if b, err := mm.Match(&req, &m); b {
 		t.Error(err)
 	}

@@ -129,6 +129,7 @@ Mock definition:
 {
 	"description": "Some text that describes the intended usage of the current configuration",
 	"request": {
+		"host": "example.com",
 		"method": "GET|POST|PUT|PATCH|...",
 		"path": "/your/path/:variable",
 		"queryStringParameters": {
@@ -175,6 +176,7 @@ Mock definition:
 
 A core feature of Mmock is the ability to return canned HTTP responses for requests matching criteria. 
 
+* *host*: Request http host. (without port)
 * *method*: Request http method. It allows more than one separated by pipes "|" **Mandatory**
 * *path*: Resource identifier. It allows :value matching. **Mandatory**
 * *queryStringParameters*: Array of query strings. It allows more than one value for the same key.
@@ -227,7 +229,8 @@ Example of REST services using scenarios:
 +---------------------------------------------------------------------------------------------+
 ```
 
-Working examples [here].(/config/crud) 
+Working examples [here](/config/crud) 
+
 
 ### Variable tags
 
@@ -297,7 +300,7 @@ Request data:
 
 
 ### Contributors
-- [@vtrifonov](https://github.com/vtrifonov)
+- Is this not enough? [@vtrifonov](https://github.com/vtrifonov) is working in a fork with a really advanced features. [HTTP API Mock](https://github.com/vtrifonov/http-api-mock) 
 
 ### Contributing
 

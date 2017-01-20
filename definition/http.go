@@ -10,6 +10,7 @@ type HttpHeaders struct {
 }
 
 type Request struct {
+	Host                  string `json:"host"`
 	Method                string `json:"method"`
 	Path                  string `json:"path"`
 	QueryStringParameters Values `json:"queryStringParameters"`
