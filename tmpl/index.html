@@ -1,131 +1,125 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>MMock Console</title>
-
-	<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
-	<script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-
-	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-	<!-- Optional theme -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-
-	<!-- Latest compiled and minified JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-
-	<script type="text/JavaScript" src="js/script.js"></script>
-
-	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-		<script type="text/JavaScript">
-	$( document ).ready(function() {
-		  var ws = new WebSocket("ws://" + location.host + "/echo");
-		  ws.onmessage = function(e) {
-		  	  var message = JSON.parse(event.data);
-		  	  logRequest(message);		      
-		  };
-	});
-		</script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>MMock Console</title>
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+        crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r"
+        crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+        crossorigin="anonymous"></script>
+    <script type="text/JavaScript" src="js/script.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/JavaScript">
+      $( document ).ready(function() {
+          var requestLogger = new RequestLogger();
+      	  var ws = new WebSocket("ws://" + location.host + "/echo");
+      	  ws.onmessage = function(e) {
+      	  	  var message = JSON.parse(event.data);
+      	  	  requestLogger.logEntry(message);	      
+      	  };
+      });
+      	
+    </script>
 </head>
 
-
 <body>
-
-  <hr>
-  
-  
-  <div class="container">
-    <h1>MMock Console</h1>
-  
+    <hr>
+    <div class="container">
+        <h1>MMock Console</h1>
         <div class="row">
-        <aside class="col-md-2 pad-right-0">
-            <ul class="nav nav-pills nav-stacked">
-              <li class="active"><a href="javascript:;"><span class="badge pull-right">2</span> Requests </a></li>
-              <li><a href="javascript:;"><span class="badge pull-right">3</span>Mocks</a></li>
-							<li><a href="javascript:;">About</a></li>
-            </ul>
-        </aside>
-        <div class="col-md-10">
-            <!--inbox toolbar-->
-            <div class="row">
-                <div class="col-xs-12">
-                    <div class="pull-right">
-                        <a class="btn btn-default btn-xs" title="Refresh" id="btnClearLog">
-                      		<span class="glyphicon glyphicon-remove-sign"> </span>
-                    		</a>
+            <aside class="col-md-2 pad-right-0">
+                <ul class="nav nav-pills nav-stacked">
+                    <li class="active"><a href="javascript:;"><span mclass="badge pull-right">2</span> Requests </a></li>
+                    <li><a href="javascript:;">About</a></li>
+                </ul>
+            </aside>
+            <div class="col-md-10">
+                <!--inbox toolbar-->
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="pull-right">
+                            <a class="btn btn-default btn-xs" title="Refresh" id="btnClearLog">
+                                <span class="glyphicon glyphicon-remove-sign"> </span>
+                            </a>
+                        </div>
                     </div>
-                </div><!--/col-->
-                <div class="col-xs-12 spacer5"></div>
-            </div><!--/row-->
-            <!--/inbox toolbar-->
-            <div class="panel panel-default requestLog" id="requestLogPanel">
-                <!--message list-->
-                <div class="table-responsive">
-                    <table class="table table-hover refresh-container pull-down">
-                        <thead class="hidden-xs">
-													<tr>
-															<td class="col-sm-2"><strong>Date</strong></td>
-															<td class="col-sm-1"><strong>Code</strong></td>
-															<td class="col-sm-1"><strong>CMD</strong></td>
-															<td class="col-sm-8"><strong>Url</strong></td>
-													</tr>
-												</thead>
-                          <tbody>
-														<tr data-toggle="collapse" data-target="#demo1" class="accordion-toggle">
-															<td class="col-sm-2">Date</td>
-															<td class="col-sm-1">Code</td>
-															<td class="col-sm-1">CMD</td>
-															<td class="col-sm-8">Url</td>
-												   </tr>
-													 <tr >
-            									<td colspan="4" class="hiddenRow">
-																<div class="accordian-body collapse" id="demo1"> 
-																				<h3>HTTP Details</h3>
-																				
-																				<ul class="nav nav-tabs">
-																					<li class="active" ><a href="#tabrequest" data-toggle="tab">Request</a></li>
-																					<li><a href="#tabresponse" data-toggle="tab">Response</a></li>
-																					<li><a href="#tablog" data-toggle="tab">Log</a></li>
-																				</ul>
-
-
-																				<div class="tab-content">
-																					<div id="tabrequest" class="tab-pane fade in active">
-																						<pre id="hdrequest"></pre>
-																					</div>
-																					<div id="tabresponse" class="tab-pane fade">
-																						<pre id="hdresponse"></pre>
-																					</div>
-																					<div id="tablog" class="tab-pane fade">
-																						<pre id="hdlog"></pre>
-																					</div >
-																				</div>
-																				
-																			</div>
-																</div>
-														</td>
-        									</tr>
-                        </tbody>
-                    </table>
-
+                    <!--/col-->
+                    <div class="col-xs-12 spacer5"></div>
                 </div>
-              
-            </div><!--/inbox panel-->
-            <div class="well well-s text-right"><em>Inbox last updated: <span id="lastUpdated">{{date | date:'MM-dd-yyyy HH:mm:ss'}}</span></em></div>
-        </div><!--/col-9-->
-       
-    <div>
-      
-  	</div>
-  
-  </div>
+                <!--/row-->
+                <!--/inbox toolbar-->
+                <div class="panel panel-default requestLog" id="requestLogPanel">
+                    <!--message list-->
+                    <div class="table-responsive">
+                        <table id="request-table" class="table table-hover refresh-container pull-down">
+                            <thead class="hidden-xs">
+                                <tr>
+                                    <td class="col-sm-2"><strong>Date</strong></td>
+                                    <td class="col-sm-1"><strong>Code</strong></td>
+                                    <td class="col-sm-1"><strong>Method</strong></td>
+                                    <td class="col-sm-8"><strong>Path</strong></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!--/inbox panel-->
+                <div class="well well-s text-right"><em>Inbox last updated: <span id="last_updated">{{date | date:'MM-dd-yyyy HH:mm:ss'}}</span></em></div>
+            </div>
+            <!--/col-9-->
+            <div>
+            </div>
+        </div>
+    </div>
+    <!-- TEMPLATES -->
+    <script id="request-entry" type="text/x-handlebars-template">
+        <tr data-toggle="collapse" data-target="#request-details-{{request_num}}" class="accordion-toggle {{request_color}}">
+            <td class="col-sm-3">{{request_date}}</td>
+            <td class="col-sm-1">{{request_code}}</td>
+            <td class="col-sm-1">{{request_method}}</td>
+            <td class="col-sm-7">{{request_path}}</td>
+        </tr>
+        <tr>
+            <td colspan="4" class="hiddenRow">
+                <div class="accordian-body collapse" id="request-details-{{request_num}}">
 
-  </div>
+                    <div class="col-md-12" style="margin-top: 10px;">
+<div class="panel with-nav-tabs panel-info">
+    <div class="panel-heading">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tabRequest-{{request_num}}" data-toggle="tab">Request</a></li>
+            <li><a href="#tabResponse-{{request_num}}" data-toggle="tab">Response</a></li>
+            <li><a href="#tabLog-{{request_num}}" data-toggle="tab">Log</a></li>
+        </ul>
+    </div>
+    <div class="panel-body" style="overflow: scroll;">
+        <div class="tab-content">
+            <div class="tab-pane fade in active"  id="tabRequest-{{request_num}}"><pre>{{request}}</pre></div>
+            <div class="tab-pane fade" id="tabResponse-{{request_num}}"><pre>{{response}}</pre></div>
+            <div class="tab-pane fade" id="tabLog-{{request_num}}"><pre>{{rlog}}</pre></div>
 
 
+        </div>
 
+    </div>
+</div>
+</div>
+</div>
+</td>
+</tr>
+</script>
 </body>
+
 </html>
