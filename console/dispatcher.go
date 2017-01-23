@@ -2,7 +2,6 @@ package console
 
 import (
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 
@@ -21,8 +20,9 @@ type Dispatcher struct {
 
 func (di *Dispatcher) consoleHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, _ := Asset("tmpl/index.html")
-	t, _ := template.New("Console").Parse(string(tmpl))
-	t.Execute(w, &di)
+	//t, _ := template.New("Console").Parse(string(tmpl))
+	//t.Execute(w, &di)
+	fmt.Fprintf(w, string(tmpl))
 }
 
 func (di *Dispatcher) removeClient(i int) {

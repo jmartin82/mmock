@@ -1,106 +1,141 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>MMock Console</title>
-
-	<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
-	<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-
-	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-	<!-- Optional theme -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-
-	<!-- Latest compiled and minified JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-
-	<script type="text/JavaScript" src="js/script.js"></script>
-
-	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-		<script type="text/JavaScript">
-	$( document ).ready(function() {
-		  var ws = new WebSocket("ws://" + location.host + "/echo");
-		  ws.onmessage = function(e) {
-		  	  var message = JSON.parse(event.data);
-		  	  logRequest(message);		      
-		  };
-	});
-		</script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>MMock Console</title>
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+        crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r"
+        crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+        crossorigin="anonymous"></script>
+    <script type="text/JavaScript" src="js/script.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/JavaScript">
+      $( document ).ready(function() {
+          var requestLogger = new RequestLogger();
+      	  var ws = new WebSocket("ws://" + location.host + "/echo");
+      	  ws.onmessage = function(e) {
+      	  	  var message = JSON.parse(event.data);
+      	  	  requestLogger.logEntry(message);	      
+      	  };
+      });
+      	
+    </script>
 </head>
 
-
 <body>
-	<!-- Stack the columns on mobile by making one full-width and the other half-width -->
-	<div class="container-fluid content" style="padding: 15px;">
-		<div class="row">
-			<div class="col-md-12 col-lg-12 console">
-				<div class="panel panel-primary" >
-					<div class="panel-heading">
-						<h3 class="panel-title">MMock Console</h3>
-					</div>
-					<div class="panel-body" style="overflow:auto">
-						
-							<ul class="list-group" id="groupConsole">
-								
-							</ul>
-						
-					</div>
-					<div class="panel-footer">
-						<label style="padding-top: 1%;">
-							<input type="checkbox" id="chkAutoScroll" checked="true" > Auto scroll
-						</label>
-						<button type="button" class="btn btn-primary" tabindex="0" id="btnClearLog" style="float:right;">
-						<span class="glyphicon glyphicon-remove-sign"></span> Clear Console</button>
-					</div>
-				</div>
-			</div>	
-		</div>
-		<div class="row">
-			<div class="alert alert-info" style="display:none" id="alertMessenge">Welcome.</div>
-		</div>
-		<div class="row" >
-			<div class="col-md-12 col-lg-12 status">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">HTTP Details</h3>
-					</div>
-					<div class="panel-body">
-
-						<div id="tirecap" style="display:none" class="alert alert-success" >
-						  <strong><span id="tistatus"> </span></strong> <span id="tirequest"> </span>
-						</div>
-						
-						<ul class="nav nav-tabs">
-						  <li class="active" ><a href="#tabrequest" data-toggle="tab">Request</a></li>
-						  <li><a href="#tabresponse" data-toggle="tab">Response</a></li>
-						  <li><a href="#tablog" data-toggle="tab">Log</a></li>
-						</ul>
-
-
-						<div class="tab-content">
-						  <div id="tabrequest" class="tab-pane fade in active">
-						    <pre id="hdrequest"></pre>
-						  </div>
-						  <div id="tabresponse" class="tab-pane fade">
-						    <pre id="hdresponse"></pre>
-						  </div>
-						  <div id="tablog" class="tab-pane fade">
-						    <pre id="hdlog"></pre>
-						  </div >
-						</div>
-						
-					</div>
-
-				</div>
-			</div>
-
-		</div>
-	</div>
+    <hr>
+    <div class="container-fluid">
+        <h1>MMock Console</h1>
+        <div class="row">
+            <aside class="col-md-2 pad-right-0">
+                <ul class="nav nav-pills nav-stacked">
+                    <li class="active"><a href="javascript:;">Requests</a></li>
+                    <li><a href="javascript:;" data-toggle="modal" data-target="#myModal">About</a></li>
+                </ul>
+            </aside>
+            <div class="col-md-10">
+                <!--inbox toolbar-->
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="pull-right">
+                            <a class="btn btn-default btn-xs" title="Refresh" id="btnClearLog">
+                                Clear
+                            </a>
+                        </div>
+                    </div>
+                    <!--/col-->
+                    <div class="col-xs-12 spacer5"></div>
+                </div>
+                <!--/row-->
+                <!--/inbox toolbar-->
+                <div class="panel panel-default requestLog" id="requestLogPanel">
+                    <!--message list-->
+                    <div id="request-data" class="table-responsive">
+                        <table id="request-table" class="table table-hover refresh-container pull-down" style="table-layout: fixed;
+    word-wrap: break-word;">
+<thead class="hidden-xs">
+    <tr>
+        <th class="col-sm-3"><strong>Date</strong></th>
+        <th class="col-sm-1"><strong>Code</strong></th>
+        <th class="col-sm-1"><strong>Method</strong></th>
+        <th class="col-sm-7"><strong>Path</strong></th>
+    </tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+</div>
+</div>
+<!--/inbox panel-->
+<div class="well well-s text-right"><em>Last request updated: <span id="last_updated">Waiting...</span></em></div>
+</div>
+<!--/col-9-->
+<div>
+</div>
+</div>
+</div>
 
 
+<!-- Modal About-->
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">MMock Web Console</h4>
+            </div>
+            <div class="modal-body">
+                <p>Mmock is an HTTP mocking application for testing and fast prototyping</p>
+                <p>Licence Copyright ©‎ 2016 - 2018, Jordi Martín (<a href="http://jordi.io" target="_blank">http://jordi.io</a>)</p>
+                <p>Released under MIT license, see <a href="https://github.com/jmartin82/mmock/blob/master/LICENSE.md" target="_blank">LICENSE</a></p>                for details. Contribute: <a href="https://github.com/jmartin82/mmock" target="_blank">https://github.com/jmartin82/mmock</a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- TEMPLATES -->
+<script id="request-entry" type="text/x-handlebars-template">
+
+    <tr class="clickable {{request_color}}" data-target="request-details-{{request_num}}">
+        <td class="col-sm-3">{{request_date}}</td>
+        <td class="col-sm-1">{{request_code}}</td>
+        <td class="col-sm-1">{{request_method}}</td>
+        <td class="col-sm-7">{{request_path}}</td>
+    </tr>
+    <tr id="request-details-{{request_num}}" class="select-row" style="display: none">
+<td colspan="4">
+    <div style="padding: 0px 15px 15px 15px">
+<h3>Details</h3>
+<h3><span class="label label-primary">Request</span></h3>
+<div>
+    <pre class="pre-scrollable"><code>{{{request}}}</code></pre>
+</div>
+<h3><span class="label label-{{request_color}}">Response</span></h3>
+<div>
+    <pre class="pre-scrollable"><code>{{{response}}}</code></pre>
+</div>
+<h3><span class="label label-default">Log</span></h3>
+<div>
+    <pre class="pre-scrollable"><code>{{{rlog}}}</code></pre>
+</div>
+
+</div>
+</td>
+</tr>
+</script>
 </body>
+
 </html>
