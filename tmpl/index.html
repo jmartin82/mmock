@@ -23,7 +23,7 @@
       $( document ).ready(function() {
           var requestLogger = new RequestLogger();
       	  var ws = new WebSocket("ws://" + location.host + "/echo");
-      	  ws.onmessage = function(e) {
+      	  ws.onmessage = function(event) {
       	  	  var message = JSON.parse(event.data);
       	  	  requestLogger.logEntry(message);	      
       	  };
@@ -111,7 +111,7 @@
 
     <tr class="clickable {{request_color}}" data-target="request-details-{{request_num}}">
         <td class="col-sm-3">{{request_date}}</td>
-        <td class="col-sm-1">{{request_code}}</td>
+        <td class="col-sm-1"><b>{{request_code}}</b></td>
         <td class="col-sm-1">{{request_method}}</td>
         <td class="col-sm-7">{{request_path}}</td>
     </tr>
