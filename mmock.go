@@ -31,11 +31,11 @@ func banner() {
 	fmt.Println("")
 
 	fmt.Print(
-		`		.---. .---. 
+		`		.---. .---.
                :     : o   :    me want request!
            _..-:   o :     :-.._    /
-       .-''  '  ` + "`" + `---' ` + "`" + `---' "   ` + "`" + `` + "`" + `-.    
-     .'   "   '  "  .    "  . '  "  ` + "`" + `.  
+       .-''  '  ` + "`" + `---' ` + "`" + `---' "   ` + "`" + `` + "`" + `-.
+     .'   "   '  "  .    "  . '  "  ` + "`" + `.
     :   '.---.,,.,...,.,.,.,..---.  ' ;
     ` + "`" + `. " ` + "`" + `.                     .' " .'
      ` + "`" + `.  '` + "`" + `.                   .' ' .'
@@ -46,7 +46,7 @@ func banner() {
     .'    "     '         "     "   ; ` + "`" + `.;";";";'
    ;         '       "       '     . ; .' ; ; ;
   ;     '         '       '   "    .'      .-'
-  '  "     "   '      "           "    _.-' 
+  '  "     "   '      "           "    _.-'
  `)
 	fmt.Println("")
 }
@@ -121,9 +121,9 @@ func main() {
 	}
 
 	sIP := flag.String("server-ip", outIP, "Mock server IP")
-	sPort := flag.Int("server-port", 8083, "Mock Server Port")
-	cIP := flag.String("console-ip", outIP, "Console Server IP")
-	cPort := flag.Int("cconsole-port", 8082, "Console server Port")
+	sPort := flag.Int("server-port", 8083, "Mock server Port")
+	cIP := flag.String("console-ip", outIP, "Console server IP")
+	cPort := flag.Int("console-port", 8082, "Console server Port")
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
 	cPath := flag.String("config-path", path, "Mocks definition folder")
 
