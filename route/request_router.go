@@ -43,8 +43,8 @@ func (rr *RequestRouter) Copy(src, dst *definition.Mock) {
 }
 
 //Route checks the request with all available mock definitions and return the matching mock for it.
-func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, map[string]string) {
-	errors := make(map[string]string)
+func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, definition.MatchErrors) {
+	errors := make(definition.MatchErrors)
 	rr.Lock()
 	defer rr.Unlock()
 	for _, mock := range rr.Mocks {

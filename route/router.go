@@ -6,6 +6,6 @@ import (
 
 //Router contains the functions to check the http request and return the matching mock.
 type Router interface {
-	Route(req *definition.Request) (*definition.Mock, map[string]string)
+	Route(req *definition.Request) (*definition.Mock, definition.MatchErrors)
 	SetMockDefinitions(mocks []definition.Mock)
 }

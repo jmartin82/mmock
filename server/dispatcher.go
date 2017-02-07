@@ -50,14 +50,8 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	log.Printf("New request: %s %s\n", req.Method, req.URL.String())
-	result := definition.Result{}
-	mock, errs := di.Router.Route(&mRequest)
-	if errs == nil {
-		result.Found = true
-	} else {
-		result.Found = false
-		result.Errors = errs
-	}
+
+	mock, result := di.getMatchingResult(&mRequest)
 
 	log.Printf("Mock match found: %s. Name : %s\n", strconv.FormatBool(result.Found), mock.Name)
 
@@ -93,6 +87,17 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	//log to console
 	m := definition.Match{Request: mRequest, Response: response, Result: result}
 	go di.recordMatchData(m)
+}
+func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definition.Mock,definition.Result) {
+	result := definition.Result{}
+	mock, errs := di.Router.Route(request)
+	if errs == nil {
+		result.Found = true
+	} else {
+		result.Found = false
+		result.Errors = errs
+	}
+	return mock,result;
 }
 
 //Start initialize the HTTP mock server
