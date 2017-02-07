@@ -4,10 +4,10 @@ go:
   - 1.7.x
 
 install:
-  - wget "https://github.com/Masterminds/glide/releases/download/v0.12.3/glide-v0.12.3-linux-amd64.tar.gz"
-  - mkdir -p $HOME/bin
-  - tar -vxz -C $HOME/bin --strip=1 -f glide-v0.12.3-linux-amd64.tar.gz
-  - export PATH="$HOME/bin:$PATH"
+  - mkdir -p ${TRAVIS_BUILD_DIR}/go/bin
+  - export PATH="${TRAVIS_BUILD_DIR}/go/bin:$PATH"
+  - mkdir -p ${TRAVIS_BUILD_DIR}/go
+  - export GOPATH="${TRAVIS_BUILD_DIR}/go:$GOPATH"
   - make get-deps
 
 script:
