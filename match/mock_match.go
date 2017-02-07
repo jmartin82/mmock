@@ -22,11 +22,15 @@ var (
 	ErrScenarioNotMatch = errors.New("Scenario state not match")
 )
 
-type MockMatch struct {
+func NewRequestMatcher(scenario scenario.ScenarioManager) *MockMatcher {
+	return &MockMatcher{Scenario: scenario}
+}
+
+type MockMatcher struct {
 	Scenario scenario.ScenarioManager
 }
 
-func (mm MockMatch) matchKeyAndValues(reqMap definition.Values, mockMap definition.Values) bool {
+func (mm MockMatcher) matchKeyAndValues(reqMap definition.Values, mockMap definition.Values) bool {
 
 	if len(mockMap) > len(reqMap) {
 
@@ -53,7 +57,7 @@ func (mm MockMatch) matchKeyAndValues(reqMap definition.Values, mockMap definiti
 	return true
 }
 
-func (mm MockMatch) matchKeyAndValue(reqMap definition.Cookies, mockMap definition.Cookies) bool {
+func (mm MockMatcher) matchKeyAndValue(reqMap definition.Cookies, mockMap definition.Cookies) bool {
 	if len(mockMap) > len(reqMap) {
 		return false
 	}
@@ -65,14 +69,14 @@ func (mm MockMatch) matchKeyAndValue(reqMap definition.Cookies, mockMap definiti
 	return true
 }
 
-func (mm MockMatch) mockMatchHost(host string, mock *definition.Request) bool {
+func (mm MockMatcher) mockMatchHost(host string, mock *definition.Request) bool {
 	if len(mock.Host) == 0 {
 		return true
 	}
 	return strings.ToLower(host) == strings.ToLower(mock.Host)
 }
 
-func (mm MockMatch) mockIncludesMethod(method string, mock *definition.Request) bool {
+func (mm MockMatcher) mockIncludesMethod(method string, mock *definition.Request) bool {
 	for _, item := range strings.Split(mock.Method, "|") {
 		if strings.ToLower(item) == strings.ToLower(method) {
 			return true
@@ -81,7 +85,7 @@ func (mm MockMatch) mockIncludesMethod(method string, mock *definition.Request) 
 	return false
 }
 
-func (mm MockMatch) matchScenarioState(scenario *definition.Scenario) bool {
+func (mm MockMatcher) matchScenarioState(scenario *definition.Scenario) bool {
 	if scenario.Name == "" {
 		return true
 	}
@@ -96,7 +100,7 @@ func (mm MockMatch) matchScenarioState(scenario *definition.Scenario) bool {
 	return false
 }
 
-func (mm MockMatch) Match(req *definition.Request, mock *definition.Mock) (bool, error) {
+func (mm MockMatcher) Match(req *definition.Request, mock *definition.Mock, scenarioAware bool) (bool, error) {
 
 	routes := urlmatcher.New(mock.Request.Path)
 
@@ -128,7 +132,7 @@ func (mm MockMatch) Match(req *definition.Request, mock *definition.Mock) (bool,
 		return false, ErrBodyNotMatch
 	}
 
-	if !mm.matchScenarioState(&mock.Control.Scenario) {
+	if scenarioAware && !mm.matchScenarioState(&mock.Control.Scenario) {
 		return false, ErrScenarioNotMatch
 	}
 

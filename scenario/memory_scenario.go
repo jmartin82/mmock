@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-func NewInMemmoryScenarion() *InMemoryScenario {
+func NewInMemoryScenario() *InMemoryScenario {
 	status := make(map[string]string)
 	return &InMemoryScenario{status: status}
 }

@@ -11,23 +11,25 @@ import (
 )
 
 //NewRouter returns a pointer to new RequestRouter
-func NewRouter(mocks []definition.Mock, matcher match.Matcher, dUpdates chan []definition.Mock) *RequestRouter {
+func NewRouter(mocks []definition.Mock, matcher match.Matcher, requestStore match.RequestStore, dUpdates chan []definition.Mock) *RequestRouter {
 	return &RequestRouter{
-		Mocks:    mocks,
-		Matcher:  matcher,
-		DUpdates: dUpdates,
+		Mocks:        mocks,
+		Matcher:      matcher,
+		RequestStore: requestStore,
+		DUpdates:     dUpdates,
 	}
 }
 
 //RequestRouter checks http requesta and try to figure out what is the best mock for each one.
 type RequestRouter struct {
-	Mocks    []definition.Mock
-	Matcher  match.Matcher
-	DUpdates chan []definition.Mock
+	Mocks        []definition.Mock
+	Matcher      match.Matcher
+	RequestStore match.RequestStore
+	DUpdates     chan []definition.Mock
 	sync.Mutex
 }
 
-func (rr *RequestRouter) Copy(src, dst *definition.Mock) {
+func (rr *RequestRouter) copy(src, dst *definition.Mock) {
 	var mod bytes.Buffer
 	enc := gob.NewEncoder(&mod)
 	dec := gob.NewDecoder(&mod)
@@ -47,12 +49,13 @@ func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, defin
 	errors := make(definition.MatchErrors)
 	rr.Lock()
 	defer rr.Unlock()
+	rr.RequestStore.Save(*req)
 	for _, mock := range rr.Mocks {
-		m, err := rr.Matcher.Match(req, &mock)
+		m, err := rr.Matcher.Match(req, &mock, true)
 		if m {
 			//we return a copy of it, not the definition itself because we will working on it.
 			md := definition.Mock{}
-			rr.Copy(&mock, &md)
+			rr.copy(&mock, &md)
 			return &md, nil
 		}
 		errors[mock.Name] = err.Error()

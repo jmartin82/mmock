@@ -41,19 +41,19 @@ function RequestLogger() {
         });
     }
 
-    function getCurrentTime() {
-        var currentdate = new Date();
-        var datetime = currentdate.getDate() + "/" +
-            (currentdate.getMonth() + 1) + "/" +
-            currentdate.getFullYear() + " @ " +
-            currentdate.getHours() + ":" +
-            currentdate.getMinutes() + ":" +
-            currentdate.getSeconds();
+    function getRequestTime(timestamp) {
+        var date = new Date(timestamp*1000);
+        var datetime = requestTime.getDate() + "/" +
+            (requestTime.getMonth() + 1) + "/" +
+            requestTime.getFullYear() + " @ " +
+            requestTime.getHours() + ":" +
+            requestTime.getMinutes() + ":" +
+            requestTime.getSeconds();
         return datetime;
     }
 
-    function updateLastRequestDate() {
-        $('#last_updated').text(getCurrentTime());
+    function updateLastRequestDate(timestamp) {
+        $('#last_updated').text(getRequestTime(timestamp));
     }
 
     function getContext(num, data) {
@@ -65,7 +65,7 @@ function RequestLogger() {
         var log = syntaxHighlight(JSON.stringify(data.result, undefined, 4));
         var color = getColorByStatus(status)
 
-        return { request_num: num, request: request, response: response, rlog: log, request_date: getCurrentTime(), request_code: status, request_method: method, request_path: path, request_color: color };
+        return { request_num: num, request: request, response: response, rlog: log, request_date: getRequestTime(data.time), request_code: status, request_method: method, request_path: path, request_color: color };
     }
 
     this.logEntry = function (data) {
@@ -74,7 +74,7 @@ function RequestLogger() {
         var html = template(context);
         $("#request-table tbody").prepend(html);
         updateTitle();
-        updateLastRequestDate();
+        updateLastRequestDate(data.time);
 
     };
 }

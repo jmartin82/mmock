@@ -85,10 +85,10 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	di.Translator.WriteHTTPResponseFromDefinition(&response, w)
 
 	//log to console
-	m := definition.Match{Request: mRequest, Response: response, Result: result}
-	go di.recordMatchData(m)
+	match := definition.Match{Time: time.Now().Unix(), Request: mRequest, Response: response, Result: result}
+	go di.recordMatchData(match)
 }
-func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definition.Mock,definition.Result) {
+func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definition.Mock, definition.Result) {
 	result := definition.Result{}
 	mock, errs := di.Router.Route(request)
 	if errs == nil {
@@ -97,7 +97,7 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 		result.Found = false
 		result.Errors = errs
 	}
-	return mock,result;
+	return mock, result
 }
 
 //Start initialize the HTTP mock server

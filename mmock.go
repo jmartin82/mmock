@@ -27,7 +27,7 @@ var ErrNotFoundDefaultPath = errors.New("We can't determinate the current path")
 var ErrNotFoundAnyMock = errors.New("No valid mock definition found")
 
 func banner() {
-	fmt.Println("MMock v 2.0.1")
+	fmt.Println("MMock v 2.0.2")
 	fmt.Println("")
 
 	fmt.Print(
@@ -66,9 +66,14 @@ func getOutboundIP() string {
 	return localAddr[0:idx]
 }
 
-func getRouter(mocks []definition.Mock, scenario scenario.ScenarioManager, dUpdates chan []definition.Mock) *route.RequestRouter {
+func getVerifier(matcher match.Matcher, requestStore match.RequestStore) match.Verifier {
+	return match.NewMatchVerifier(matcher, requestStore)
+}
+
+func getRouter(mocks []definition.Mock, matcher match.Matcher, requestStore match.RequestStore, dUpdates chan []definition.Mock) *route.RequestRouter {
 	log.Printf("Loding router with %d definitions\n", len(mocks))
-	router := route.NewRouter(mocks, match.MockMatch{Scenario: scenario}, dUpdates)
+
+	router := route.NewRouter(mocks, matcher, requestStore, dUpdates)
 	router.MockChangeWatch()
 	return router
 }
@@ -79,7 +84,8 @@ func getVarsProcessor() vars.VarsProcessor {
 }
 
 func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, scenario scenario.ScenarioManager, varsProcessor vars.VarsProcessor) {
-	dispatcher := server.Dispatcher{IP: ip,
+	dispatcher := server.Dispatcher{
+		IP:            ip,
 		Port:          port,
 		Router:        router,
 		Translator:    translate.HTTPTranslator{},
@@ -90,8 +96,13 @@ func startServer(ip string, port int, done chan bool, router route.Router, mLog 
 	dispatcher.Start()
 	done <- true
 }
-func startConsole(ip string, port int, done chan bool, mLog chan definition.Match) {
-	dispatcher := console.Dispatcher{IP: ip, Port: port, Mlog: mLog}
+func startConsole(ip string, port int, verifier match.Verifier, done chan bool, mLog chan definition.Match) {
+	dispatcher := console.Dispatcher{
+		IP:         ip,
+		Port:       port,
+		Translator: translate.HTTPTranslator{},
+		Verifier:   verifier,
+		Mlog:       mLog}
 	dispatcher.Start()
 	done <- true
 }
@@ -135,15 +146,20 @@ func main() {
 	dUpdates := make(chan []definition.Mock)
 	done := make(chan bool)
 
-	scenario := scenario.NewInMemmoryScenarion()
+	//shared structs
+	scenario := scenario.NewInMemoryScenario()
+	matcher := match.NewRequestMatcher(scenario)
+	requestStore := match.NewMemoryRequestStore()
+
 	mocks := getMocks(path, dUpdates)
-	router := getRouter(mocks, scenario, dUpdates)
+	verify := getVerifier(matcher, requestStore)
+	router := getRouter(mocks, matcher, requestStore, dUpdates)
 	varsProcessor := getVarsProcessor()
 
 	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	if *console {
-		go startConsole(*cIP, *cPort, done, mLog)
+		go startConsole(*cIP, *cPort, verify, done, mLog)
 		log.Printf("Console running at %s:%d\n", *cIP, *cPort)
 	}
 

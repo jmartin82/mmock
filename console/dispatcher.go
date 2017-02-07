@@ -1,28 +1,47 @@
 package console
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/match"
+	"github.com/jmartin82/mmock/translate"
 	"golang.org/x/net/websocket"
 )
 
 //Dispatcher is the http console server.
 type Dispatcher struct {
-	IP      string
-	Port    int
-	Mlog    chan definition.Match
-	clients []*websocket.Conn
+	IP         string
+	Port       int
+	Translator translate.MessageTranslator
+	Verifier   match.Verifier
+	Mlog       chan definition.Match
+	clients    []*websocket.Conn
 }
 
 func (di *Dispatcher) consoleHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, _ := Asset("tmpl/index.html")
-	//t, _ := template.New("Console").Parse(string(tmpl))
-	//t.Execute(w, &di)
 	fmt.Fprintf(w, string(tmpl))
+}
+
+func (di *Dispatcher) verifyHandler(w http.ResponseWriter, r *http.Request) {
+
+	dReq := definition.Request{}
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&dReq)
+	if err != nil {
+
+	}
+	defer r.Body.Close()
+	result := di.Verifier.Verify(dReq)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
+
 }
 
 func (di *Dispatcher) removeClient(i int) {
@@ -65,6 +84,7 @@ func (di *Dispatcher) Start() {
 	http.Handle("/echo", websocket.Handler(di.echoHandler))
 	http.Handle("/js/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "tmpl"}))
 	http.Handle("/css/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "tmpl"}))
+	http.HandleFunc("/verify", di.verifyHandler)
 	http.HandleFunc("/", di.consoleHandler)
 
 	go di.logFanOut()
