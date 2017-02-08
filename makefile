@@ -39,7 +39,6 @@ vet:
 	go-ls -exec="go vet -v"
 
 get-deps:
-	curl https://glide.sh/get | sh
 	go get github.com/laher/gols/cmd/go-ls
 	glide install
 

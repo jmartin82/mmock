@@ -7,8 +7,8 @@ import (
 	"github.com/jmartin82/mmock/vars/fakedata"
 )
 
-func getProcessor() VarsProcessor {
-	return VarsProcessor{FillerFactory: MockFillerFactory{FakeAdapter: fakedata.NewDummyDataFaker("AleixMG")}}
+func getProcessor() Processor {
+	return Processor{FillerFactory: MockFillerFactory{FakeAdapter: fakedata.NewDummyDataFaker("AleixMG")}}
 }
 
 func TestReplaceTags(t *testing.T) {

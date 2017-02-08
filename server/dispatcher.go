@@ -23,7 +23,7 @@ type Dispatcher struct {
 	Port          int
 	Router        route.Router
 	Translator    translate.MessageTranslator
-	VarsProcessor vars.VarsProcessor
+	Processor vars.Processor
 	Scenario      scenario.ScenarioManager
 	Store         match.Store
 	Mlog          chan definition.Match
@@ -87,7 +87,7 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 			response = pr.MakeRequest(mock.Request)
 		} else {
 
-			di.VarsProcessor.Eval(request, mock)
+			di.Processor.Eval(request, mock)
 			if mock.Control.Crazy {
 				log.Printf("Running crazy mode")
 				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)

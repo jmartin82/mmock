@@ -78,18 +78,18 @@ func getRouter(mocks []definition.Mock, checker match.Checker, dUpdates chan []d
 	return router
 }
 
-func getVarsProcessor() vars.VarsProcessor {
+func getVarsProcessor() vars.Processor {
 
-	return vars.VarsProcessor{FillerFactory: vars.MockFillerFactory{FakeAdapter: fakedata.FakeAdapter{}}}
+	return vars.Processor{FillerFactory: vars.MockFillerFactory{FakeAdapter: fakedata.FakeAdapter{}}}
 }
 
-func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, scenario scenario.ScenarioManager, varsProcessor vars.VarsProcessor, matchStore match.Store) {
+func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, scenario scenario.ScenarioManager, varsProcessor vars.Processor, matchStore match.Store) {
 	dispatcher := server.Dispatcher{
 		IP:            ip,
 		Port:          port,
 		Router:        router,
 		Translator:    translate.HTTPTranslator{},
-		VarsProcessor: varsProcessor,
+		Processor: varsProcessor,
 
 		Scenario: scenario,
 		Store:    matchStore,
