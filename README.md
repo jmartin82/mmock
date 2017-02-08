@@ -31,6 +31,7 @@ Built with Go - Mmock runs without installation on multiple platforms.
 * Mock definitions hot replace (edit your mocks without restart)
 * Web interface to view requests data (method,path,headers,cookies,body,etc..)
 * Stateful behaviour with scenarios
+* Verifying
 * Proxy mode
 * Fine grain log info in web interface
 * Real-time updates using WebSockets
@@ -230,6 +231,102 @@ Example of REST services using scenarios:
 ```
 
 Working examples [here](/config/crud) 
+
+### Verify
+
+The Mmock rrecords all requests it receives in memory (at least until it is reset). 
+This makes it possible to verify that a request matching a specific pattern was received, and also to fetch the requests details.
+
+You can get that data throught the web console server (by default it has the same ip of mock sever and port 8082).
+
+#### REST Endpoints
+
+**Title** : Get all requests.<br>
+**URL** : /request/all<br>
+**Method** : GET<br>
+**Response Codes**: Success (200 OK)<br>
+
+
+**Title** : Get all matched requests with any mock.<br>
+**URL** : /request/matched<br>
+**Method** : GET<br>
+**Response Codes**: Success (200 OK)<br>
+
+**Title** : Get all non matched requests.<br>
+**URL** : /request/unmatched<br>
+**Method** : GET<br>
+**Response Codes**: Success (200 OK)<br>
+
+**Title** : Get all requests that match with an specific pattern.<br>
+**URL** : /request/verify<br>
+**Method** : POST<br>
+**Data Params**:  <br>
+Like stubbing this call also uses the same DSL to filter and query requests.
+
+```
+{
+	"host": "example.com",
+	"method": "GET|POST|PUT|PATCH|...",
+	"path": "/your/path/:variable",
+	"queryStringParameters": {
+		"name": ["value"],
+		"name": ["value", "value"]
+	},
+	"headers": {
+		"name": ["value"]
+	},
+	"cookies": {
+		"name": "value"
+	},
+	"body": "Expected Body"
+}
+```
+**Response Codes**: Success (200 OK)<br>
+
+#### Realtime Endpoints
+
+Also there is a real time endpoint available through WebSockets that broadcast all requests.
+
+**Title** : Get all requests.<br>
+**URL** : /echo <br>
+
+
+#### Output
+
+All enpoints have the same output format:
+
+```
+[
+  {
+    "time": 1486563983,
+    "request": {
+      "host": "192.168.20.209",
+      "method": "GET",
+      "path": "/hello",
+      "queryStringParameters": {},
+      "headers": {
+        "Accept": [
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+        ]
+      },
+      "cookies": {},
+      "body": ""
+    },
+    "response": {
+      "statusCode": 200,
+      "headers": null,
+      "cookies": {
+        "visit": "true"
+      },
+      "body": "Hello world!"
+    },
+    "result": {
+      "match": true,
+      "errors": null
+    }
+  }
+]
+```
 
 
 ### Variable tags
