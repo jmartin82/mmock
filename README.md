@@ -266,8 +266,8 @@ Like stubbing this call also uses the same DSL to filter and query requests.
 ```
 {
 	"host": "example.com",
-	"method": "GET|POST|PUT|PATCH|...",
-	"path": "/your/path/:variable",
+	"method": "GET|POST|PUT|PATCH|... (Mandatory)", 
+	"path": "/your/path/:variable (Mandatory)",
 	"queryStringParameters": {
 		"name": ["value"],
 		"name": ["value", "value"]

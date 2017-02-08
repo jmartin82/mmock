@@ -51,7 +51,6 @@ func (di *Dispatcher) Start() {
 	http.Handle("/css/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "tmpl"}))
 
 	//verification
-	http.HandleFunc("/request", di.requestDoc)
 	http.HandleFunc("/request/reset", di.requestReset)
 	http.HandleFunc("/request/verify", di.requestVerifyHandler)
 	http.HandleFunc("/request/all", di.requestAllHandler)
@@ -88,10 +87,6 @@ func (di *Dispatcher) echoHandler(ws *websocket.Conn) {
 }
 
 //API REQUEST
-
-func (di *Dispatcher) requestDoc(w http.ResponseWriter, r *http.Request) {
-
-}
 
 func (di *Dispatcher) requestVerifyHandler(w http.ResponseWriter, r *http.Request) {
 
