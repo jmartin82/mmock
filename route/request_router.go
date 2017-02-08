@@ -11,21 +11,19 @@ import (
 )
 
 //NewRouter returns a pointer to new RequestRouter
-func NewRouter(mocks []definition.Mock, matcher match.Matcher, requestStore match.RequestStore, dUpdates chan []definition.Mock) *RequestRouter {
+func NewRouter(mocks []definition.Mock, checker match.Checker, dUpdates chan []definition.Mock) *RequestRouter {
 	return &RequestRouter{
-		Mocks:        mocks,
-		Matcher:      matcher,
-		RequestStore: requestStore,
-		DUpdates:     dUpdates,
+		Mocks:    mocks,
+		Checker:  checker,
+		DUpdates: dUpdates,
 	}
 }
 
 //RequestRouter checks http requesta and try to figure out what is the best mock for each one.
 type RequestRouter struct {
-	Mocks        []definition.Mock
-	Matcher      match.Matcher
-	RequestStore match.RequestStore
-	DUpdates     chan []definition.Mock
+	Mocks    []definition.Mock
+	Checker  match.Checker
+	DUpdates chan []definition.Mock
 	sync.Mutex
 }
 
@@ -49,9 +47,8 @@ func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, defin
 	errors := make(definition.MatchErrors)
 	rr.Lock()
 	defer rr.Unlock()
-	rr.RequestStore.Save(*req)
 	for _, mock := range rr.Mocks {
-		m, err := rr.Matcher.Match(req, &mock, true)
+		m, err := rr.Checker.Check(req, &mock, true)
 		if m {
 			//we return a copy of it, not the definition itself because we will working on it.
 			md := definition.Mock{}

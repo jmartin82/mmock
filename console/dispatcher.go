@@ -18,7 +18,7 @@ type Dispatcher struct {
 	IP         string
 	Port       int
 	Translator translate.MessageTranslator
-	Verifier   match.Verifier
+	MatchSpy   match.Spier
 	Mlog       chan definition.Match
 	clients    []*websocket.Conn
 }
@@ -34,10 +34,10 @@ func (di *Dispatcher) verifyHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&dReq)
 	if err != nil {
-
+		//TODO
 	}
 	defer r.Body.Close()
-	result := di.Verifier.Verify(dReq)
+	result := di.MatchSpy.Find(dReq)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)

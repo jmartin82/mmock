@@ -17,7 +17,7 @@ type MockResponseWriter interface {
 }
 
 //MessageTranslator defines the translator contract between http and mock and viceversa.
-//this translation decople the mock matcher from the specific http implementation.
+//this translation decople the mock checker from the specific http implementation.
 type MessageTranslator interface {
 	MockRequestBuilder
 	MockResponseWriter

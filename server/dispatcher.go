@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/match"
 	"github.com/jmartin82/mmock/proxy"
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/scenario"
@@ -24,11 +25,12 @@ type Dispatcher struct {
 	Translator    translate.MessageTranslator
 	VarsProcessor vars.VarsProcessor
 	Scenario      scenario.ScenarioManager
+	Store         match.Store
 	Mlog          chan definition.Match
 }
 
-func (di Dispatcher) recordMatchData(msg definition.Match) {
-	di.Mlog <- msg
+func (di Dispatcher) recordMatchData(msg *definition.Match) {
+	di.Mlog <- *msg
 }
 
 func (di Dispatcher) randomStatusCode(currentStatus int) int {
@@ -42,7 +44,6 @@ func (di Dispatcher) randomStatusCode(currentStatus int) int {
 //ServerHTTP is the mock http server request handler.
 //It uses the router to decide the matching mock and translator as adapter between the HTTP impelementation and the mock definition.
 func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	var response definition.Response
 	mRequest := di.Translator.BuildRequestDefinitionFromHTTP(req)
 
 	if mRequest.Path == "/favicon.ico" {
@@ -51,7 +52,32 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	log.Printf("New request: %s %s\n", req.Method, req.URL.String())
 
-	mock, result := di.getMatchingResult(&mRequest)
+	mock, match := di.getMatchingResult(&mRequest)
+
+	//save the match info
+	di.Store.Save(*match)
+
+	//set new scenario
+	if mock.Control.Scenario.NewState != "" {
+		di.Scenario.SetState(mock.Control.Scenario.Name, mock.Control.Scenario.NewState)
+	}
+
+	//translate request
+	di.Translator.WriteHTTPResponseFromDefinition(match.Response, w)
+
+	go di.recordMatchData(match)
+}
+
+func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definition.Mock, *definition.Match) {
+	response := &definition.Response{}
+	result := definition.Result{}
+	mock, errs := di.Router.Route(request)
+	if errs == nil {
+		result.Found = true
+	} else {
+		result.Found = false
+		result.Errors = errs
+	}
 
 	log.Printf("Mock match found: %s. Name : %s\n", strconv.FormatBool(result.Found), mock.Name)
 
@@ -61,7 +87,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			response = pr.MakeRequest(mock.Request)
 		} else {
 
-			di.VarsProcessor.Eval(&mRequest, mock)
+			di.VarsProcessor.Eval(request, mock)
 			if mock.Control.Crazy {
 				log.Printf("Running crazy mode")
 				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)
@@ -70,34 +96,14 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				log.Printf("Adding a delay")
 				time.Sleep(time.Duration(mock.Control.Delay) * time.Second)
 			}
-			response = mock.Response
+			response = &mock.Response
 		}
 
 	} else {
-		response = mock.Response
+		response = &mock.Response
 	}
 
-	//set new scenario
-	if mock.Control.Scenario.NewState != "" {
-		di.Scenario.SetState(mock.Control.Scenario.Name, mock.Control.Scenario.NewState)
-	}
-	//translate request
-	di.Translator.WriteHTTPResponseFromDefinition(&response, w)
-
-	//log to console
-	match := definition.Match{Time: time.Now().Unix(), Request: mRequest, Response: response, Result: result}
-	go di.recordMatchData(match)
-}
-func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definition.Mock, definition.Result) {
-	result := definition.Result{}
-	mock, errs := di.Router.Route(request)
-	if errs == nil {
-		result.Found = true
-	} else {
-		result.Found = false
-		result.Errors = errs
-	}
-	return mock, result
+	return mock, &definition.Match{Time: time.Now().Unix(), Request: request, Response: response, Result: result}
 }
 
 //Start initialize the HTTP mock server

@@ -66,14 +66,14 @@ func getOutboundIP() string {
 	return localAddr[0:idx]
 }
 
-func getVerifier(matcher match.Matcher, requestStore match.RequestStore) match.Verifier {
-	return match.NewMatchVerifier(matcher, requestStore)
+func getMatchSpy(checker match.Checker, matchStore match.Store) match.Spier {
+	return match.NewSpy(checker, matchStore)
 }
 
-func getRouter(mocks []definition.Mock, matcher match.Matcher, requestStore match.RequestStore, dUpdates chan []definition.Mock) *route.RequestRouter {
+func getRouter(mocks []definition.Mock, checker match.Checker, dUpdates chan []definition.Mock) *route.RequestRouter {
 	log.Printf("Loding router with %d definitions\n", len(mocks))
 
-	router := route.NewRouter(mocks, matcher, requestStore, dUpdates)
+	router := route.NewRouter(mocks, checker, dUpdates)
 	router.MockChangeWatch()
 	return router
 }
@@ -83,26 +83,27 @@ func getVarsProcessor() vars.VarsProcessor {
 	return vars.VarsProcessor{FillerFactory: vars.MockFillerFactory{FakeAdapter: fakedata.FakeAdapter{}}}
 }
 
-func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, scenario scenario.ScenarioManager, varsProcessor vars.VarsProcessor) {
+func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, scenario scenario.ScenarioManager, varsProcessor vars.VarsProcessor, matchStore match.Store) {
 	dispatcher := server.Dispatcher{
 		IP:            ip,
 		Port:          port,
 		Router:        router,
 		Translator:    translate.HTTPTranslator{},
 		VarsProcessor: varsProcessor,
-		Scenario:      scenario,
-		Mlog:          mLog,
+
+		Scenario: scenario,
+		Store:    matchStore,
+		Mlog:     mLog,
 	}
 	dispatcher.Start()
 	done <- true
 }
-func startConsole(ip string, port int, verifier match.Verifier, done chan bool, mLog chan definition.Match) {
+func startConsole(ip string, port int, spy match.Spier, done chan bool, mLog chan definition.Match) {
 	dispatcher := console.Dispatcher{
-		IP:         ip,
-		Port:       port,
-		Translator: translate.HTTPTranslator{},
-		Verifier:   verifier,
-		Mlog:       mLog}
+		IP:       ip,
+		Port:     port,
+		MatchSpy: spy,
+		Mlog:     mLog}
 	dispatcher.Start()
 	done <- true
 }
@@ -148,18 +149,18 @@ func main() {
 
 	//shared structs
 	scenario := scenario.NewInMemoryScenario()
-	matcher := match.NewRequestMatcher(scenario)
-	requestStore := match.NewMemoryRequestStore()
+	checker := match.NewTester(scenario)
+	matchStore := match.NewMemoryStore()
 
 	mocks := getMocks(path, dUpdates)
-	verify := getVerifier(matcher, requestStore)
-	router := getRouter(mocks, matcher, requestStore, dUpdates)
+	spy := getMatchSpy(checker, matchStore)
+	router := getRouter(mocks, checker, dUpdates)
 	varsProcessor := getVarsProcessor()
 
-	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor)
+	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor, matchStore)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	if *console {
-		go startConsole(*cIP, *cPort, verify, done, mLog)
+		go startConsole(*cIP, *cPort, spy, done, mLog)
 		log.Printf("Console running at %s:%d\n", *cIP, *cPort)
 	}
 

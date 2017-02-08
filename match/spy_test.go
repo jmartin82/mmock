@@ -17,24 +17,24 @@ func (dsm DummyScenarioManager) GetState(name string) string {
 }
 
 func TestMach(t *testing.T) {
-	msr := NewMemoryRequestStore()
-	m1 := definition.Request{Host: "TEST1"}
+	msr := NewMemoryStore()
+	m1 := definition.Match{Request: &definition.Request{Host: "TEST1"}}
 	msr.Save(m1)
-	m2 := definition.Request{Host: "TEST2"}
+	m2 := definition.Match{Request: &definition.Request{Host: "TEST2"}}
 	msr.Save(m2)
-	m3 := definition.Request{Host: "TEST1"}
+	m3 := definition.Match{Request: &definition.Request{Host: "TEST1"}}
 	msr.Save(m3)
 
-	matchVeryfier := NewMatchVerifier(MockMatcher{Scenario: DummyScenarioManager{}}, msr)
+	matchVeryfier := NewSpy(NewTester(DummyScenarioManager{}), msr)
 
-	matches := matchVeryfier.Verify(definition.Request{Host: "TEST1"})
+	matches := matchVeryfier.Find(definition.Request{Host: "TEST1"})
 
 	if len(matches) != 2 {
 		t.Fatalf("Expected matches 2 != %v", len(matches))
 	}
 
 	for _, match := range matches {
-		if match.Host != "TEST1" {
+		if match.Request.Host != "TEST1" {
 			t.Fatalf("Invalid match")
 		}
 	}

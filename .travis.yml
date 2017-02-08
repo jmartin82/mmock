@@ -4,10 +4,7 @@ go:
   - 1.7.x
 
 install:
-  - mkdir -p ${TRAVIS_BUILD_DIR}/go/bin
-  - export PATH="${TRAVIS_BUILD_DIR}/go/bin:$PATH"
-  - mkdir -p ${TRAVIS_BUILD_DIR}/go
-  - export GOPATH="${TRAVIS_BUILD_DIR}/go:$GOPATH"
+  - mkdir -p $GOPATH/bin
   - make get-deps
 
 script:

@@ -42,7 +42,7 @@ function RequestLogger() {
     }
 
     function getRequestTime(timestamp) {
-        var date = new Date(timestamp*1000);
+        var requestTime = new Date(timestamp*1000);
         var datetime = requestTime.getDate() + "/" +
             (requestTime.getMonth() + 1) + "/" +
             requestTime.getFullYear() + " @ " +

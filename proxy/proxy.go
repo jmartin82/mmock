@@ -15,7 +15,7 @@ type Proxy struct {
 }
 
 // MakeRequest creates a real request to the desired service using data from the original request
-func (pr *Proxy) MakeRequest(request definition.Request) definition.Response {
+func (pr *Proxy) MakeRequest(request definition.Request) *definition.Response {
 
 	log.Println("Proxy to URL:>", pr.URL)
 
@@ -32,7 +32,7 @@ func (pr *Proxy) MakeRequest(request definition.Request) definition.Response {
 	}
 	defer resp.Body.Close()
 
-	r := definition.Response{}
+	r := &definition.Response{}
 	r.StatusCode = resp.StatusCode
 
 	r.Headers = make(definition.Values)

@@ -10,8 +10,8 @@ type Result struct {
 
 //Match contains the whole information about the request match. The http request, the final response received and the matching result.
 type Match struct {
-	Time     int64    `json:"time"`
-	Request  Request  `json:"request"`
-	Response Response `json:"response"`
-	Result   Result   `json:"result"`
+	Time     int64     `json:"time"`
+	Request  *Request  `json:"request"`
+	Response *Response `json:"response"`
+	Result   Result    `json:"result"`
 }

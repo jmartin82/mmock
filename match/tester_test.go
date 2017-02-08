@@ -14,13 +14,13 @@ func TestMatchMethod(t *testing.T) {
 	m := definition.Mock{}
 	m.Request.Method = "GET"
 
-	mm := MockMatcher{}
-	if b, err := mm.Match(&req, &m, true); !b {
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
 		t.Error(err)
 	}
 
 	req.Method = "POST"
-	if b, err := mm.Match(&req, &m, true); b {
+	if b, err := mm.Check(&req, &m, true); b {
 		t.Error(err)
 	}
 }
@@ -33,13 +33,13 @@ func TestMatchPath(t *testing.T) {
 	m := definition.Mock{}
 	m.Request.Path = "/a/b/c"
 
-	mm := MockMatcher{}
-	if b, err := mm.Match(&req, &m, true); !b {
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
 		t.Error(err)
 	}
 
 	req.Path = "/a/b/d"
-	if b, err := mm.Match(&req, &m, true); b {
+	if b, err := mm.Check(&req, &m, true); b {
 		t.Error(err)
 	}
 }
@@ -51,9 +51,9 @@ func TestPathVars(t *testing.T) {
 	m := definition.Mock{}
 	m.Request.Path = "/a/:b/:c"
 
-	mm := MockMatcher{}
+	mm := Tester{}
 
-	if b, err := mm.Match(&req, &m, true); !b {
+	if b, err := mm.Check(&req, &m, true); !b {
 		t.Error(err)
 	}
 }
@@ -65,9 +65,9 @@ func TestPathGlob(t *testing.T) {
 	m := definition.Mock{}
 	m.Request.Path = "/a/*"
 
-	mm := MockMatcher{}
+	mm := Tester{}
 
-	if b, err := mm.Match(&req, &m, true); !b {
+	if b, err := mm.Check(&req, &m, true); !b {
 		t.Error(err)
 	}
 }
@@ -83,13 +83,13 @@ func TestMatchQueryString(t *testing.T) {
 	mval["test"] = []string{"test"}
 	m.Request.QueryStringParameters = mval
 
-	mm := MockMatcher{}
-	if b, err := mm.Match(&req, &m, true); !b {
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
 		t.Error(err)
 	}
 
 	mval["test2"] = []string{"test2"}
-	if b, err := mm.Match(&req, &m, true); b {
+	if b, err := mm.Check(&req, &m, true); b {
 		t.Error(err)
 	}
 
@@ -106,13 +106,13 @@ func TestMatchCookies(t *testing.T) {
 	mval["test"] = "test"
 	m.Request.Cookies = mval
 
-	mm := MockMatcher{}
-	if b, err := mm.Match(&req, &m, true); !b {
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
 		t.Error(err)
 	}
 
 	mval["test2"] = "test2"
-	if b, err := mm.Match(&req, &m, true); b {
+	if b, err := mm.Check(&req, &m, true); b {
 		t.Error(err)
 	}
 }
@@ -128,13 +128,13 @@ func TestMatchHeaders(t *testing.T) {
 	mval["test"] = []string{"test"}
 	m.Request.Headers = mval
 
-	mm := MockMatcher{}
-	if b, err := mm.Match(&req, &m, true); !b {
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
 		t.Error(err)
 	}
 
 	mval["test2"] = []string{"test2"}
-	if b, err := mm.Match(&req, &m, true); b {
+	if b, err := mm.Check(&req, &m, true); b {
 		t.Error(err)
 	}
 }
@@ -147,13 +147,13 @@ func TestMatchHost(t *testing.T) {
 	m := definition.Mock{}
 	m.Request.Host = "domain.com"
 
-	mm := MockMatcher{}
-	if b, err := mm.Match(&req, &m, true); !b {
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
 		t.Error(err)
 	}
 
 	req.Host = "error.com"
-	if b, err := mm.Match(&req, &m, true); b {
+	if b, err := mm.Check(&req, &m, true); b {
 		t.Error(err)
 	}
 }
@@ -166,13 +166,13 @@ func TestMatchBody(t *testing.T) {
 	m := definition.Mock{}
 	m.Request.Body = "HelloWorld"
 
-	mm := MockMatcher{}
-	if b, err := mm.Match(&req, &m, true); !b {
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
 		t.Error(err)
 	}
 
 	req.Path = "ByeBye"
-	if b, err := mm.Match(&req, &m, true); b {
+	if b, err := mm.Check(&req, &m, true); b {
 		t.Error(err)
 	}
 }
@@ -184,8 +184,8 @@ func TestGlobBody(t *testing.T) {
 	m := definition.Mock{}
 	m.Request.Body = "*World*"
 
-	mm := MockMatcher{}
-	if b, err := mm.Match(&req, &m, true); !b {
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
 		t.Error(err)
 	}
 
@@ -195,8 +195,8 @@ func TestMatchIgnoreMissingBodyDefinition(t *testing.T) {
 	req := definition.Request{}
 	req.Body = "HelloWorld"
 	m := definition.Mock{}
-	mm := MockMatcher{}
-	if b, _ := mm.Match(&req, &m, true); !b {
+	mm := Tester{}
+	if b, _ := mm.Check(&req, &m, true); !b {
 		t.Error("Not expected match")
 	}
 }
@@ -208,12 +208,12 @@ func TestSceneMatchingDefinition(t *testing.T) {
 	m.Control.Scenario.Name = "uSEr"
 	m.Control.Scenario.RequiredState = []string{"created"}
 	s := scenario.NewInMemoryScenario()
-	mm := MockMatcher{Scenario: s}
-	if b, _ := mm.Match(&req, &m, true); b {
+	mm := Tester{Scenario: s}
+	if b, _ := mm.Check(&req, &m, true); b {
 		t.Error("Scenario doesn't match")
 	}
 	s.SetState("user", "created")
-	if b, _ := mm.Match(&req, &m, true); !b {
+	if b, _ := mm.Check(&req, &m, true); !b {
 		t.Error("Scenario match")
 	}
 }
@@ -225,12 +225,12 @@ func TestSceneMatchingDefinitionDisabled(t *testing.T) {
 	m.Control.Scenario.Name = "uSEr"
 	m.Control.Scenario.RequiredState = []string{"created"}
 	s := scenario.NewInMemoryScenario()
-	mm := MockMatcher{Scenario: s}
-	if b, _ := mm.Match(&req, &m, false); !b {
+	mm := Tester{Scenario: s}
+	if b, _ := mm.Check(&req, &m, false); !b {
 		t.Error("Scenario not skiped")
 	}
 
-	if b, _ := mm.Match(&req, &m, true); b {
+	if b, _ := mm.Check(&req, &m, true); b {
 		t.Error("Scenario skiped")
 	}
 
@@ -255,9 +255,9 @@ func TestMatchIgnoreUnexpectedHeadersAndQuery(t *testing.T) {
 	m.Request.QueryStringParameters = mval
 	m.Request.Headers = mval
 
-	mm := MockMatcher{}
+	mm := Tester{}
 
-	if b, _ := mm.Match(&req, &m, true); !b {
+	if b, _ := mm.Check(&req, &m, true); !b {
 		t.Error("Not expected match")
 	}
 }
