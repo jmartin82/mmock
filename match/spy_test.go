@@ -16,18 +16,17 @@ func (dsm DummyScenarioManager) GetState(name string) string {
 	return ""
 }
 
-func TestMach(t *testing.T) {
-	msr := NewMemoryStore()
+func TestFindMatches(t *testing.T) {
+	spy := NewSpy(NewTester(DummyScenarioManager{}), NewMemoryStore())
+
 	m1 := definition.Match{Request: &definition.Request{Host: "TEST1"}}
-	msr.Save(m1)
+	spy.Save(m1)
 	m2 := definition.Match{Request: &definition.Request{Host: "TEST2"}}
-	msr.Save(m2)
+	spy.Save(m2)
 	m3 := definition.Match{Request: &definition.Request{Host: "TEST1"}}
-	msr.Save(m3)
+	spy.Save(m3)
 
-	matchVeryfier := NewSpy(NewTester(DummyScenarioManager{}), msr)
-
-	matches := matchVeryfier.Find(definition.Request{Host: "TEST1"})
+	matches := spy.Find(definition.Request{Host: "TEST1"})
 
 	if len(matches) != 2 {
 		t.Fatalf("Expected matches 2 != %v", len(matches))
@@ -37,6 +36,35 @@ func TestMach(t *testing.T) {
 		if match.Request.Host != "TEST1" {
 			t.Fatalf("Invalid match")
 		}
+	}
+
+}
+
+func TestMatchByResult(t *testing.T) {
+	spy := NewSpy(NewTester(DummyScenarioManager{}), NewMemoryStore())
+
+	m1 := definition.Match{Result: definition.Result{Found: true}}
+	spy.Save(m1)
+	m2 := definition.Match{Result: definition.Result{Found: false}}
+	spy.Save(m2)
+	m3 := definition.Match{Result: definition.Result{Found: true}}
+	spy.Save(m3)
+
+	matches := spy.GetAll()
+
+	if len(matches) != 3 {
+		t.Fatalf("Expected matches 3 != %v", len(matches))
+	}
+
+	matches = spy.GetMatched()
+
+	if len(matches) != 2 {
+		t.Fatalf("Expected matches 2 != %v", len(matches))
+	}
+	matches = spy.GetUnMatched()
+
+	if len(matches) != 1 {
+		t.Fatalf("Expected matches 1 != %v", len(matches))
 	}
 
 }

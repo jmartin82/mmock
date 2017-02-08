@@ -38,7 +38,7 @@ func (mc Spy) GetMatched() []definition.Match {
 	return mc.getMatchByResult(true)
 }
 
-func (mc Spy) GetNotMatched() []definition.Match {
+func (mc Spy) GetUnMatched() []definition.Match {
 	return mc.getMatchByResult(false)
 }
 

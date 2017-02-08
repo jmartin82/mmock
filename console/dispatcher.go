@@ -99,7 +99,7 @@ func (di *Dispatcher) requestVerifyHandler(w http.ResponseWriter, r *http.Reques
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&dReq)
 	if err != nil {
-		//TODO
+		log.Println("Invalid request input")
 	}
 	defer r.Body.Close()
 	result := di.MatchSpy.Find(dReq)
@@ -127,7 +127,7 @@ func (di *Dispatcher) requestMatchedHandler(w http.ResponseWriter, r *http.Reque
 }
 
 func (di *Dispatcher) requestUnMatchedHandler(w http.ResponseWriter, r *http.Request) {
-	result := di.MatchSpy.GetNotMatched()
+	result := di.MatchSpy.GetUnMatched()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)
 }
