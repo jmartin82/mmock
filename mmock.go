@@ -83,17 +83,16 @@ func getVarsProcessor() vars.Processor {
 	return vars.Processor{FillerFactory: vars.MockFillerFactory{FakeAdapter: fakedata.FakeAdapter{}}}
 }
 
-func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, scenario scenario.ScenarioManager, varsProcessor vars.Processor, matchStore match.Store) {
+func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, scenario scenario.ScenarioManager, varsProcessor vars.Processor, spier match.Spier) {
 	dispatcher := server.Dispatcher{
-		IP:            ip,
-		Port:          port,
-		Router:        router,
-		Translator:    translate.HTTPTranslator{},
-		Processor: varsProcessor,
-
-		Scenario: scenario,
-		Store:    matchStore,
-		Mlog:     mLog,
+		IP:         ip,
+		Port:       port,
+		Router:     router,
+		Translator: translate.HTTPTranslator{},
+		Processor:  varsProcessor,
+		Scenario:   scenario,
+		Spier:      spier,
+		Mlog:       mLog,
 	}
 	dispatcher.Start()
 	done <- true
@@ -157,7 +156,7 @@ func main() {
 	router := getRouter(mocks, checker, dUpdates)
 	varsProcessor := getVarsProcessor()
 
-	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor, matchStore)
+	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor, spy)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	if *console {
 		go startConsole(*cIP, *cPort, spy, done, mLog)

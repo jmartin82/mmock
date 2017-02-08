@@ -6,8 +6,7 @@ import (
 
 type Spier interface {
 	Find(definition.Request) []definition.Match
-	GetAll() []definition.Match
 	GetMatched() []definition.Match
 	GetNotMatched() []definition.Match
-	Forget()
+	Store
 }

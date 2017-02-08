@@ -19,14 +19,14 @@ import (
 
 //Dispatcher is the mock http server
 type Dispatcher struct {
-	IP            string
-	Port          int
-	Router        route.Router
-	Translator    translate.MessageTranslator
-	Processor vars.Processor
-	Scenario      scenario.ScenarioManager
-	Store         match.Store
-	Mlog          chan definition.Match
+	IP         string
+	Port       int
+	Router     route.Router
+	Translator translate.MessageTranslator
+	Processor  vars.Processor
+	Scenario   scenario.ScenarioManager
+	Spier      match.Spier
+	Mlog       chan definition.Match
 }
 
 func (di Dispatcher) recordMatchData(msg *definition.Match) {
@@ -55,7 +55,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	mock, match := di.getMatchingResult(&mRequest)
 
 	//save the match info
-	di.Store.Save(*match)
+	di.Spier.Save(*match)
 
 	//set new scenario
 	if mock.Control.Scenario.NewState != "" {
