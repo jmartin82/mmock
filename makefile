@@ -31,7 +31,7 @@ test:
 	
 coverage:
 	goverage -v -covermode count -coverprofile=coverage.out
-	goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+	goveralls -coverprofile=coverage.out -service=travis-ci -ignore=console/bindata.go,vars/fakedata/fake_adapter.go,mmock.go -repotoken $$COVERALLS_TOKEN
 	#go tool cover -html=coverage.out
 
 
