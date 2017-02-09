@@ -13,3 +13,4 @@ install:
 
 script:
   - make test
+  - make coverage
