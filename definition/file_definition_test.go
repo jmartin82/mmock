@@ -133,11 +133,3 @@ func TestHotReplace(t *testing.T) {
 	close(updatesCh)
 
 }
-
-/*
-func TestUpdateOnFileChange(t *testing.T) {
-	const s, sep, want = "chicken", "ken", 4
-	t.Errorf("Index(%q,%q) = %v; want %v", s, sep, got, want)
-
-}
-*/
