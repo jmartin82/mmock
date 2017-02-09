@@ -41,6 +41,7 @@ vet:
 
 get-deps:
 	go get github.com/mattn/goveralls
+	go get github.com/haya14busa/goverage
 	go get github.com/laher/gols/cmd/go-ls
 	glide install
 
