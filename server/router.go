@@ -1,4 +1,4 @@
-package route
+package server
 
 import (
 	"bytes"
@@ -10,24 +10,24 @@ import (
 	"github.com/jmartin82/mmock/match"
 )
 
-//NewRouter returns a pointer to new RequestRouter
-func NewRouter(mocks []definition.Mock, checker match.Checker, dUpdates chan []definition.Mock) *RequestRouter {
-	return &RequestRouter{
+//NewRouter returns a pointer to new Router
+func NewRouter(mocks []definition.Mock, checker match.Checker, dUpdates chan []definition.Mock) *Router {
+	return &Router{
 		Mocks:    mocks,
 		Checker:  checker,
 		DUpdates: dUpdates,
 	}
 }
 
-//RequestRouter checks http requesta and try to figure out what is the best mock for each one.
-type RequestRouter struct {
+//Router checks http requesta and try to figure out what is the best mock for each one.
+type Router struct {
 	Mocks    []definition.Mock
 	Checker  match.Checker
 	DUpdates chan []definition.Mock
 	sync.Mutex
 }
 
-func (rr *RequestRouter) copy(src, dst *definition.Mock) {
+func (rr *Router) copy(src, dst *definition.Mock) {
 	var mod bytes.Buffer
 	enc := gob.NewEncoder(&mod)
 	dec := gob.NewDecoder(&mod)
@@ -43,7 +43,7 @@ func (rr *RequestRouter) copy(src, dst *definition.Mock) {
 }
 
 //Route checks the request with all available mock definitions and return the matching mock for it.
-func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, definition.MatchErrors) {
+func (rr *Router) Resolve(req *definition.Request) (*definition.Mock, definition.MatchErrors) {
 	errors := make(definition.MatchErrors)
 	rr.Lock()
 	defer rr.Unlock()
@@ -66,14 +66,14 @@ func (rr *RequestRouter) Route(req *definition.Request) (*definition.Mock, defin
 }
 
 //SetMockDefinitions allows replace the current mock definitions for new ones.
-func (rr *RequestRouter) SetMockDefinitions(mocks []definition.Mock) {
+func (rr *Router) SetMockDefinitions(mocks []definition.Mock) {
 	rr.Lock()
 	rr.Mocks = mocks
 	rr.Unlock()
 }
 
 //MockChangeWatch monitors the mock configuration dir and loads again all the mocks it something change.
-func (rr *RequestRouter) MockChangeWatch() {
+func (rr *Router) MockChangeWatch() {
 	go func() {
 		for {
 			mocks := <-rr.DUpdates

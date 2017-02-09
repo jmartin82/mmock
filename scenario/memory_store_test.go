@@ -3,7 +3,7 @@ package scenario
 import "testing"
 
 func TestBasicSenarioManage(t *testing.T) {
-	ms := NewInMemoryScenario()
+	ms := NewMemoryStore()
 
 	state := ms.GetState("scene1")
 	if state != "not_started" {

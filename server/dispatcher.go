@@ -11,7 +11,6 @@ import (
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
 	"github.com/jmartin82/mmock/proxy"
-	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/scenario"
 	"github.com/jmartin82/mmock/translate"
 	"github.com/jmartin82/mmock/vars"
@@ -21,10 +20,10 @@ import (
 type Dispatcher struct {
 	IP         string
 	Port       int
-	Router     route.Router
+	Resolver   Resolver
 	Translator translate.MessageTranslator
 	Processor  vars.Processor
-	Scenario   scenario.ScenarioManager
+	Scenario   scenario.Director
 	Spier      match.Spier
 	Mlog       chan definition.Match
 }
@@ -71,7 +70,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definition.Mock, *definition.Match) {
 	response := &definition.Response{}
 	result := definition.Result{}
-	mock, errs := di.Router.Route(request)
+	mock, errs := di.Resolver.Resolve(request)
 	if errs == nil {
 		result.Found = true
 	} else {

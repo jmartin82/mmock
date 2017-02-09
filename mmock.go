@@ -12,7 +12,6 @@ import (
 	"github.com/jmartin82/mmock/console"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
-	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/scenario"
 	"github.com/jmartin82/mmock/server"
 	"github.com/jmartin82/mmock/translate"
@@ -70,10 +69,10 @@ func getMatchSpy(checker match.Checker, matchStore match.Store) match.Spier {
 	return match.NewSpy(checker, matchStore)
 }
 
-func getRouter(mocks []definition.Mock, checker match.Checker, dUpdates chan []definition.Mock) *route.RequestRouter {
+func getRouter(mocks []definition.Mock, checker match.Checker, dUpdates chan []definition.Mock) *server.Router {
 	log.Printf("Loding router with %d definitions\n", len(mocks))
 
-	router := route.NewRouter(mocks, checker, dUpdates)
+	router := server.NewRouter(mocks, checker, dUpdates)
 	router.MockChangeWatch()
 	return router
 }
@@ -83,12 +82,12 @@ func getVarsProcessor() vars.Processor {
 	return vars.Processor{FillerFactory: vars.MockFillerFactory{FakeAdapter: fakedata.FakeAdapter{}}}
 }
 
-func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, scenario scenario.ScenarioManager, varsProcessor vars.Processor, spier match.Spier) {
+func startServer(ip string, port int, done chan bool, router server.Resolver, mLog chan definition.Match, scenario scenario.Director, varsProcessor vars.Processor, spier match.Spier) {
 	dispatcher := server.Dispatcher{
 		IP:         ip,
 		Port:       port,
-		Router:     router,
-		Translator: translate.HTTPTranslator{},
+		Resolver:   router,
+		Translator: translate.HTTP{},
 		Processor:  varsProcessor,
 		Scenario:   scenario,
 		Spier:      spier,
@@ -147,7 +146,7 @@ func main() {
 	done := make(chan bool)
 
 	//shared structs
-	scenario := scenario.NewInMemoryScenario()
+	scenario := scenario.NewMemoryStore()
 	checker := match.NewTester(scenario)
 	matchStore := match.NewMemoryStore()
 

@@ -22,12 +22,12 @@ var (
 	ErrScenarioNotMatch = errors.New("Scenario state not match")
 )
 
-func NewTester(scenario scenario.ScenarioManager) *Tester {
+func NewTester(scenario scenario.Director) *Tester {
 	return &Tester{Scenario: scenario}
 }
 
 type Tester struct {
-	Scenario scenario.ScenarioManager
+	Scenario scenario.Director
 }
 
 func (mm Tester) matchKeyAndValues(reqMap definition.Values, mockMap definition.Values) bool {

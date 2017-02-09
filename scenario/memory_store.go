@@ -4,21 +4,21 @@ import (
 	"strings"
 )
 
-func NewInMemoryScenario() *InMemoryScenario {
+func NewMemoryStore() *MemoryStore {
 	status := make(map[string]string)
-	return &InMemoryScenario{status: status}
+	return &MemoryStore{status: status}
 }
 
-type InMemoryScenario struct {
+type MemoryStore struct {
 	status map[string]string
 }
 
-func (sm *InMemoryScenario) SetState(name, status string) {
+func (sm *MemoryStore) SetState(name, status string) {
 	sm.status[strings.ToLower(name)] = strings.ToLower(status)
 
 }
 
-func (sm *InMemoryScenario) GetState(name string) string {
+func (sm *MemoryStore) GetState(name string) string {
 	if v, f := sm.status[strings.ToLower(name)]; f {
 		return v
 	}

@@ -7,12 +7,12 @@ import (
 	"github.com/jmartin82/mmock/definition"
 )
 
-type RequestVars struct {
+type Request struct {
 	Mock    *definition.Mock
 	Request *definition.Request
 }
 
-func (rp RequestVars) Fill(holders []string) map[string]string {
+func (rp Request) Fill(holders []string) map[string]string {
 
 	vars := make(map[string]string)
 	for _, tag := range holders {
@@ -37,7 +37,7 @@ func (rp RequestVars) Fill(holders []string) map[string]string {
 	return vars
 }
 
-func (rp RequestVars) getPathParm(m *definition.Mock, req *definition.Request, name string) (string, bool) {
+func (rp Request) getPathParm(m *definition.Mock, req *definition.Request, name string) (string, bool) {
 
 	routes := urlmatcher.New(m.Request.Path)
 	mparm := routes.Match(req.Path)
@@ -50,7 +50,7 @@ func (rp RequestVars) getPathParm(m *definition.Mock, req *definition.Request, n
 	return value, true
 }
 
-func (rp RequestVars) getQueryStringParam(req *definition.Request, name string) (string, bool) {
+func (rp Request) getQueryStringParam(req *definition.Request, name string) (string, bool) {
 
 	if len(rp.Request.QueryStringParameters) == 0 {
 		return "", false
@@ -63,7 +63,7 @@ func (rp RequestVars) getQueryStringParam(req *definition.Request, name string) 
 	return value[0], true
 }
 
-func (rp RequestVars) getCookieParam(req *definition.Request, name string) (string, bool) {
+func (rp Request) getCookieParam(req *definition.Request, name string) (string, bool) {
 
 	if len(rp.Request.Cookies) == 0 {
 		return "", false
