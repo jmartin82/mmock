@@ -31,7 +31,8 @@ test:
 	
 coverage:
 	goverage -v -covermode count -coverprofile=coverage.out
-	go tool cover -html=coverage.out
+	goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+	#go tool cover -html=coverage.out
 
 
 # https://godoc.org/golang.org/x/tools/cmd/vet
@@ -39,6 +40,7 @@ vet:
 	go-ls -exec="go vet -v"
 
 get-deps:
+	go get github.com/mattn/goveralls
 	go get github.com/laher/gols/cmd/go-ls
 	glide install
 

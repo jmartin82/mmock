@@ -8,9 +8,9 @@ function RequestLogger() {
     this.color = "red";
 
     function getColorByStatus(statusCode) {
-        if (statusCode == 200 || statusCode == 201) {
+        if (statusCode === 200 || statusCode === 201) {
             return "success";
-        } else if (statusCode == 404) {
+        } else if (statusCode === 404) {
             return "danger";
         } else {
             return "warning";
