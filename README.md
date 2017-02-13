@@ -1,4 +1,4 @@
-Mmock 
+Mmock
 =========
 [![Build Status](https://travis-ci.org/jmartin82/mmock.svg?branch=master)](https://travis-ci.org/jmartin82/mmock)
 
@@ -14,6 +14,9 @@ Easy and fast HTTP mock server.
 * Release it to a real server
 
 Built with Go - Mmock runs without installation on multiple platforms.
+
+### Total Requests Served
+![Requests Served](http://mmock.alfonsfoubert.com/render/?from=-24hours&target=stats.counters.mmock.requests.succesful.count)
 
 ### Version
 
@@ -95,7 +98,7 @@ docker run -v YOUR_ABS_PATH:/config -p 8082:8082 -p 8083:8083  mmock/mmock
 ```
 
 
-Or run mmock locally from the command line. 
+Or run mmock locally from the command line.
 
 ```
 go get github.com/jmartin82/mmock
@@ -175,7 +178,7 @@ Mock definition:
 
 #### Request
 
-A core feature of Mmock is the ability to return canned HTTP responses for requests matching criteria. 
+A core feature of Mmock is the ability to return canned HTTP responses for requests matching criteria.
 
 * *host*: Request http host. (without port)
 * *method*: Request http method. It allows more than one separated by pipes "|" **Mandatory**
@@ -202,7 +205,7 @@ In case of queryStringParameters, headers and cookies, the request can be matche
 * *crazy*: Return random server errors (5xx) in some request. Simulate server problems.
 * *priority*: Set the priority to avoid match in less restrictive mocks.
 
-### Scenarios 
+### Scenarios
 
 With the scenarios you can simulate a stateful service. It's useful to create test doubles.
 
@@ -230,7 +233,7 @@ Example of REST services using scenarios:
 +---------------------------------------------------------------------------------------------+
 ```
 
-Working examples [here](/config/crud) 
+Working examples [here](/config/crud)
 
 ### Verify
 
@@ -331,7 +334,7 @@ All enpoints have the same output format:
 
 ### Variable tags
 
-You can use variable data (random data or request data) in response. The variables will be defined as tags like this {{nameVar}} 
+You can use variable data (random data or request data) in response. The variables will be defined as tags like this {{nameVar}}
 
 Request data:
 
@@ -397,7 +400,7 @@ Request data:
 
 
 ### Contributors
-- Is this not enough? [@vtrifonov](https://github.com/vtrifonov) is working in a fork with a really advanced features. [HTTP API Mock](https://github.com/vtrifonov/http-api-mock) 
+- Is this not enough? [@vtrifonov](https://github.com/vtrifonov) is working in a fork with a really advanced features. [HTTP API Mock](https://github.com/vtrifonov/http-api-mock)
 
 ### Contributing
 

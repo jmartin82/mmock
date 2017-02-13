@@ -1,5 +1,5 @@
-hash: 5bb703c4ae8c92866eba3c04863a046773ff0005a49de62cf25bc75aa6c517ba
-updated: 2016-12-31T13:22:17.331847499+01:00
+hash: 59005496003b7a6b7f2c6f5c1d8553a933275338179f6e0366f4443a36ac7f16
+updated: 2017-02-13T22:48:06.943770885+01:00
 imports:
 - name: github.com/azer/url-router
   version: 1a0aa252538c21ad85fb4041c0df3d648ab813a1
@@ -10,7 +10,7 @@ imports:
 - name: github.com/icrowley/fake
   version: 84bff6d01560fb0b5a396ba29534e93fd00d09c6
 - name: github.com/radovskyb/watcher
-  version: 1925df70dcfd7eeb5085fc45c40f1e53759f5e3f
+  version: 828a655184ef96820e071c58bdecb5221d0ae1c3
 - name: github.com/ryanuber/go-glob
   version: 572520ed46dbddaed19ea3d9541bdd0494163693
 - name: github.com/twinj/uuid
@@ -19,6 +19,8 @@ imports:
   version: 45e771701b814666a7eb299e6c7a57d0b1799e91
   subpackages:
   - websocket
+- name: gopkg.in/alexcesaro/statsd.v2
+  version: 7fea3f0d2fab1ad973e641e51dba45443a311a90
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 testImports: []

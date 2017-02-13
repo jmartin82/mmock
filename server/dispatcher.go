@@ -12,6 +12,7 @@ import (
 	"github.com/jmartin82/mmock/match"
 	"github.com/jmartin82/mmock/proxy"
 	"github.com/jmartin82/mmock/scenario"
+	"github.com/jmartin82/mmock/statistics"
 	"github.com/jmartin82/mmock/translate"
 	"github.com/jmartin82/mmock/vars"
 )
@@ -26,10 +27,11 @@ type Dispatcher struct {
 	Scenario   scenario.Director
 	Spier      match.Spier
 	Mlog       chan definition.Match
+	Stats      statistics.Statistics
 }
 
-func (di Dispatcher) recordMatchData(msg *definition.Match) {
-	di.Mlog <- *msg
+func (di Dispatcher) recordMatchData(msg definition.Match) {
+	di.Mlog <- msg
 }
 
 func (di Dispatcher) randomStatusCode(currentStatus int) int {
@@ -64,7 +66,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	//translate request
 	di.Translator.WriteHTTPResponseFromDefinition(match.Response, w)
 
-	go di.recordMatchData(match)
+	go di.recordMatchData(*match)
 }
 
 func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definition.Mock, *definition.Match) {
@@ -97,7 +99,7 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 			}
 			response = &mock.Response
 		}
-
+		di.Stats.TrackSuccesfulRequest()
 	} else {
 		response = &mock.Response
 	}
