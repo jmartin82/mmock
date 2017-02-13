@@ -21,7 +21,7 @@ func (dm DummyMatcher) Check(req *definition.Request, mock *definition.Mock, sce
 func TestValidRoute(t *testing.T) {
 
 	mocks := []definition.Mock{
-		definition.Mock{
+		{
 			Response: definition.Response{
 				StatusCode: 200,
 			},
@@ -45,7 +45,7 @@ func TestValidRoute(t *testing.T) {
 func TestInvalidRoute(t *testing.T) {
 
 	mocks := []definition.Mock{
-		definition.Mock{
+		{
 			Name: "XX",
 			Response: definition.Response{
 				StatusCode: 200,
@@ -70,7 +70,7 @@ func TestInvalidRoute(t *testing.T) {
 func TestRoutesLoadViaChannel(t *testing.T) {
 
 	mocks := []definition.Mock{
-		definition.Mock{
+		{
 			Name: "XX",
 			Response: definition.Response{
 				StatusCode: 200,

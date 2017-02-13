@@ -12,7 +12,7 @@ type MemoryStore struct {
 	sync.Mutex
 }
 
-//Save store a match informtion
+//Save store a match information
 func (mrs *MemoryStore) Save(req definition.Match) {
 	mrs.Lock()
 	mrs.matches = append(mrs.matches, req)
