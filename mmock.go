@@ -15,6 +15,7 @@ import (
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/scenario"
 	"github.com/jmartin82/mmock/server"
+	"github.com/jmartin82/mmock/statistics"
 	"github.com/jmartin82/mmock/translate"
 	"github.com/jmartin82/mmock/vars"
 	"github.com/jmartin82/mmock/vars/fakedata"
@@ -78,7 +79,7 @@ func getVarsProcessor() vars.VarsProcessor {
 	return vars.VarsProcessor{FillerFactory: vars.MockFillerFactory{FakeAdapter: fakedata.FakeAdapter{}}}
 }
 
-func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, scenario scenario.ScenarioManager, varsProcessor vars.VarsProcessor) {
+func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, scenario scenario.ScenarioManager, varsProcessor vars.VarsProcessor, stats statistics.Statistics) {
 	dispatcher := server.Dispatcher{IP: ip,
 		Port:          port,
 		Router:        router,
@@ -86,6 +87,7 @@ func startServer(ip string, port int, done chan bool, router route.Router, mLog 
 		VarsProcessor: varsProcessor,
 		Scenario:      scenario,
 		Mlog:          mLog,
+		Stats:         stats,
 	}
 	dispatcher.Start()
 	done <- true
@@ -94,6 +96,18 @@ func startConsole(ip string, port int, done chan bool, mLog chan definition.Matc
 	dispatcher := console.Dispatcher{IP: ip, Port: port, Mlog: mLog}
 	dispatcher.Start()
 	done <- true
+}
+
+func startStatistics(real *bool) statistics.Statistics {
+	var stats statistics.Statistics
+	if *real {
+		stats = statistics.NewStatsDStatistics()
+		log.Printf("Sending anonymous statistics\n")
+	} else {
+		stats = statistics.NewNullableStatistics()
+		log.Printf("Not sending statistics\n")
+	}
+	return stats
 }
 
 func getMocks(path string, updateCh chan []definition.Mock) []definition.Mock {
@@ -122,6 +136,7 @@ func main() {
 
 	sIP := flag.String("server-ip", outIP, "Mock server IP")
 	sPort := flag.Int("server-port", 8083, "Mock server Port")
+	sStatistics := flag.Bool("server-statistics", true, "Mock server sends anonymous statistics")
 	cIP := flag.String("console-ip", outIP, "Console server IP")
 	cPort := flag.Int("console-port", 8082, "Console server Port")
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
@@ -140,13 +155,14 @@ func main() {
 	router := getRouter(mocks, scenario, dUpdates)
 	varsProcessor := getVarsProcessor()
 
-	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor)
+	stats := startStatistics(sStatistics)
+	defer stats.Stop()
+	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor, stats)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	if *console {
 		go startConsole(*cIP, *cPort, done, mLog)
 		log.Printf("Console running at %s:%d\n", *cIP, *cPort)
 	}
-
 	<-done
 
 }
