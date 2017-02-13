@@ -15,8 +15,8 @@ Easy and fast HTTP mock server.
 
 Built with Go - Mmock runs without installation on multiple platforms.
 
-#### Total Requests Served
-[![Requests Served](http://mmock.alfonsfoubert.com/render/?from=-24hours&target=stats.counters.mmock.requests.succesful.count)
+### Total Requests Served
+![Requests Served](http://mmock.alfonsfoubert.com/render/?from=-24hours&target=stats.counters.mmock.requests.succesful.count)
 
 ### Version
 
