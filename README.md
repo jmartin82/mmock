@@ -18,12 +18,6 @@ Built with Go - Mmock runs without installation on multiple platforms.
 ### Total Requests Served
 ![Requests Served](http://mmock.alfonsfoubert.com/render/?from=-24hours&target=stats.counters.mmock.requests.succesful.count)
 
-### Version
-
-|  Current version |  v2.0.0 |
-|------------------|---------|
-* Potentially breaking changes from 1.x
-
 ### Features
 
 * Easy mock definition via JSON or YAML
@@ -400,6 +394,7 @@ Request data:
 
 
 ### Contributors
+- Awesome use statistics from [@alfonsfoubert](https://github.com/alfonsfoubert)
 - Is this not enough? [@vtrifonov](https://github.com/vtrifonov) is working in a fork with a really advanced features. [HTTP API Mock](https://github.com/vtrifonov/http-api-mock)
 
 ### Contributing
