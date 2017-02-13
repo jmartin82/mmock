@@ -13,12 +13,12 @@ import (
 
 var errMissingParameterValue = errors.New("The requested method needs input parameters which are not supplied!")
 
-//FakeVars parses the data looking for fake data tags or request data tags
-type FakeVars struct {
+//Fake parses the data looking for fake data tags or request data tags
+type Fake struct {
 	Fake fakedata.DataFaker
 }
 
-func (fv FakeVars) call(data reflect.Value, name string) (string, error) {
+func (fv Fake) call(data reflect.Value, name string) (string, error) {
 	// get a reflect.Value for the method
 	methodVal := data.MethodByName(name)
 	// turn that into an interface{}
@@ -39,7 +39,7 @@ func (fv FakeVars) call(data reflect.Value, name string) (string, error) {
 	return res, nil
 }
 
-func (fv FakeVars) callWithIntParameter(data reflect.Value, name string, parameter int) string {
+func (fv Fake) callWithIntParameter(data reflect.Value, name string, parameter int) string {
 	// get a reflect.Value for the method
 	methodVal := data.MethodByName(name)
 	// turn that into an interface{}
@@ -51,7 +51,7 @@ func (fv FakeVars) callWithIntParameter(data reflect.Value, name string, paramet
 	return res
 }
 
-func (fv FakeVars) callMethod(name string) (string, bool) {
+func (fv Fake) callMethod(name string) (string, bool) {
 	method, parameter, hasParameter := fv.getMethodAndParameter(name)
 	if hasParameter {
 		name = method
@@ -83,7 +83,7 @@ func (fv FakeVars) callMethod(name string) (string, bool) {
 	return "", found
 }
 
-func (fv FakeVars) getMethodAndParameter(input string) (method string, parameter int, success bool) {
+func (fv Fake) getMethodAndParameter(input string) (method string, parameter int, success bool) {
 	r := regexp.MustCompile(`(?P<method>\w+)\((?P<parameter>.*?)\)`)
 
 	match := r.FindStringSubmatch(input)
@@ -112,7 +112,7 @@ func (fv FakeVars) getMethodAndParameter(input string) (method string, parameter
 	return
 }
 
-func (fv FakeVars) Fill(holders []string) map[string]string {
+func (fv Fake) Fill(holders []string) map[string]string {
 
 	vars := make(map[string]string)
 	for _, tag := range holders {

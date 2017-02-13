@@ -9,11 +9,11 @@ import (
 
 var varsRegex = regexp.MustCompile(`\{\{\s*(.+?)\s*\}\}`)
 
-type VarsProcessor struct {
+type Processor struct {
 	FillerFactory FillerFactory
 }
 
-func (fp VarsProcessor) Eval(req *definition.Request, m *definition.Mock) {
+func (fp Processor) Eval(req *definition.Request, m *definition.Mock) {
 	requestFiller := fp.FillerFactory.CreateRequestFiller(req, m)
 	fakeFiller := fp.FillerFactory.CreateFakeFiller()
 	holders := fp.walkAndGet(m.Response)
@@ -23,7 +23,7 @@ func (fp VarsProcessor) Eval(req *definition.Request, m *definition.Mock) {
 	fp.walkAndFill(m, vars)
 }
 
-func (fp VarsProcessor) walkAndGet(res definition.Response) []string {
+func (fp Processor) walkAndGet(res definition.Response) []string {
 
 	vars := []string{}
 	for _, header := range res.Headers {
@@ -40,7 +40,7 @@ func (fp VarsProcessor) walkAndGet(res definition.Response) []string {
 	return vars
 }
 
-func (fp VarsProcessor) walkAndFill(m *definition.Mock, vars map[string]string) {
+func (fp Processor) walkAndFill(m *definition.Mock, vars map[string]string) {
 	res := &m.Response
 	for header, values := range res.Headers {
 		for i, value := range values {
@@ -55,7 +55,7 @@ func (fp VarsProcessor) walkAndFill(m *definition.Mock, vars map[string]string) 
 	res.Body = fp.replaceVars(res.Body, vars)
 }
 
-func (fp VarsProcessor) replaceVars(input string, vars map[string]string) string {
+func (fp Processor) replaceVars(input string, vars map[string]string) string {
 	return varsRegex.ReplaceAllStringFunc(input, func(value string) string {
 		varName := strings.Trim(value, "{} ")
 		// replace the strings
@@ -67,7 +67,7 @@ func (fp VarsProcessor) replaceVars(input string, vars map[string]string) string
 	})
 }
 
-func (fp VarsProcessor) extractVars(input string, vars *[]string) {
+func (fp Processor) extractVars(input string, vars *[]string) {
 	if m := varsRegex.FindAllString(input, -1); m != nil {
 		for _, v := range m {
 			varName := strings.Trim(v, "{} ")
@@ -76,7 +76,7 @@ func (fp VarsProcessor) extractVars(input string, vars *[]string) {
 	}
 }
 
-func (fp VarsProcessor) mergeVars(org map[string]string, vals map[string]string) {
+func (fp Processor) mergeVars(org map[string]string, vals map[string]string) {
 	for k, v := range vals {
 		org[k] = v
 	}

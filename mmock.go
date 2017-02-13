@@ -12,7 +12,6 @@ import (
 	"github.com/jmartin82/mmock/console"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
-	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/scenario"
 	"github.com/jmartin82/mmock/server"
 	"github.com/jmartin82/mmock/statistics"
@@ -28,7 +27,7 @@ var ErrNotFoundDefaultPath = errors.New("We can't determinate the current path")
 var ErrNotFoundAnyMock = errors.New("No valid mock definition found")
 
 func banner() {
-	fmt.Println("MMock v 2.0.1")
+	fmt.Println("MMock v 2.0.2")
 	fmt.Println("")
 
 	fmt.Print(
@@ -67,35 +66,47 @@ func getOutboundIP() string {
 	return localAddr[0:idx]
 }
 
-func getRouter(mocks []definition.Mock, scenario scenario.ScenarioManager, dUpdates chan []definition.Mock) *route.RequestRouter {
+func getMatchSpy(checker match.Checker, matchStore match.Store) match.Spier {
+	return match.NewSpy(checker, matchStore)
+}
+
+func getRouter(mocks []definition.Mock, checker match.Checker, dUpdates chan []definition.Mock) *server.Router {
 	log.Printf("Loding router with %d definitions\n", len(mocks))
-	router := route.NewRouter(mocks, match.MockMatch{Scenario: scenario}, dUpdates)
+
+	router := server.NewRouter(mocks, checker, dUpdates)
 	router.MockChangeWatch()
 	return router
 }
 
-func getVarsProcessor() vars.VarsProcessor {
+func getVarsProcessor() vars.Processor {
 
-	return vars.VarsProcessor{FillerFactory: vars.MockFillerFactory{FakeAdapter: fakedata.FakeAdapter{}}}
+	return vars.Processor{FillerFactory: vars.MockFillerFactory{FakeAdapter: fakedata.FakeAdapter{}}}
 }
 
-func startServer(ip string, port int, done chan bool, router route.Router, mLog chan definition.Match, scenario scenario.ScenarioManager, varsProcessor vars.VarsProcessor, stats statistics.Statistics) {
-	dispatcher := server.Dispatcher{IP: ip,
-		Port:          port,
-		Router:        router,
-		Translator:    translate.HTTPTranslator{},
-		VarsProcessor: varsProcessor,
-		Scenario:      scenario,
-		Mlog:          mLog,
-		Stats:         stats,
+func startServer(ip string, port int, done chan bool, router server.Resolver, mLog chan definition.Match, scenario scenario.Director, varsProcessor vars.Processor, spier match.Spier, stats statistics.Statistics) {
+	dispatcher := server.Dispatcher{
+		IP:         ip,
+		Port:       port,
+		Resolver:   router,
+		Translator: translate.HTTP{},
+		Processor:  varsProcessor,
+		Scenario:   scenario,
+		Spier:      spier,
+		Mlog:       mLog,
+		Stats:      stats,
 	}
 	dispatcher.Start()
 	done <- true
 }
-func startConsole(ip string, port int, done chan bool, mLog chan definition.Match) {
-	dispatcher := console.Dispatcher{IP: ip, Port: port, Mlog: mLog}
+func startConsole(ip string, port int, spy match.Spier, done chan bool, mLog chan definition.Match) {
+	dispatcher := console.Dispatcher{
+		IP:       ip,
+		Port:     port,
+		MatchSpy: spy,
+		Mlog:     mLog}
 	dispatcher.Start()
 	done <- true
+
 }
 
 func startStatistics(real *bool) statistics.Statistics {
@@ -150,19 +161,25 @@ func main() {
 	dUpdates := make(chan []definition.Mock)
 	done := make(chan bool)
 
-	scenario := scenario.NewInMemmoryScenarion()
+	//shared structs
+	scenario := scenario.NewMemoryStore()
+	checker := match.NewTester(scenario)
+	matchStore := match.NewMemoryStore()
+
 	mocks := getMocks(path, dUpdates)
-	router := getRouter(mocks, scenario, dUpdates)
+	spy := getMatchSpy(checker, matchStore)
+	router := getRouter(mocks, checker, dUpdates)
 	varsProcessor := getVarsProcessor()
 
 	stats := startStatistics(sStatistics)
 	defer stats.Stop()
-	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor, stats)
+	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor, spy, stats)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	if *console {
-		go startConsole(*cIP, *cPort, done, mLog)
+		go startConsole(*cIP, *cPort, spy, done, mLog)
 		log.Printf("Console running at %s:%d\n", *cIP, *cPort)
 	}
+
 	<-done
 
 }

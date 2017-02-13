@@ -15,10 +15,10 @@ type MockFillerFactory struct {
 }
 
 func (mff MockFillerFactory) CreateRequestFiller(req *definition.Request, mock *definition.Mock) Filler {
-	return RequestVars{Mock: mock, Request: req}
+	return Request{Mock: mock, Request: req}
 }
 
 func (mff MockFillerFactory) CreateFakeFiller() Filler {
 
-	return FakeVars{Fake: mff.FakeAdapter}
+	return Fake{Fake: mff.FakeAdapter}
 }

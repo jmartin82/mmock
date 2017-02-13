@@ -1,28 +1,24 @@
 package console
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/match"
 	"golang.org/x/net/websocket"
 )
 
 //Dispatcher is the http console server.
 type Dispatcher struct {
-	IP      string
-	Port    int
-	Mlog    chan definition.Match
-	clients []*websocket.Conn
-}
-
-func (di *Dispatcher) consoleHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl, _ := Asset("tmpl/index.html")
-	//t, _ := template.New("Console").Parse(string(tmpl))
-	//t.Execute(w, &di)
-	fmt.Fprintf(w, string(tmpl))
+	IP       string
+	Port     int
+	MatchSpy match.Spier
+	Mlog     chan definition.Match
+	clients  []*websocket.Conn
 }
 
 func (di *Dispatcher) removeClient(i int) {
@@ -33,18 +29,6 @@ func (di *Dispatcher) removeClient(i int) {
 
 func (di *Dispatcher) addClient(ws *websocket.Conn) {
 	di.clients = append(di.clients, ws)
-}
-
-func (di *Dispatcher) echoHandler(ws *websocket.Conn) {
-	defer func() {
-		ws.Close()
-	}()
-
-	di.addClient(ws)
-
-	//block
-	var message string
-	websocket.Message.Receive(ws, &message)
 }
 
 func (di *Dispatcher) logFanOut() {
@@ -65,6 +49,14 @@ func (di *Dispatcher) Start() {
 	http.Handle("/echo", websocket.Handler(di.echoHandler))
 	http.Handle("/js/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "tmpl"}))
 	http.Handle("/css/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "tmpl"}))
+
+	//verification
+	http.HandleFunc("/request/reset", di.requestReset)
+	http.HandleFunc("/request/verify", di.requestVerifyHandler)
+	http.HandleFunc("/request/all", di.requestAllHandler)
+	http.HandleFunc("/request/matched", di.requestMatchedHandler)
+	http.HandleFunc("/request/unmatched", di.requestUnMatchedHandler)
+
 	http.HandleFunc("/", di.consoleHandler)
 
 	go di.logFanOut()
@@ -74,4 +66,63 @@ func (di *Dispatcher) Start() {
 	if err != nil {
 		log.Fatalf("ListenAndServe: " + err.Error())
 	}
+}
+
+//CONSOLE
+func (di *Dispatcher) consoleHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl, _ := Asset("tmpl/index.html")
+	fmt.Fprintf(w, string(tmpl))
+}
+
+func (di *Dispatcher) echoHandler(ws *websocket.Conn) {
+	defer func() {
+		ws.Close()
+	}()
+
+	di.addClient(ws)
+
+	//block
+	var message string
+	websocket.Message.Receive(ws, &message)
+}
+
+//API REQUEST
+
+func (di *Dispatcher) requestVerifyHandler(w http.ResponseWriter, r *http.Request) {
+
+	dReq := definition.Request{}
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&dReq)
+	if err != nil {
+		log.Println("Invalid request input")
+	}
+	defer r.Body.Close()
+	result := di.MatchSpy.Find(dReq)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
+
+}
+
+func (di *Dispatcher) requestReset(w http.ResponseWriter, r *http.Request) {
+	di.MatchSpy.Reset()
+}
+
+func (di *Dispatcher) requestAllHandler(w http.ResponseWriter, r *http.Request) {
+	result := di.MatchSpy.GetAll()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
+
+}
+
+func (di *Dispatcher) requestMatchedHandler(w http.ResponseWriter, r *http.Request) {
+	result := di.MatchSpy.GetMatched()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
+}
+
+func (di *Dispatcher) requestUnMatchedHandler(w http.ResponseWriter, r *http.Request) {
+	result := di.MatchSpy.GetUnMatched()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
 }
