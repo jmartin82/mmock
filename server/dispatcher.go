@@ -12,6 +12,7 @@ import (
 	"github.com/jmartin82/mmock/proxy"
 	"github.com/jmartin82/mmock/route"
 	"github.com/jmartin82/mmock/scenario"
+	"github.com/jmartin82/mmock/statistics"
 	"github.com/jmartin82/mmock/translate"
 	"github.com/jmartin82/mmock/vars"
 )
@@ -25,6 +26,7 @@ type Dispatcher struct {
 	VarsProcessor vars.VarsProcessor
 	Scenario      scenario.ScenarioManager
 	Mlog          chan definition.Match
+	Stats         statistics.Statistics
 }
 
 func (di Dispatcher) recordMatchData(msg definition.Match) {
@@ -78,7 +80,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			}
 			response = mock.Response
 		}
-
+		di.Stats.TrackSuccesfulRequest()
 	} else {
 		response = mock.Response
 	}
