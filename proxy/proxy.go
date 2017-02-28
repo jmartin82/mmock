@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"bytes"
+	"crypto/tls"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -17,22 +18,28 @@ type Proxy struct {
 // MakeRequest creates a real request to the desired service using data from the original request
 func (pr *Proxy) MakeRequest(request definition.Request) *definition.Response {
 
+	r := &definition.Response{}
 	log.Println("Proxy to URL:>", pr.URL)
-
 	req, err := http.NewRequest(request.Method, pr.URL, bytes.NewBufferString(request.Body))
 	for h, values := range request.Headers {
 		for _, value := range values {
 			req.Header.Add(h, value)
 		}
 	}
-	client := &http.Client{}
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	client := &http.Client{Transport: tr}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		log.Println("Impossible create a proxy request: ", err)
+		r.StatusCode = 500
+		return r
 	}
 	defer resp.Body.Close()
 
-	r := &definition.Response{}
 	r.StatusCode = resp.StatusCode
 
 	r.Headers = make(definition.Values)
