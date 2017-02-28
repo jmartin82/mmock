@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"bytes"
+	"crypto/tls"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -25,10 +26,16 @@ func (pr *Proxy) MakeRequest(request definition.Request) *definition.Response {
 			req.Header.Add(h, value)
 		}
 	}
-	client := &http.Client{}
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	client := &http.Client{Transport: tr}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		log.Println("Impossible create a proxy request: ", err)
+		return
 	}
 	defer resp.Body.Close()
 
