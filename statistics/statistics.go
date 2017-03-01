@@ -33,10 +33,10 @@ func TrackSuccesfulRequest() {
 	statistics.Increment("requests.succesful")
 }
 
-func Stop() {
-	statistics.Stop()
+func SetMonitor(monitor Monitor) {
+	statistics.SetMonitor(monitor)
 }
 
-func Disable() {
-	statistics.SetMonitor(NewNullableMonitor())
+func Stop() {
+	statistics.Stop()
 }

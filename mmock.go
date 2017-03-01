@@ -158,7 +158,7 @@ func main() {
 	varsProcessor := getVarsProcessor()
 
 	if !(*sStatistics) {
-		statistics.Disable()
+		statistics.SetMonitor(statistics.NewNullableMonitor())
 		log.Printf("Not sending statistics\n")
 	}
 	defer statistics.Stop()
