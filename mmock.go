@@ -83,7 +83,7 @@ func getVarsProcessor() vars.Processor {
 	return vars.Processor{FillerFactory: vars.MockFillerFactory{FakeAdapter: fakedata.FakeAdapter{}}}
 }
 
-func startServer(ip string, port int, done chan bool, router server.Resolver, mLog chan definition.Match, scenario scenario.Director, varsProcessor vars.Processor, spier match.Spier, stats statistics.Statistics) {
+func startServer(ip string, port int, done chan bool, router server.Resolver, mLog chan definition.Match, scenario scenario.Director, varsProcessor vars.Processor, spier match.Spier) {
 	dispatcher := server.Dispatcher{
 		IP:         ip,
 		Port:       port,
@@ -93,7 +93,6 @@ func startServer(ip string, port int, done chan bool, router server.Resolver, mL
 		Scenario:   scenario,
 		Spier:      spier,
 		Mlog:       mLog,
-		Stats:      stats,
 	}
 	dispatcher.Start()
 	done <- true
@@ -106,19 +105,6 @@ func startConsole(ip string, port int, spy match.Spier, done chan bool, mLog cha
 		Mlog:     mLog}
 	dispatcher.Start()
 	done <- true
-
-}
-
-func startStatistics(real *bool) statistics.Statistics {
-	var stats statistics.Statistics
-	if *real {
-		stats = statistics.NewStatsDStatistics()
-		log.Printf("Sending anonymous statistics\n")
-	} else {
-		stats = statistics.NewNullableStatistics()
-		log.Printf("Not sending statistics\n")
-	}
-	return stats
 }
 
 func getMocks(path string, updateCh chan []definition.Mock) []definition.Mock {
@@ -171,9 +157,13 @@ func main() {
 	router := getRouter(mocks, checker, dUpdates)
 	varsProcessor := getVarsProcessor()
 
-	stats := startStatistics(sStatistics)
-	defer stats.Stop()
-	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor, spy, stats)
+	if !(*sStatistics) {
+		statistics.Disable()
+		log.Printf("Not sending statistics\n")
+	}
+	defer statistics.Stop()
+
+	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor, spy)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	if *console {
 		go startConsole(*cIP, *cPort, spy, done, mLog)
