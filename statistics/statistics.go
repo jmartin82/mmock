@@ -1,65 +1,42 @@
 package statistics
 
-import (
-	"log"
-	"os"
-
-	"gopkg.in/alexcesaro/statsd.v2"
-)
-
-// Statistics interface
-type Statistics interface {
-	TrackSuccesfulRequest()
-	Stop()
+type Monitor interface {
+	Increment(metric string)
+	Close()
 }
 
-// ---------------
-// Nullable Object
-// ---------------
-type NullableStatistics struct{}
-
-func NewNullableStatistics() *NullableStatistics {
-	return &NullableStatistics{}
+type Statistics struct {
+	monitor Monitor
 }
 
-func (stats *NullableStatistics) TrackSuccesfulRequest() {
+func (s *Statistics) Increment(metric string) {
+	s.monitor.Increment(metric)
 }
 
-func (stats *NullableStatistics) Stop() {
+func (s *Statistics) Stop() {
+	s.monitor.Close()
 }
 
-// -------------
-// StatsD Object
-// -------------
-func getStatisticsAddress() string {
-	ip := os.Getenv("MMOCK_STATISTICS_ADDRESS")
-	if ip == "" {
-		ip = "statistics.alfonsfoubert.com:8125"
-	}
-	return ip
+func (s *Statistics) SetMonitor(monitor Monitor) {
+	s.monitor = monitor
 }
 
-type StatsDStatistics struct {
-	client *statsd.Client
-}
-
-func NewStatsDStatistics() *StatsDStatistics {
-	c, err := statsd.New(
-		statsd.Address(getStatisticsAddress()),
-		statsd.Prefix("mmock"),
-	)
-	if err != nil {
-		log.Print(err)
-	}
-	return &StatsDStatistics{
-		client: c,
+func NewStatistics() *Statistics {
+	return &Statistics{
+		monitor: NewStatsDMonitor(),
 	}
 }
 
-func (stats *StatsDStatistics) TrackSuccesfulRequest() {
-	stats.client.Increment("requests.succesful")
+var statistics = NewStatistics()
+
+func TrackSuccesfulRequest() {
+	statistics.Increment("requests.succesful")
 }
 
-func (stats *StatsDStatistics) Stop() {
-	stats.client.Close()
+func SetMonitor(monitor Monitor) {
+	statistics.SetMonitor(monitor)
+}
+
+func Stop() {
+	statistics.Stop()
 }

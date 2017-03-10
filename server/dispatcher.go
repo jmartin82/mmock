@@ -27,7 +27,6 @@ type Dispatcher struct {
 	Scenario   scenario.Director
 	Spier      match.Spier
 	Mlog       chan definition.Match
-	Stats      statistics.Statistics
 }
 
 func (di Dispatcher) recordMatchData(msg definition.Match) {
@@ -99,7 +98,7 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 			}
 			response = &mock.Response
 		}
-		di.Stats.TrackSuccesfulRequest()
+		statistics.TrackSuccesfulRequest()
 	} else {
 		response = &mock.Response
 	}
