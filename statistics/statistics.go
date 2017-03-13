@@ -23,7 +23,7 @@ func (s *Statistics) SetMonitor(monitor Monitor) {
 
 func NewStatistics() *Statistics {
 	return &Statistics{
-		monitor: NewStatsDMonitor(),
+		monitor: NewStatsHatMonitor(),
 	}
 }
 

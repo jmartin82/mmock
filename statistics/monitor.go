@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/stathat/go"
 	statsd "gopkg.in/alexcesaro/statsd.v2"
 )
 
@@ -36,4 +37,17 @@ func NewStatsDMonitor() Monitor {
 		log.Print(err)
 	}
 	return m
+}
+
+type StatsHatMonitor struct{}
+
+func NewStatsHatMonitor() Monitor {
+	return &StatsHatMonitor{}
+}
+
+func (stats *StatsHatMonitor) Increment(metric string) {
+	stathat.PostEZCount(metric, "0uzDCBeE2Ni9cCF5", 1)
+}
+
+func (stats *StatsHatMonitor) Close() {
 }

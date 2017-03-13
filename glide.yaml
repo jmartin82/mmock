@@ -14,3 +14,4 @@ import:
 - package: github.com/radovskyb/watcher
 - package: gopkg.in/alexcesaro/statsd.v2
   version: ~2.0.0
+- package: github.com/stathat/go
