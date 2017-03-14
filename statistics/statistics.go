@@ -29,8 +29,24 @@ func NewStatistics() *Statistics {
 
 var statistics = NewStatistics()
 
-func TrackSuccesfulRequest() {
-	statistics.Increment("requests.succesful")
+func TrackMockRequest() {
+	statistics.Increment("requests.mock")
+}
+
+func TrackConsoleRequest() {
+	statistics.Increment("requests.console")
+}
+
+func TrackVerifyRequest() {
+	statistics.Increment("requests.verify")
+}
+
+func TrackScenarioFeature() {
+	statistics.Increment("feature.scenario")
+}
+
+func TrackProxyFeature() {
+	statistics.Increment("feature.proxy")
 }
 
 func SetMonitor(monitor Monitor) {
