@@ -15,7 +15,6 @@ type MemoryStore struct {
 
 func (sm *MemoryStore) SetState(name, status string) {
 	sm.status[strings.ToLower(name)] = strings.ToLower(status)
-
 }
 
 func (sm *MemoryStore) GetState(name string) string {

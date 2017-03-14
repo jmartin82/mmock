@@ -59,6 +59,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	//set new scenario
 	if mock.Control.Scenario.NewState != "" {
+		statistics.TrackScenarioFeature()
 		di.Scenario.SetState(mock.Control.Scenario.Name, mock.Control.Scenario.NewState)
 	}
 
@@ -83,6 +84,7 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 
 	if result.Found {
 		if len(mock.Control.ProxyBaseURL) > 0 {
+			statistics.TrackProxyFeature()
 			pr := proxy.Proxy{URL: mock.Control.ProxyBaseURL}
 			response = pr.MakeRequest(mock.Request)
 		} else {
@@ -98,7 +100,7 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 			}
 			response = &mock.Response
 		}
-		statistics.TrackSuccesfulRequest()
+		statistics.TrackMockRequest()
 	} else {
 		response = &mock.Response
 	}

@@ -1,5 +1,5 @@
-hash: 59005496003b7a6b7f2c6f5c1d8553a933275338179f6e0366f4443a36ac7f16
-updated: 2017-02-13T22:48:06.943770885+01:00
+hash: ea19bc849f75d7cf1c87198760b8009a95da16e64296f44826969bed131ba772
+updated: 2017-03-13T23:52:49.307046557+01:00
 imports:
 - name: github.com/azer/url-router
   version: 1a0aa252538c21ad85fb4041c0df3d648ab813a1
@@ -13,6 +13,8 @@ imports:
   version: 828a655184ef96820e071c58bdecb5221d0ae1c3
 - name: github.com/ryanuber/go-glob
   version: 572520ed46dbddaed19ea3d9541bdd0494163693
+- name: github.com/stathat/go
+  version: 74669b9f388d9d788c97399a0824adbfee78400e
 - name: github.com/twinj/uuid
   version: 89173bcdda19db0eb88aef1e1cb1cb2505561d31
 - name: golang.org/x/net

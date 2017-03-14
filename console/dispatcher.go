@@ -9,6 +9,7 @@ import (
 	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
+	"github.com/jmartin82/mmock/statistics"
 	"golang.org/x/net/websocket"
 )
 
@@ -70,6 +71,7 @@ func (di *Dispatcher) Start() {
 
 //CONSOLE
 func (di *Dispatcher) consoleHandler(w http.ResponseWriter, r *http.Request) {
+	statistics.TrackConsoleRequest()
 	tmpl, _ := Asset("tmpl/index.html")
 	fmt.Fprintf(w, string(tmpl))
 }
@@ -89,7 +91,7 @@ func (di *Dispatcher) echoHandler(ws *websocket.Conn) {
 //API REQUEST
 
 func (di *Dispatcher) requestVerifyHandler(w http.ResponseWriter, r *http.Request) {
-
+	statistics.TrackVerifyRequest()
 	dReq := definition.Request{}
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&dReq)
