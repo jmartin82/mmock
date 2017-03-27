@@ -98,8 +98,8 @@ func (fd *FileDefinition) WatchDir() {
 		}
 	}()
 
-	// Watch test_folder recursively for changes.
-	if err := fd.watcher.Add(fd.Path); err != nil {
+	// Watch dir recursively for changes.
+	if err := fd.watcher.AddRecursive(fd.Path); err != nil {
 		log.Println("Impossible bind the config folder to the files monitor: ", err)
 		return
 	}
