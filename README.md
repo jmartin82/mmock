@@ -194,7 +194,7 @@ In case of queryStringParameters, headers and cookies, the request can be matche
 * *proxyBaseURL*: If this parameter is present, it sends the request data to the BaseURL and resend the response to de client. Useful if you don't want mock a the whole service. NOTE: It's not necessary fill the response field in this case.
 * *delay*: Delay the response in seconds. Simulate bad connection or bad server performance.
 * *crazy*: Return random server errors (5xx) in some request. Simulate server problems.
-* *priority*: Set the priority to avoid match in less restrictive mocks.
+* *priority*: Set the priority to avoid match in less restrictive mocks. Higher, more priority.
 
 ### Scenarios
 
@@ -228,10 +228,10 @@ Working examples [here](/config/crud)
 
 ### Verify
 
-The Mmock rrecords all requests it receives in memory (at least until it is reset). 
+The Mmock records all requests it receives in memory (at least until it is reset). 
 This makes it possible to verify that a request matching a specific pattern was received, and also to fetch the requests details.
 
-You can get that data throught the web console server (by default it has the same ip of mock sever and port 8082).
+You can get that data through the web console server (by default it has the same ip of mock sever and port 8082).
 
 #### REST Endpoints
 
@@ -240,11 +240,16 @@ You can get that data throught the web console server (by default it has the sam
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
-
 **Title** : Get all matched requests with any mock.<br>
 **URL** : /request/matched<br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
+
+**Title** : Clean all recorded request.<br>
+**URL** : /request/reset<br>
+**Method** : GET<br>
+**Response Codes**: Success (200 OK)<br>
+
 
 **Title** : Get all non matched requests.<br>
 **URL** : /request/unmatched<br>
