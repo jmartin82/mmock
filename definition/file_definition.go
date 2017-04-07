@@ -7,7 +7,10 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
+
+	"fmt"
 
 	"github.com/radovskyb/watcher"
 )
@@ -126,7 +129,11 @@ func (fd *FileDefinition) getMockFromFile(filename string) (Mock, error) {
 				return Mock{}, ErrInvalidMockDefinition
 			}
 			log.Printf("Loading config file: %s\n", filename)
-			return reader.Read(buf)
+			mock, erd := reader.Read(buf)
+			if erd != nil {
+				log.Printf("Invalid mock format in: %s Err: %s", filename, erd)
+			}
+			return mock, erd
 		}
 
 	}
@@ -143,12 +150,16 @@ func (fd *FileDefinition) ReadMocksDefinition() []Mock {
 	mocks := []Mock{}
 	for _, file := range fd.getConfigFiles(fd.Path) {
 		if mockDef, err := fd.getMockFromFile(file); err == nil {
-			mockDef.Name = filepath.Base(file)
+			mockDef.Name = strings.TrimPrefix(file, fd.Path)
 			mocks = append(mocks, mockDef)
 		}
 	}
 
 	sort.Sort(PrioritySort(mocks))
+	log.Println("Match Test Order:")
+	for _, mock := range mocks {
+		fmt.Printf("\t%s\n", mock.Name)
+	}
 
 	return mocks
 }
