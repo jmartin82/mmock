@@ -17,7 +17,7 @@ type mockReader struct {
 	readOk  int
 }
 
-func (mr *mockReader) CanRead(filename string) bool {
+func (mr *mockReader) CanParse(filename string) bool {
 	if mr.canRead > 0 {
 		mr.canRead--
 		return true

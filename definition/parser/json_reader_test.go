@@ -1,8 +1,8 @@
-package definition
+package parser
 
 import "testing"
 
-func TestJSONCanRead(t *testing.T) {
+func TestJSONCanParse(t *testing.T) {
 	json := JSONReader{}
 
 	var extTest = []struct {
@@ -17,7 +17,7 @@ func TestJSONCanRead(t *testing.T) {
 	}
 
 	for _, p := range extTest {
-		actual := json.CanRead(p.n)
+		actual := json.CanParse(p.n)
 		if actual != p.expected {
 			t.Errorf("With value %s expected '%v' actual '%v'", p.n, p.expected, actual)
 		}

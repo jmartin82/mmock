@@ -236,12 +236,12 @@ You can get that data through the web console server (by default it has the same
 #### REST Endpoints
 
 **Title** : Get all requests.<br>
-**URL** : /request/all<br>
+**URL** : /__admin/request/all<br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
 **Title** : Get all matched requests with any mock.<br>
-**URL** : /request/matched<br>
+**URL** : /__admin/request/matched<br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
@@ -252,12 +252,12 @@ You can get that data through the web console server (by default it has the same
 
 
 **Title** : Get all non matched requests.<br>
-**URL** : /request/unmatched<br>
+**URL** : /__admin/request/unmatched<br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
 **Title** : Get all requests that match with an specific pattern.<br>
-**URL** : /request/verify<br>
+**URL** : /__admin/request/verify<br>
 **Method** : POST<br>
 **Data Params**:  <br>
 Like stubbing this call also uses the same DSL to filter and query requests.
@@ -280,6 +280,11 @@ Like stubbing this call also uses the same DSL to filter and query requests.
 	"body": "Expected Body"
 }
 ```
+**Response Codes**: Success (200 OK)<br>
+
+**Title** : Clean all scenarios status.<br>
+**URL** : /__admin/scenarios/reset_all<br>
+**Method** : POT<br>
 **Response Codes**: Success (200 OK)<br>
 
 #### Realtime Endpoints

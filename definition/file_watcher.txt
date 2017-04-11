@@ -1,0 +1,38 @@
+
+func (fd *FileDefinition) UnWatchDir() {
+	if fd.watcher != nil {
+		fd.watcher.Close()
+	}
+}
+
+//WatchDir start the watching process to detect any change on defintions
+func (fd *FileDefinition) WatchDir() {
+	fd.watcher = watcher.New()
+
+	// SetMaxEvents to 1 to allow at most 1 Event to be received
+	fd.watcher.SetMaxEvents(1)
+	go func() {
+		for {
+			select {
+			case event := <-fd.watcher.Event:
+				log.Println("Changes detected in mock definitions ", event.String())
+				fd.Updates <- fd.ReadMocksDefinition()
+			case err := <-fd.watcher.Error:
+				log.Println("File monitor error", err)
+			}
+		}
+	}()
+
+	// Watch dir recursively for changes.
+	if err := fd.watcher.AddRecursive(fd.Path); err != nil {
+		log.Println("Impossible bind the config folder to the files monitor: ", err)
+		return
+	}
+
+	go func() {
+		if err := fd.watcher.Start(time.Millisecond * 100); err != nil {
+			log.Println("Impossible to start the config files monitor: ", err)
+		}
+	}()
+
+}

@@ -1,8 +1,8 @@
-package definition
+package parser
 
 import "testing"
 
-func TestYamlCanRead(t *testing.T) {
+func TestYamlCanParse(t *testing.T) {
 	yaml := YAMLReader{}
 
 	var extTest = []struct {
@@ -18,7 +18,7 @@ func TestYamlCanRead(t *testing.T) {
 	}
 
 	for _, p := range extTest {
-		actual := yaml.CanRead(p.n)
+		actual := yaml.CanParse(p.n)
 		if actual != p.expected {
 			t.Errorf("With value %s expected '%v' actual '%v'", p.n, p.expected, actual)
 		}

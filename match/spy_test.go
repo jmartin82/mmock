@@ -12,6 +12,12 @@ type DummyScenarioManager struct {
 func (dsm DummyScenarioManager) SetState(name, status string) {
 
 }
+func (dsm DummyScenarioManager) Reset(name string) bool {
+	return true
+}
+func (dsm DummyScenarioManager) ResetAll() {
+
+}
 func (dsm DummyScenarioManager) GetState(name string) string {
 	return ""
 }
