@@ -97,17 +97,11 @@ func getMapping(path string) definition.Mapping {
 	configMapper.AddConfigParser(parser.JSONReader{})
 	configMapper.AddConfigParser(parser.YAMLReader{})
 
-	mapping := definition.NewConfigMapping(path, configMapper)
+	fsUpdate := make(chan struct{})
+	watcher := definition.NewFileWatcher(path, fsUpdate)
+	watcher.Bind()
 
-	filepath.Walk(path, func(filePath string, fileInfo os.FileInfo, err error) error {
-		if !fileInfo.IsDir() {
-			URI := strings.TrimPrefix(filePath, path)
-			mapping.Load(URI)
-		}
-		return nil
-	})
-
-	return mapping
+	return definition.NewConfigMapping(path, configMapper, fsUpdate)
 }
 
 func getRouter(mapping definition.Mapping, checker match.Checker) *server.Router {
@@ -134,12 +128,13 @@ func startServer(ip string, port int, done chan bool, router server.Resolver, mL
 	dispatcher.Start()
 	done <- true
 }
-func startConsole(ip string, port int, spy match.Spier, scenario scenario.Director, done chan bool, mLog chan definition.Match) {
+func startConsole(ip string, port int, spy match.Spier, scenario scenario.Director, mapping definition.Mapping, done chan bool, mLog chan definition.Match) {
 	dispatcher := console.Dispatcher{
 		IP:       ip,
 		Port:     port,
 		MatchSpy: spy,
 		Scenario: scenario,
+		Mapping:  mapping,
 		Mlog:     mLog}
 	dispatcher.Start()
 	done <- true
@@ -186,7 +181,7 @@ func main() {
 	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor, spy)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	if *console {
-		go startConsole(*cIP, *cPort, spy, scenario, done, mLog)
+		go startConsole(*cIP, *cPort, spy, scenario, mapping, done, mLog)
 		log.Printf("Console running at %s:%d\n", *cIP, *cPort)
 	}
 

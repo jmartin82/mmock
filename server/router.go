@@ -56,9 +56,9 @@ func (rr *Router) Resolve(req *definition.Request) (*definition.Mock, definition
 			rr.copy(&mock, &md)
 			return &md, nil
 		}
-		errors[mock.Name] = err.Error()
+		errors[mock.URI] = err.Error()
 		if err != match.ErrPathNotMatch {
-			log.Printf("Discarding mock: %s Reason: %s\n", mock.Name, err.Error())
+			log.Printf("Discarding mock: %s Reason: %s\n", mock.URI, err.Error())
 		}
 	}
 	return getNotFoundResult(), errors

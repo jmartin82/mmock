@@ -27,7 +27,7 @@ func TestYamlCanParse(t *testing.T) {
 }
 
 func TestYamlRead(t *testing.T) {
-	validDefinition := []byte(`name: name
+	validDefinition := []byte(`URI: name
 description: description
 request: 
  method: GET
@@ -63,17 +63,17 @@ control:
 	invalidDefinition := []byte("sfsdf")
 
 	yaml := YAMLReader{}
-	m, err := yaml.Read(invalidDefinition)
+	m, err := yaml.Parse(invalidDefinition)
 	if err == nil {
 		t.Errorf("Expected error in definition")
 	}
 
-	m, err = yaml.Read(validDefinition)
+	m, err = yaml.Parse(validDefinition)
 	if err != nil {
 		t.Errorf("Unexpected error in definition", err)
 	}
 
-	if m.Name != "name" {
+	if m.URI != "name" {
 		t.Errorf("Missing name")
 	}
 

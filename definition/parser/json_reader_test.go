@@ -27,7 +27,7 @@ func TestJSONCanParse(t *testing.T) {
 
 func TestJSONRead(t *testing.T) {
 	validDefinition := []byte(`{
-		"name": "name",
+		"URI": "name",
 		"description": "description",
 		"request": {
 			"method": "GET",
@@ -71,17 +71,17 @@ func TestJSONRead(t *testing.T) {
 	invalidDefinition := []byte("sfsdf")
 
 	json := JSONReader{}
-	m, err := json.Read(invalidDefinition)
+	m, err := json.Parse(invalidDefinition)
 	if err == nil {
 		t.Errorf("Expected error in definition")
 	}
 
-	m, err = json.Read(validDefinition)
+	m, err = json.Parse(validDefinition)
 	if err != nil {
 		t.Errorf("Unexpected error in definition")
 	}
 
-	if m.Name != "name" {
+	if m.URI != "name" {
 		t.Errorf("Missing name")
 	}
 

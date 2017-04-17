@@ -226,6 +226,8 @@ Example of REST services using scenarios:
 
 Working examples [here](/config/crud)
 
+#### REST Endpoints
+
 ### Verify
 
 The Mmock records all requests it receives in memory (at least until it is reset). 
@@ -233,7 +235,6 @@ This makes it possible to verify that a request matching a specific pattern was 
 
 You can get that data through the web console server (by default it has the same ip of mock sever and port 8082).
 
-#### REST Endpoints
 
 **Title** : Get all requests.<br>
 **URL** : /__admin/request/all<br>
@@ -249,7 +250,6 @@ You can get that data through the web console server (by default it has the same
 **URL** : /request/reset<br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
-
 
 **Title** : Get all non matched requests.<br>
 **URL** : /__admin/request/unmatched<br>
@@ -284,8 +284,37 @@ Like stubbing this call also uses the same DSL to filter and query requests.
 
 **Title** : Clean all scenarios status.<br>
 **URL** : /__admin/scenarios/reset_all<br>
-**Method** : POT<br>
+**Method** : POST<br>
 **Response Codes**: Success (200 OK)<br>
+
+### Mapping
+
+TBD
+
+**Title** : Get all mock definitions.<br>
+**URL** : /__admin/mapping <br>
+**Method** : GET<br>
+**Response Codes**: Success (200 OK)<br>
+
+**Title** : Create new mock definition.<br>
+**URL** : /__admin/mapping/:uri <br>
+**Method** : POST<br>
+**Response Codes**: Success (201 OK)<br>
+
+**Title** : Get mock definition.<br>
+**URL** : /__admin/mapping/:uri <br>
+**Method** : GET<br>
+**Response Codes**: Success (200 OK)<br>
+
+**Title** : Update mock definition.<br>
+**URL** : /__admin/mapping/:uri <br>
+**Method** : PUT<br>
+**Response Codes**: Success (200 OK)<br>
+
+**Title** : Delete mock definition.<br>
+**URL** : /__admin/mapping/:uri <br>
+**Method** : DELETE<br>
+**Response Codes**: Success (200 OK)<br>)
 
 #### Realtime Endpoints
 

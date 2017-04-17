@@ -80,7 +80,7 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 		result.Errors = errs
 	}
 
-	log.Printf("Mock match found: %s. Name : %s\n", strconv.FormatBool(result.Found), mock.Name)
+	log.Printf("Mock match found: %s. Name : %s\n", strconv.FormatBool(result.Found), mock.URI)
 
 	if result.Found {
 		if len(mock.Control.ProxyBaseURL) > 0 {

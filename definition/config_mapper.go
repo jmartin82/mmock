@@ -1,6 +1,7 @@
 package definition
 
 import (
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"log"
@@ -45,6 +46,13 @@ func (fd *ConfigMapper) AddConfigParser(reader Parser) {
 }
 
 func (fd *ConfigMapper) Write(filename string, mock Mock) error {
+
+	content, err := json.Marshal(mock)
+	if err != nil {
+		return err
+	}
+
+	ioutil.WriteFile(filename, content, 0644)
 
 	return nil
 }

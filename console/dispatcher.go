@@ -23,6 +23,7 @@ type Dispatcher struct {
 	Port     int
 	MatchSpy match.Spier
 	Scenario scenario.Director
+	Mapping  definition.Mapping
 	Mlog     chan definition.Match
 	clients  []*websocket.Conn
 }
@@ -70,10 +71,13 @@ func (di *Dispatcher) Start() {
 	e.GET("/__admin/request/unmatched", di.requestUnMatchedHandler)
 	e.GET("/__admin/scenarios/reset_all", di.scenariosResetHandler)
 
-	//__admin/scenarios/reset_all
-	//GET  __admin/mapping/{{file}}
-	//POST __admin/mapping/{{file}}
-	//DELETE  __admin/mapping/{{file}}
+	//mapping
+	e.GET("/__admin/mapping", di.mappingListHandler)
+	e.GET("/__admin/mapping/:uri", di.mappingGetHandler)
+	e.POST("/__admin/mapping/:uri", di.mappingCreateHandler)
+	e.PUT("/__admin/mapping/:uri", di.mappingUpdateHandler)
+	e.DELETE("/__admin/mapping/:uri", di.mappingDeleteHandler)
+
 	//POST __admin/mapping (all)
 
 	go di.logFanOut()
@@ -102,6 +106,103 @@ func (di *Dispatcher) webSocketHandler(c echo.Context) error {
 }
 
 //API REQUEST
+func (di *Dispatcher) mappingListHandler(c echo.Context) (err error) {
+	mocks := di.Mapping.List()
+	return c.JSON(http.StatusOK, mocks)
+}
+
+func (di *Dispatcher) mappingGetHandler(c echo.Context) (err error) {
+
+	URI := c.Param("uri")
+	mock := definition.Mock{}
+	ok := false
+	if mock, ok = di.Mapping.Get(URI); !ok {
+		ar := &ActionResponse{
+			Result: "not_found",
+		}
+		return c.JSON(http.StatusNotFound, ar)
+	}
+
+	return c.JSON(http.StatusOK, mock)
+
+}
+
+func (di *Dispatcher) mappingDeleteHandler(c echo.Context) (err error) {
+
+	URI := c.Param("uri")
+	ok := false
+	if _, ok = di.Mapping.Get(URI); !ok {
+		ar := &ActionResponse{
+			Result: "not_found",
+		}
+		return c.JSON(http.StatusNotFound, ar)
+	}
+
+	if err = di.Mapping.Delete(URI); err != nil {
+		return err
+	}
+	ar := &ActionResponse{
+		Result: "deleted",
+	}
+	return c.JSON(http.StatusOK, ar)
+
+}
+
+func (di *Dispatcher) mappingCreateHandler(c echo.Context) (err error) {
+
+	mock := &definition.Mock{}
+	URI := c.Param("uri")
+
+	if _, ok := di.Mapping.Get(URI); ok {
+		ar := &ActionResponse{
+			Result: "already_exists",
+		}
+		return c.JSON(http.StatusConflict, ar)
+	}
+
+	if err = c.Bind(mock); err != nil {
+		return
+	}
+
+	err = di.Mapping.Set(URI, *mock)
+	if err != nil {
+		return
+	}
+
+	ar := &ActionResponse{
+		Result: "created",
+	}
+	return c.JSON(http.StatusCreated, ar)
+
+}
+
+func (di *Dispatcher) mappingUpdateHandler(c echo.Context) (err error) {
+
+	mock := &definition.Mock{}
+	URI := c.Param("uri")
+
+	if _, ok := di.Mapping.Get(URI); !ok {
+		ar := &ActionResponse{
+			Result: "not_found",
+		}
+		return c.JSON(http.StatusNotFound, ar)
+	}
+
+	if err = c.Bind(mock); err != nil {
+		return
+	}
+
+	err = di.Mapping.Set(URI, *mock)
+	if err != nil {
+		return
+	}
+
+	ar := &ActionResponse{
+		Result: "updated",
+	}
+	return c.JSON(http.StatusOK, ar)
+
+}
 
 func (di *Dispatcher) requestVerifyHandler(c echo.Context) error {
 	statistics.TrackVerifyRequest()

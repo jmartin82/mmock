@@ -16,7 +16,7 @@ type Control struct {
 
 //Mock contains the user mock definition
 type Mock struct {
-	Name        string
+	URI         string
 	Description string   `json:"description"`
 	Request     Request  `json:"request"`
 	Response    Response `json:"response"`
