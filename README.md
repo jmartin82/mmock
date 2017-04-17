@@ -237,12 +237,12 @@ You can get that data through the web console server (by default it has the same
 
 
 **Title** : Get all requests.<br>
-**URL** : /__admin/request/all<br>
+**URL** : /api/request/all<br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
 **Title** : Get all matched requests with any mock.<br>
-**URL** : /__admin/request/matched<br>
+**URL** : /api/request/matched<br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
@@ -252,12 +252,12 @@ You can get that data through the web console server (by default it has the same
 **Response Codes**: Success (200 OK)<br>
 
 **Title** : Get all non matched requests.<br>
-**URL** : /__admin/request/unmatched<br>
+**URL** : /api/request/unmatched<br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
 **Title** : Get all requests that match with an specific pattern.<br>
-**URL** : /__admin/request/verify<br>
+**URL** : /api/request/verify<br>
 **Method** : POST<br>
 **Data Params**:  <br>
 Like stubbing this call also uses the same DSL to filter and query requests.
@@ -283,7 +283,7 @@ Like stubbing this call also uses the same DSL to filter and query requests.
 **Response Codes**: Success (200 OK)<br>
 
 **Title** : Clean all scenarios status.<br>
-**URL** : /__admin/scenarios/reset_all<br>
+**URL** : /api/scenarios/reset_all<br>
 **Method** : POST<br>
 **Response Codes**: Success (200 OK)<br>
 
@@ -292,27 +292,27 @@ Like stubbing this call also uses the same DSL to filter and query requests.
 TBD
 
 **Title** : Get all mock definitions.<br>
-**URL** : /__admin/mapping <br>
+**URL** : /api/mapping <br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
 **Title** : Create new mock definition.<br>
-**URL** : /__admin/mapping/:uri <br>
+**URL** : /api/mapping/:uri <br>
 **Method** : POST<br>
 **Response Codes**: Success (201 OK)<br>
 
 **Title** : Get mock definition.<br>
-**URL** : /__admin/mapping/:uri <br>
+**URL** : /api/mapping/:uri <br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
 **Title** : Update mock definition.<br>
-**URL** : /__admin/mapping/:uri <br>
+**URL** : /api/mapping/:uri <br>
 **Method** : PUT<br>
 **Response Codes**: Success (200 OK)<br>
 
 **Title** : Delete mock definition.<br>
-**URL** : /__admin/mapping/:uri <br>
+**URL** : /api/mapping/:uri <br>
 **Method** : DELETE<br>
 **Response Codes**: Success (200 OK)<br>)
 

@@ -64,21 +64,21 @@ func (di *Dispatcher) Start() {
 	e.GET("/", di.consoleHandler)
 
 	//verification
-	e.GET("/__admin/request/reset", di.requestResetHandler)
-	e.GET("/__admin/request/verify", di.requestVerifyHandler)
-	e.GET("/__admin/request/all", di.requestAllHandler)
-	e.GET("/__admin/request/matched", di.requestMatchedHandler)
-	e.GET("/__admin/request/unmatched", di.requestUnMatchedHandler)
-	e.GET("/__admin/scenarios/reset_all", di.scenariosResetHandler)
+	e.GET("/api/request/reset", di.requestResetHandler)
+	e.GET("/api/request/verify", di.requestVerifyHandler)
+	e.GET("/api/request/all", di.requestAllHandler)
+	e.GET("/api/request/matched", di.requestMatchedHandler)
+	e.GET("/api/request/unmatched", di.requestUnMatchedHandler)
+	e.GET("/api/scenarios/reset_all", di.scenariosResetHandler)
 
 	//mapping
-	e.GET("/__admin/mapping", di.mappingListHandler)
-	e.GET("/__admin/mapping/:uri", di.mappingGetHandler)
-	e.POST("/__admin/mapping/:uri", di.mappingCreateHandler)
-	e.PUT("/__admin/mapping/:uri", di.mappingUpdateHandler)
-	e.DELETE("/__admin/mapping/:uri", di.mappingDeleteHandler)
+	e.GET("/api/mapping", di.mappingListHandler)
+	e.GET("/api/mapping/:uri", di.mappingGetHandler)
+	e.POST("/api/mapping/:uri", di.mappingCreateHandler)
+	e.PUT("/api/mapping/:uri", di.mappingUpdateHandler)
+	e.DELETE("/api/mapping/:uri", di.mappingDeleteHandler)
 
-	//POST __admin/mapping (all)
+	//POST api/mapping (all)
 
 	go di.logFanOut()
 
