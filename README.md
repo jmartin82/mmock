@@ -233,9 +233,6 @@ Working examples [here](/config/crud)
 The Mmock records all requests it receives in memory (at least until it is reset). 
 This makes it possible to verify that a request matching a specific pattern was received, and also to fetch the requests details.
 
-You can get that data through the web console server (by default it has the same ip of mock sever and port 8082).
-
-
 **Title** : Get all requests.<br>
 **URL** : /api/request/all<br>
 **Method** : GET<br>
@@ -282,6 +279,8 @@ Like stubbing this call also uses the same DSL to filter and query requests.
 ```
 **Response Codes**: Success (200 OK)<br>
 
+### Scenario
+
 **Title** : Clean all scenarios status.<br>
 **URL** : /api/scenarios/reset_all<br>
 **Method** : POST<br>
@@ -289,7 +288,7 @@ Like stubbing this call also uses the same DSL to filter and query requests.
 
 ### Mapping
 
-TBD
+You can manage remotely your stub mappings whenever you need with this simple API:
 
 **Title** : Get all mock definitions.<br>
 **URL** : /api/mapping <br>
