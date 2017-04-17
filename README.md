@@ -436,7 +436,7 @@ Request data:
 
 Clone this repository to ```$GOPATH/src/github.com/jmartin82/mmock``` and type ```go get .```.
 
-Requires Go 1.6+ to build.
+Requires Go 1.7+ to build.
 
 If you make any changes, run ```go fmt ./...``` before submitting a pull request.
 
