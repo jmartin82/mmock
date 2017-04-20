@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"strings"
+
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
@@ -90,7 +92,8 @@ func (di *Dispatcher) Start() {
 func (di *Dispatcher) consoleHandler(c echo.Context) error {
 	statistics.TrackConsoleRequest()
 	tmpl, _ := Asset("tmpl/index.html")
-	return c.HTML(http.StatusOK, string(tmpl))
+	content := strings.Replace(string(tmpl), "##MOCK_SERVER_ENDPOINT##", "192.168.1.37:8082", 1)
+	return c.HTML(http.StatusOK, content)
 }
 
 func (di *Dispatcher) webSocketHandler(c echo.Context) error {
@@ -161,7 +164,10 @@ func (di *Dispatcher) mappingCreateHandler(c echo.Context) (err error) {
 	}
 
 	if err = c.Bind(mock); err != nil {
-		return
+		ar := &ActionResponse{
+			Result: "invalid_mock_definition",
+		}
+		return c.JSON(http.StatusBadRequest, ar)
 	}
 
 	err = di.Mapping.Set(URI, *mock)

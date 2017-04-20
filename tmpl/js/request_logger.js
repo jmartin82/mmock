@@ -3,9 +3,7 @@ function RequestLogger() {
     var source = $("#request-entry").html();
     var template = Handlebars.compile(source);
 
-    this.num = 0;
-    this.type = "macintosh";
-    this.color = "red";
+    this.num = 0
 
     function getColorByStatus(statusCode) {
         if (statusCode === 200 || statusCode === 201) {
@@ -20,25 +18,6 @@ function RequestLogger() {
     function updateTitle() {
         $(document).attr("title", "NEW REQUEST!!");
         setTimeout(function () { $(document).attr("title", "MMock Console"); }, 2000);
-    }
-
-    function syntaxHighlight(json) {
-        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-            var cls = 'number';
-            if (/^"/.test(match)) {
-                if (/:$/.test(match)) {
-                    cls = 'key';
-                } else {
-                    cls = 'string';
-                }
-            } else if (/true|false/.test(match)) {
-                cls = 'boolean';
-            } else if (/null/.test(match)) {
-                cls = 'null';
-            }
-            return '<span class="' + cls + '">' + match + '</span>';
-        });
     }
 
     function getRequestTime(timestamp) {
