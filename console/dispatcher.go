@@ -75,10 +75,10 @@ func (di *Dispatcher) Start() {
 
 	//mapping
 	e.GET("/api/mapping", di.mappingListHandler)
-	e.GET("/api/mapping/:uri", di.mappingGetHandler)
-	e.POST("/api/mapping/:uri", di.mappingCreateHandler)
-	e.PUT("/api/mapping/:uri", di.mappingUpdateHandler)
-	e.DELETE("/api/mapping/:uri", di.mappingDeleteHandler)
+	e.GET("/api/mapping/*", di.mappingGetHandler)
+	e.POST("/api/mapping/*", di.mappingCreateHandler)
+	e.PUT("/api/mapping/*", di.mappingUpdateHandler)
+	e.DELETE("/api/mapping/*", di.mappingDeleteHandler)
 
 	//POST api/mapping (all)
 
@@ -92,7 +92,8 @@ func (di *Dispatcher) Start() {
 func (di *Dispatcher) consoleHandler(c echo.Context) error {
 	statistics.TrackConsoleRequest()
 	tmpl, _ := Asset("tmpl/index.html")
-	content := strings.Replace(string(tmpl), "##MOCK_SERVER_ENDPOINT##", "192.168.1.37:8082", 1)
+	addr := fmt.Sprintf("%s:%d", di.IP, di.Port)
+	content := strings.Replace(string(tmpl), "##MOCK_SERVER_ENDPOINT##", addr, 1)
 	return c.HTML(http.StatusOK, content)
 }
 
@@ -108,6 +109,11 @@ func (di *Dispatcher) webSocketHandler(c echo.Context) error {
 	return nil
 }
 
+func (di *Dispatcher) getMappingUri(path string) string {
+	root := "/api/mapping/"
+	return strings.TrimPrefix(path, root)
+}
+
 //API REQUEST
 func (di *Dispatcher) mappingListHandler(c echo.Context) (err error) {
 	mocks := di.Mapping.List()
@@ -116,7 +122,7 @@ func (di *Dispatcher) mappingListHandler(c echo.Context) (err error) {
 
 func (di *Dispatcher) mappingGetHandler(c echo.Context) (err error) {
 
-	URI := c.Param("uri")
+	URI := di.getMappingUri(c.Request().URL.Path)
 	mock := definition.Mock{}
 	ok := false
 	if mock, ok = di.Mapping.Get(URI); !ok {
@@ -132,7 +138,7 @@ func (di *Dispatcher) mappingGetHandler(c echo.Context) (err error) {
 
 func (di *Dispatcher) mappingDeleteHandler(c echo.Context) (err error) {
 
-	URI := c.Param("uri")
+	URI := di.getMappingUri(c.Request().URL.Path)
 	ok := false
 	if _, ok = di.Mapping.Get(URI); !ok {
 		ar := &ActionResponse{
@@ -154,7 +160,7 @@ func (di *Dispatcher) mappingDeleteHandler(c echo.Context) (err error) {
 func (di *Dispatcher) mappingCreateHandler(c echo.Context) (err error) {
 
 	mock := &definition.Mock{}
-	URI := c.Param("uri")
+	URI := di.getMappingUri(c.Request().URL.Path)
 
 	if _, ok := di.Mapping.Get(URI); ok {
 		ar := &ActionResponse{
@@ -185,7 +191,7 @@ func (di *Dispatcher) mappingCreateHandler(c echo.Context) (err error) {
 func (di *Dispatcher) mappingUpdateHandler(c echo.Context) (err error) {
 
 	mock := &definition.Mock{}
-	URI := c.Param("uri")
+	URI := di.getMappingUri(c.Request().URL.Path)
 
 	if _, ok := di.Mapping.Get(URI); !ok {
 		ar := &ActionResponse{
@@ -195,7 +201,10 @@ func (di *Dispatcher) mappingUpdateHandler(c echo.Context) (err error) {
 	}
 
 	if err = c.Bind(mock); err != nil {
-		return
+		ar := &ActionResponse{
+			Result: "invalid_mock_definition",
+		}
+		return c.JSON(http.StatusBadRequest, ar)
 	}
 
 	err = di.Mapping.Set(URI, *mock)

@@ -22,10 +22,10 @@ function Mapping(domain) {
     $('#mapping-data').on('click', '.btn-view-mapping', function() {
         var uri = $(this).data("uri");
         $.getJSON("http://" + domain + "/api/mapping/" + uri, function(data) {
-            content = JSON.stringify(data, null, 4)
+            var content = JSON.stringify(data, null, "\t")
             BootstrapDialog.show({
                 title: 'Mapping definition',
-                message: "<div class=\"pre\">" + syntaxHighlight(content) + "</div>"
+                message: '<pre>' + syntaxHighlight(content) + '</pre>'
             });
         });
     });
@@ -35,10 +35,13 @@ function Mapping(domain) {
         var uri = $(this).data("uri");
         var endpoint = "http://" + domain + "/api/mapping/" + uri;
         $.getJSON(endpoint, function(data) {
-            content = JSON.stringify(data)
+            var content = JSON.stringify(data, null,"\t")
+            var $text = $('<textarea id="text-update-mapping" style="min-width:570px;min-height:300px"></textarea>');
+            $text.val(content)
+            
             BootstrapDialog.show({
                 title: 'Mapping edit',
-                message: "<textarea id='text-update-mapping' style='min-width:100%;height:300px'>" + content + "</textarea>",
+                message: $text,
                 buttons: [{
                     label: 'Cancel',
                     action: function(dialog) {
@@ -46,6 +49,7 @@ function Mapping(domain) {
                     }
                 }, {
                     label: 'Save',
+                    cssClass: 'btn-primary',
                     action: function(dialog) {
                        var content = $('#text-update-mapping').val();
                        $.ajax({
