@@ -107,7 +107,8 @@
                                         <th width="15%">Uri</th>
                                         <th width="30%">Description</th>
                                         <th width="5%">Method</th>
-                                        <th width="35%">Path</th>
+                                        <th width="30%">Path</th>
+                                        <th width="5%">Result</th>
                                         <th></th>
                                         <th></th>
                                     </tr>
@@ -182,8 +183,9 @@
         <tr>
             <td><b>{{URI}}</b></td>
             <td>{{description}}</td>
-            <td><span class="label label-primary">{{request.method}}</span></td>
+            <td><span class="label label-{{method_color}}">{{request.method}}</span></td>
             <td>{{{request.path}}}</td>
+            <td><span class="label label-{{status_color}}">{{response.statusCode}}</span></td>
             <td><a class="btn btn-default btn-xs btn-view-mapping" data-uri="{{URI}}">View</a></td>
             <td><a class="btn btn-default btn-xs btn-edit-mapping" data-uri="{{URI}}">Edit</a></td>
         </tr>

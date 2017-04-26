@@ -5,16 +5,6 @@ function RequestLogger() {
 
     this.num = 0
 
-    function getColorByStatus(statusCode) {
-        if (statusCode === 200 || statusCode === 201) {
-            return "success";
-        } else if (statusCode === 404) {
-            return "danger";
-        } else {
-            return "warning";
-        }
-    }
-
     function updateTitle() {
         $(document).attr("title", "NEW REQUEST!!");
         setTimeout(function () { $(document).attr("title", "MMock Console"); }, 2000);

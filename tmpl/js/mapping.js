@@ -10,6 +10,8 @@ function Mapping(domain) {
             var items = [];
             $("#mapping-table tbody").empty();
             $.each(data, function(key, mapping) {
+                mapping['status_color'] =  getColorByStatus(mapping.response.statusCode);
+                mapping['method_color'] =  getColorByMethod(mapping.request.method);
                 var html = mapping_template(mapping);
                 $("#mapping-table tbody").append(html);
             });
