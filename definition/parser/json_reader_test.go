@@ -1,8 +1,8 @@
-package definition
+package parser
 
 import "testing"
 
-func TestJSONCanRead(t *testing.T) {
+func TestJSONCanParse(t *testing.T) {
 	json := JSONReader{}
 
 	var extTest = []struct {
@@ -17,7 +17,7 @@ func TestJSONCanRead(t *testing.T) {
 	}
 
 	for _, p := range extTest {
-		actual := json.CanRead(p.n)
+		actual := json.CanParse(p.n)
 		if actual != p.expected {
 			t.Errorf("With value %s expected '%v' actual '%v'", p.n, p.expected, actual)
 		}
@@ -27,7 +27,7 @@ func TestJSONCanRead(t *testing.T) {
 
 func TestJSONRead(t *testing.T) {
 	validDefinition := []byte(`{
-		"name": "name",
+		"URI": "name",
 		"description": "description",
 		"request": {
 			"method": "GET",
@@ -71,17 +71,17 @@ func TestJSONRead(t *testing.T) {
 	invalidDefinition := []byte("sfsdf")
 
 	json := JSONReader{}
-	m, err := json.Read(invalidDefinition)
+	m, err := json.Parse(invalidDefinition)
 	if err == nil {
 		t.Errorf("Expected error in definition")
 	}
 
-	m, err = json.Read(validDefinition)
+	m, err = json.Parse(validDefinition)
 	if err != nil {
 		t.Errorf("Unexpected error in definition")
 	}
 
-	if m.Name != "name" {
+	if m.URI != "name" {
 		t.Errorf("Missing name")
 	}
 

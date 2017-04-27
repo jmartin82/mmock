@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/jmartin82/mmock/console"
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/definition/parser"
 	"github.com/jmartin82/mmock/match"
 	"github.com/jmartin82/mmock/scenario"
 	"github.com/jmartin82/mmock/server"
@@ -19,6 +21,9 @@ import (
 	"github.com/jmartin82/mmock/vars"
 	"github.com/jmartin82/mmock/vars/fakedata"
 )
+
+//ErrNotFoundPath error from missing or configuration path
+var ErrNotFoundPath = errors.New("Configuration path not found")
 
 //ErrNotFoundDefaultPath if we can't resolve the current path
 var ErrNotFoundDefaultPath = errors.New("We can't determinate the current path")
@@ -70,11 +75,37 @@ func getMatchSpy(checker match.Checker, matchStore match.Store) match.Spier {
 	return match.NewSpy(checker, matchStore)
 }
 
-func getRouter(mocks []definition.Mock, checker match.Checker, dUpdates chan []definition.Mock) *server.Router {
-	log.Printf("Loding router with %d definitions\n", len(mocks))
+func existsConfigPath(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
 
-	router := server.NewRouter(mocks, checker, dUpdates)
-	router.MockChangeWatch()
+func getMapping(path string) definition.Mapping {
+	path, _ = filepath.Abs(path)
+	if !existsConfigPath(path) {
+		log.Fatalf(ErrNotFoundPath.Error())
+	}
+
+	configMapper := definition.NewConfigMapper()
+
+	configMapper.AddConfigParser(parser.JSONReader{})
+	configMapper.AddConfigParser(parser.YAMLReader{})
+
+	fsUpdate := make(chan struct{})
+	watcher := definition.NewFileWatcher(path, fsUpdate)
+	watcher.Bind()
+
+	return definition.NewConfigMapping(path, configMapper, fsUpdate)
+}
+
+func getRouter(mapping definition.Mapping, checker match.Checker) *server.Router {
+	router := server.NewRouter(mapping, checker)
 	return router
 }
 
@@ -97,30 +128,16 @@ func startServer(ip string, port int, done chan bool, router server.Resolver, mL
 	dispatcher.Start()
 	done <- true
 }
-func startConsole(ip string, port int, spy match.Spier, done chan bool, mLog chan definition.Match) {
+func startConsole(ip string, port int, spy match.Spier, scenario scenario.Director, mapping definition.Mapping, done chan bool, mLog chan definition.Match) {
 	dispatcher := console.Dispatcher{
 		IP:       ip,
 		Port:     port,
 		MatchSpy: spy,
+		Scenario: scenario,
+		Mapping:  mapping,
 		Mlog:     mLog}
 	dispatcher.Start()
 	done <- true
-}
-
-func getMocks(path string, updateCh chan []definition.Mock) []definition.Mock {
-	log.Printf("Reading Mock definition from: %s\n", path)
-
-	definitionReader := definition.NewFileDefinition(path, updateCh)
-
-	definitionReader.AddConfigReader(definition.JSONReader{})
-	definitionReader.AddConfigReader(definition.YAMLReader{})
-
-	mocks := definitionReader.ReadMocksDefinition()
-	if len(mocks) == 0 {
-		log.Fatalln(ErrNotFoundAnyMock.Error())
-	}
-	definitionReader.WatchDir()
-	return mocks
 }
 
 func main() {
@@ -140,11 +157,9 @@ func main() {
 	cPath := flag.String("config-path", path, "Mocks definition folder")
 
 	flag.Parse()
-	path, _ = filepath.Abs(*cPath)
 
 	//chanels
 	mLog := make(chan definition.Match)
-	dUpdates := make(chan []definition.Mock)
 	done := make(chan bool)
 
 	//shared structs
@@ -152,9 +167,9 @@ func main() {
 	checker := match.NewTester(scenario)
 	matchStore := match.NewMemoryStore()
 
-	mocks := getMocks(path, dUpdates)
+	mapping := getMapping(*cPath)
 	spy := getMatchSpy(checker, matchStore)
-	router := getRouter(mocks, checker, dUpdates)
+	router := getRouter(mapping, checker)
 	varsProcessor := getVarsProcessor()
 
 	if !(*sStatistics) {
@@ -166,7 +181,7 @@ func main() {
 	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor, spy)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	if *console {
-		go startConsole(*cIP, *cPort, spy, done, mLog)
+		go startConsole(*cIP, *cPort, spy, scenario, mapping, done, mLog)
 		log.Printf("Console running at %s:%d\n", *cIP, *cPort)
 	}
 

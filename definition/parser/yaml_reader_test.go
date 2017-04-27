@@ -1,8 +1,8 @@
-package definition
+package parser
 
 import "testing"
 
-func TestYamlCanRead(t *testing.T) {
+func TestYamlCanParse(t *testing.T) {
 	yaml := YAMLReader{}
 
 	var extTest = []struct {
@@ -18,7 +18,7 @@ func TestYamlCanRead(t *testing.T) {
 	}
 
 	for _, p := range extTest {
-		actual := yaml.CanRead(p.n)
+		actual := yaml.CanParse(p.n)
 		if actual != p.expected {
 			t.Errorf("With value %s expected '%v' actual '%v'", p.n, p.expected, actual)
 		}
@@ -27,7 +27,7 @@ func TestYamlCanRead(t *testing.T) {
 }
 
 func TestYamlRead(t *testing.T) {
-	validDefinition := []byte(`name: name
+	validDefinition := []byte(`URI: name
 description: description
 request: 
  method: GET
@@ -63,17 +63,17 @@ control:
 	invalidDefinition := []byte("sfsdf")
 
 	yaml := YAMLReader{}
-	m, err := yaml.Read(invalidDefinition)
+	m, err := yaml.Parse(invalidDefinition)
 	if err == nil {
 		t.Errorf("Expected error in definition")
 	}
 
-	m, err = yaml.Read(validDefinition)
+	m, err = yaml.Parse(validDefinition)
 	if err != nil {
 		t.Errorf("Unexpected error in definition", err)
 	}
 
-	if m.Name != "name" {
+	if m.URI != "name" {
 		t.Errorf("Missing name")
 	}
 

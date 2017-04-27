@@ -18,6 +18,23 @@ func (dm DummyMatcher) Check(req *definition.Request, mock *definition.Mock, sce
 	return false, errors.New("Random Error")
 }
 
+type DummyMapper struct {
+	mocks []definition.Mock
+}
+
+func (mm DummyMapper) Set(URI string, mock definition.Mock) error {
+	return nil
+}
+func (mm DummyMapper) Delete(URI string) error {
+	return nil
+}
+func (mm DummyMapper) Get(URI string) (definition.Mock, bool) {
+	return definition.Mock{}, false
+}
+func (mm DummyMapper) List() []definition.Mock {
+	return mm.mocks
+}
+
 func TestValidRoute(t *testing.T) {
 
 	mocks := []definition.Mock{
@@ -27,11 +44,11 @@ func TestValidRoute(t *testing.T) {
 			},
 		},
 	}
-	dUpdate := make(chan []definition.Mock)
+
+	dummyMapper := DummyMapper{mocks: mocks}
 	dummyMatcher := DummyMatcher{OK: true}
 
-	r := NewRouter(mocks, dummyMatcher, dUpdate)
-
+	r := NewRouter(dummyMapper, dummyMatcher)
 	req := definition.Request{Path: "/test"}
 
 	m, errs := r.Resolve(&req)
@@ -46,16 +63,16 @@ func TestInvalidRoute(t *testing.T) {
 
 	mocks := []definition.Mock{
 		{
-			Name: "XX",
+			URI: "XX",
 			Response: definition.Response{
 				StatusCode: 200,
 			},
 		},
 	}
-	dUpdate := make(chan []definition.Mock)
+	dummyMapper := DummyMapper{mocks: mocks}
 	dummyMatcher := DummyMatcher{OK: false}
 
-	r := NewRouter(mocks, dummyMatcher, dUpdate)
+	r := NewRouter(dummyMapper, dummyMatcher)
 
 	req := definition.Request{Path: "/test"}
 
@@ -65,37 +82,4 @@ func TestInvalidRoute(t *testing.T) {
 		t.Fatalf("Invalid route resolved")
 	}
 
-}
-
-func TestRoutesLoadViaChannel(t *testing.T) {
-
-	mocks := []definition.Mock{
-		{
-			Name: "XX",
-			Response: definition.Response{
-				StatusCode: 200,
-			},
-		},
-	}
-	dUpdate := make(chan []definition.Mock)
-	dummyMatcher := DummyMatcher{OK: true}
-
-	r := NewRouter([]definition.Mock{}, dummyMatcher, dUpdate)
-
-	req := definition.Request{Path: "/test"}
-
-	m, _ := r.Resolve(&req)
-
-	if m.Name != "" {
-		t.Fatalf("Invalid route resolved")
-	}
-
-	go r.MockChangeWatch()
-	dUpdate <- mocks
-
-	m, _ = r.Resolve(&req)
-
-	if m.Name == "" {
-		t.Fatalf("Route not found")
-	}
 }

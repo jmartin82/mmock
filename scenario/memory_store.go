@@ -13,6 +13,18 @@ type MemoryStore struct {
 	status map[string]string
 }
 
+func (sm *MemoryStore) Reset(name string) bool {
+	if _, f := sm.status[strings.ToLower(name)]; f {
+		sm.status[strings.ToLower(name)] = "not_started"
+		return true
+	}
+	return false
+}
+
+func (sm *MemoryStore) ResetAll() {
+	sm.status = make(map[string]string)
+}
+
 func (sm *MemoryStore) SetState(name, status string) {
 	sm.status[strings.ToLower(name)] = strings.ToLower(status)
 }

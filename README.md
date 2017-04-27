@@ -226,22 +226,20 @@ Example of REST services using scenarios:
 
 Working examples [here](/config/crud)
 
+#### REST Endpoints
+
 ### Verify
 
 The Mmock records all requests it receives in memory (at least until it is reset). 
 This makes it possible to verify that a request matching a specific pattern was received, and also to fetch the requests details.
 
-You can get that data through the web console server (by default it has the same ip of mock sever and port 8082).
-
-#### REST Endpoints
-
 **Title** : Get all requests.<br>
-**URL** : /request/all<br>
+**URL** : /api/request/all<br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
 **Title** : Get all matched requests with any mock.<br>
-**URL** : /request/matched<br>
+**URL** : /api/request/matched<br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
@@ -250,14 +248,13 @@ You can get that data through the web console server (by default it has the same
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
-
 **Title** : Get all non matched requests.<br>
-**URL** : /request/unmatched<br>
+**URL** : /api/request/unmatched<br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
 **Title** : Get all requests that match with an specific pattern.<br>
-**URL** : /request/verify<br>
+**URL** : /api/request/verify<br>
 **Method** : POST<br>
 **Data Params**:  <br>
 Like stubbing this call also uses the same DSL to filter and query requests.
@@ -281,6 +278,42 @@ Like stubbing this call also uses the same DSL to filter and query requests.
 }
 ```
 **Response Codes**: Success (200 OK)<br>
+
+### Scenario
+
+**Title** : Clean all scenarios status.<br>
+**URL** : /api/scenarios/reset_all<br>
+**Method** : POST<br>
+**Response Codes**: Success (200 OK)<br>
+
+### Mapping
+
+You can manage remotely your stub mappings whenever you need with this simple API:
+
+**Title** : Get all mock definitions.<br>
+**URL** : /api/mapping <br>
+**Method** : GET<br>
+**Response Codes**: Success (200 OK)<br>
+
+**Title** : Create new mock definition.<br>
+**URL** : /api/mapping/:uri <br>
+**Method** : POST<br>
+**Response Codes**: Success (201 OK)<br>
+
+**Title** : Get mock definition.<br>
+**URL** : /api/mapping/:uri <br>
+**Method** : GET<br>
+**Response Codes**: Success (200 OK)<br>
+
+**Title** : Update mock definition.<br>
+**URL** : /api/mapping/:uri <br>
+**Method** : PUT<br>
+**Response Codes**: Success (200 OK)<br>
+
+**Title** : Delete mock definition.<br>
+**URL** : /api/mapping/:uri <br>
+**Method** : DELETE<br>
+**Response Codes**: Success (200 OK)<br>)
 
 #### Realtime Endpoints
 
@@ -403,7 +436,7 @@ Request data:
 
 Clone this repository to ```$GOPATH/src/github.com/jmartin82/mmock``` and type ```go get .```.
 
-Requires Go 1.6+ to build.
+Requires Go 1.7+ to build.
 
 If you make any changes, run ```go fmt ./...``` before submitting a pull request.
 
