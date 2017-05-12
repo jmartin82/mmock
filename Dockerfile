@@ -1,11 +1,10 @@
-FROM alpine:3.4
+FROM golang:1.8-alpine
 
 # Install ca-certificates, required for the "release message" feature:
 RUN apk --no-cache add \
     ca-certificates
 
 RUN apk --no-cache add --virtual build-dependencies \
-    go \
     git \
   && mkdir -p /root/gocode \
   && export GOPATH=/root/gocode \

@@ -92,8 +92,7 @@ func (di *Dispatcher) Start() {
 func (di *Dispatcher) consoleHandler(c echo.Context) error {
 	statistics.TrackConsoleRequest()
 	tmpl, _ := Asset("tmpl/index.html")
-	addr := fmt.Sprintf("%s:%d", di.IP, di.Port)
-	content := strings.Replace(string(tmpl), "##MOCK_SERVER_ENDPOINT##", addr, 1)
+	content := string(tmpl)
 	return c.HTML(http.StatusOK, content)
 }
 
