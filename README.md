@@ -283,7 +283,7 @@ Like stubbing this call also uses the same DSL to filter and query requests.
 
 **Title** : Clean all scenarios status.<br>
 **URL** : /api/scenarios/reset_all<br>
-**Method** : POST<br>
+**Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
 ### Mapping
@@ -436,7 +436,7 @@ Request data:
 
 Clone this repository to ```$GOPATH/src/github.com/jmartin82/mmock``` and type ```go get .```.
 
-Requires Go 1.7+ to build.
+Requires Go 1.8+ to build.
 
 If you make any changes, run ```go fmt ./...``` before submitting a pull request.
 
