@@ -1,0 +1,11 @@
+{
+	"description": "Returns body parameters when send as form-data values",
+	"request": {
+		"method": "POST",
+		"path": "/body/form"
+	},
+	"response": {
+		"statusCode": 200,
+		"body": "User with email {{request.body.email}} as been tracked with uuid {{request.body.tracking[uuid]}}"
+	}
+}

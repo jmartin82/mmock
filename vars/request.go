@@ -5,6 +5,7 @@ import (
 
 	urlmatcher "github.com/azer/url-router"
 	"github.com/jmartin82/mmock/definition"
+	"net/url"
 )
 
 type Request struct {
@@ -21,6 +22,8 @@ func (rp Request) Fill(holders []string) map[string]string {
 		if tag == "request.body" && rp.Request.Body != "" {
 			s = rp.Request.Body
 			found = true
+		} else if i := strings.Index(tag, "request.body."); i == 0 {
+			s, found = rp.getBodyParam(rp.Request, tag[13:])
 		} else if i := strings.Index(tag, "request.query."); i == 0 {
 			s, found = rp.getQueryStringParam(rp.Request, tag[14:])
 		} else if i := strings.Index(tag, "request.path."); i == 0 {
@@ -44,6 +47,21 @@ func (rp Request) getPathParm(m *definition.Mock, req *definition.Request, name 
 
 	value, f := mparm.Params[name]
 	if !f {
+		return "", false
+	}
+
+	return value, true
+}
+
+func (rp Request) getBodyParam(req *definition.Request, name string) (string, bool) {
+
+	values, err := url.ParseQuery(req.Body)
+	if err != nil {
+		return "", false
+	}
+
+	value := values.Get(name)
+	if value == "" {
 		return "", false
 	}
 
