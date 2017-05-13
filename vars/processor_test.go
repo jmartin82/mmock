@@ -325,7 +325,7 @@ func TestReplaceMissingTags(t *testing.T) {
 	}
 }
 
-func TestReplaceBodyFormUrlEncodedTags(t *testing.T) {
+func TestReplaceFormUrlEncodedBodyTags(t *testing.T) {
 	req := definition.Request{}
 	req.Body = "one=foo&two[array]=bar"
 	req.Headers = make(definition.Values)
@@ -339,6 +339,89 @@ func TestReplaceBodyFormUrlEncodedTags(t *testing.T) {
 	varsProcessor.Eval(&req, &mock)
 
 	if mock.Response.Body != "Form data placeholders. One 'foo'. Two 'bar'." {
+		t.Error("Replaced tags from body form do not match", mock.Response.Body)
+	}
+}
+
+func TestReplaceJsonBodyEncodedTags(t *testing.T) {
+	req := definition.Request{}
+	req.Headers = make(definition.Values)
+	req.Headers["Content-Type"] = []string{"application/json"}
+	req.Body = `
+{
+  "email": "hilari@hilarimoragrega.com",
+  "age": 34,
+  "height": 5.66,
+  "weight": null,
+  "level": -8,
+  "active": true,
+  "friends": [
+    "jordi.martin@gmail.com", 
+    "alfons.faubert@gmail.com"
+  ],
+  "attributes": {
+    "programming": 15,
+    "trolling": 27
+  },
+  "tracking": {
+    "uuid":"0bd74115-2307-458f-8288-b726724045ef",
+    "nesting": {
+      "level": "nesting is ok"
+    },
+    "discarded": "do not return"
+  }
+}
+`
+	res := definition.Response{}
+	res.Body = `
+{
+  "email": "{{request.body.email}}",
+  "age": {{request.body.age}},
+  "height": {{request.body.height}},
+  "weight": {{request.body.weight}},
+  "active": {{request.body.active}},
+  "level": {{request.body.level}},
+  "friends": {{request.body.friends}},
+  "attributes": {{request.body.attributes}},
+  "tracking": {
+    "uuid": "{{request.body.tracking.uuid}}",
+    "deeper": {
+      "level": "{{request.body.tracking.nesting.level}}"
+    }
+  }
+}
+`
+
+	expected := `
+{
+  "email": "hilari@hilarimoragrega.com",
+  "age": 34,
+  "height": 5.66,
+  "weight": null,
+  "active": true,
+  "level": -8,
+  "friends": [
+    "jordi.martin@gmail.com", 
+    "alfons.faubert@gmail.com"
+  ],
+  "attributes": {
+    "programming": 15,
+    "trolling": 27
+  },
+  "tracking": {
+    "uuid": "0bd74115-2307-458f-8288-b726724045ef",
+    "deeper": {
+      "level": "nesting is ok"
+    }
+  }
+}
+`
+
+	mock := definition.Mock{Request: req, Response: res}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != expected {
 		t.Error("Replaced tags from body form do not match", mock.Response.Body)
 	}
 }
