@@ -6,6 +6,8 @@ import (
 	urlmatcher "github.com/azer/url-router"
 	"github.com/jmartin82/mmock/definition"
 	"net/url"
+	"encoding/json"
+	"strconv"
 )
 
 type Request struct {
@@ -53,21 +55,6 @@ func (rp Request) getPathParm(m *definition.Mock, req *definition.Request, name 
 	return value, true
 }
 
-func (rp Request) getBodyParam(req *definition.Request, name string) (string, bool) {
-
-	values, err := url.ParseQuery(req.Body)
-	if err != nil {
-		return "", false
-	}
-
-	value := values.Get(name)
-	if value == "" {
-		return "", false
-	}
-
-	return value, true
-}
-
 func (rp Request) getQueryStringParam(req *definition.Request, name string) (string, bool) {
 
 	if len(rp.Request.QueryStringParameters) == 0 {
@@ -92,4 +79,88 @@ func (rp Request) getCookieParam(req *definition.Request, name string) (string, 
 	}
 
 	return value, true
+}
+
+func (rp Request) getBodyParam(req *definition.Request, name string) (string, bool) {
+
+	contentType, found := req.Headers["Content-Type"] 
+	if !found {
+		return "", false
+	}
+
+	if i := strings.Index(contentType[0], "application/x-www-form-urlencoded"); i == 0 {
+		return rp.getUrlEncodedFormBodyParam(rp.Request, name)
+	} else if i := strings.Index(contentType[0], "application/json"); i == 0 {
+		return rp.getJsonBodyParam(rp.Request, name)
+	}
+
+	return "", false
+}
+
+func (rp Request) getUrlEncodedFormBodyParam(req *definition.Request, name string) (string, bool) {
+
+	values, err := url.ParseQuery(req.Body)
+	if err != nil {
+		return "", false
+	}
+
+	value := values.Get(name)
+	if value == "" {
+		return "", false
+	}
+
+	return value, true
+}
+
+func (rp Request) getJsonBodyParam(req *definition.Request, name string) (string, bool) {
+
+	var payload map[string]*json.RawMessage
+	if err := json.Unmarshal([]byte(req.Body), &payload); err != nil {
+		return "", false
+	}
+
+	parts := strings.SplitN(name, ".", 2)
+	if len(parts) == 1 {
+		if value, found := payload[name]; found {
+			return rp.getJsonValue(value)
+		}
+	} else {
+		
+	}
+
+	return "", false
+}
+
+func (rp Request) getJsonValue(value *json.RawMessage) (string, bool) {
+	// Is json 'null' value
+	if value == nil {
+		return "null", true
+	}
+
+	var toNumber json.Number
+	if err := json.Unmarshal(*value, &toNumber); err == nil {
+		return toNumber.String(), true
+	}
+
+	var toBoolean bool
+	if err := json.Unmarshal(*value, &toBoolean); err == nil {
+		return strconv.FormatBool(toBoolean), true
+	}
+
+	var toString string
+	if err := json.Unmarshal(*value, &toString); err == nil {
+		return toString, true
+	}
+
+	var toArray []*json.RawMessage
+	if err := json.Unmarshal(*value, &toArray); err == nil {
+		return string(*value), true 
+	}
+
+	var toObject map[string]*json.RawMessage
+	if err := json.Unmarshal(*value, &toObject); err == nil {
+		return string(*value), true
+	}
+
+	return "", false
 }
