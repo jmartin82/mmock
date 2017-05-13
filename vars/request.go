@@ -29,7 +29,7 @@ func (rp Request) Fill(holders []string) map[string]string {
 		} else if i := strings.Index(tag, "request.query."); i == 0 {
 			s, found = rp.getQueryStringParam(rp.Request, tag[14:])
 		} else if i := strings.Index(tag, "request.path."); i == 0 {
-			s, found = rp.getPathParm(rp.Mock, rp.Request, tag[13:])
+			s, found = rp.getPathParam(rp.Mock, rp.Request, tag[13:])
 		} else if i := strings.Index(tag, "request.cookie."); i == 0 {
 			s, found = rp.getCookieParam(rp.Request, tag[15:])
 		}
@@ -42,7 +42,7 @@ func (rp Request) Fill(holders []string) map[string]string {
 	return vars
 }
 
-func (rp Request) getPathParm(m *definition.Mock, req *definition.Request, name string) (string, bool) {
+func (rp Request) getPathParam(m *definition.Mock, req *definition.Request, name string) (string, bool) {
 
 	routes := urlmatcher.New(m.Request.Path)
 	mparm := routes.Match(req.Path)
