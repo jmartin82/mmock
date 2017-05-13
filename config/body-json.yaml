@@ -1,0 +1,26 @@
+request: 
+  method: POST
+  path: /body/json
+response:
+  statusCode: 200
+  headers:
+    Content-Type: 
+      - "application/json"
+  body: >
+    {  
+      "id": {{fake.Digits}},
+      "email": "{{request.body.email}}",
+      "age": {{request.body.age}},
+      "height": {{request.body.height}},
+      "weight": {{request.body.weight}},
+      "active": {{request.body.active}},
+      "level": {{request.body.level}},
+      "friends": {{request.body.friends}},
+      "attributes": {{request.body.attributes}},
+      "tracking": {
+        "uuid": "{{request.body.tracking.uuid}}",
+        "deeper": {
+          "level": "{{request.body.tracking.nesting.level}}"
+        }
+      }
+    }
