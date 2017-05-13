@@ -119,16 +119,32 @@ func (rp Request) getJsonBodyParam(req *definition.Request, name string) (string
 		return "", false
 	}
 
+	return rp.getJsonObjectParamRecursive(payload, name, 100)
+}
+
+func (rp Request) getJsonObjectParamRecursive(payload map[string]*json.RawMessage, name string, levelsLeft uint) (string, bool) {
+
 	parts := strings.SplitN(name, ".", 2)
-	if len(parts) == 1 {
-		if value, found := payload[name]; found {
-			return rp.getJsonValue(value)
-		}
-	} else {
-		
+	value, found := payload[parts[0]]; 
+	if !found {
+		return "", false
 	}
 
-	return "", false
+	if len(parts) == 1 {
+		return rp.getJsonValue(value)
+	}
+
+	levelsLeft = levelsLeft - 1
+	if levelsLeft == 0 {
+		return "", false
+	}
+
+	var nested map[string]*json.RawMessage
+	if err := json.Unmarshal(*value, &nested); err != nil {
+		return "", false
+	}
+
+	return rp.getJsonObjectParamRecursive(nested, parts[1], levelsLeft)
 }
 
 func (rp Request) getJsonValue(value *json.RawMessage) (string, bool) {

@@ -18,6 +18,9 @@ response:
       "friends": {{request.body.friends}},
       "attributes": {{request.body.attributes}},
       "tracking": {
-        "uuid": "{{request.body.tracking.uuid}}"
+        "uuid": "{{request.body.tracking.uuid}}",
+        "deeper": {
+          "level": "{{request.body.tracking.nesting.level}}"
+        }
       }
     }
