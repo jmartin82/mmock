@@ -324,3 +324,21 @@ func TestReplaceMissingTags(t *testing.T) {
 		t.Error("Replaced missing tags not match", mock.Response.Body)
 	}
 }
+
+func TestReplaceBodyFormUrlEncodedTags(t *testing.T) {
+	req := definition.Request{}
+	req.Body = "one=foo&two[array]=bar"
+	req.Headers = make(definition.Values)
+	req.Headers["Content-Type"] = []string{"application/x-www-form-urlencoded"}
+
+	res := definition.Response{}
+	res.Body = "Form data placeholders. One '{{request.body.one}}'. Two '{{request.body.two[array]}}'."
+
+	mock := definition.Mock{Request: req, Response: res}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != "Form data placeholders. One 'foo'. Two 'bar'." {
+		t.Error("Replaced tags from body form do not match", mock.Response.Body)
+	}
+}

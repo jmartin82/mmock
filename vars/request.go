@@ -148,7 +148,7 @@ func (rp Request) getJsonObjectParamRecursive(payload map[string]*json.RawMessag
 }
 
 func (rp Request) getJsonValue(value *json.RawMessage) (string, bool) {
-	// Is json 'null' value
+
 	if value == nil {
 		return "null", true
 	}
