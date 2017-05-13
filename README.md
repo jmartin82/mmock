@@ -430,6 +430,7 @@ Request data:
 
 
 ### Contributors
+- Amazing request body parsing form [@hmoragrega](https://github.com/hmoragrega)
 - Awesome use statistics from [@alfonsfoubert](https://github.com/alfonsfoubert)
 - Is this not enough? [@vtrifonov](https://github.com/vtrifonov) is working in a fork with a really advanced features. [HTTP API Mock](https://github.com/vtrifonov/http-api-mock)
 
