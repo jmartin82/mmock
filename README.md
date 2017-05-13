@@ -41,7 +41,7 @@ Built with Go - Mmock runs without installation on multiple platforms.
 
 Mock definition file example:
 
-```
+```json
 {
 	"request": {
 		"method": "GET",
@@ -60,7 +60,7 @@ Mock definition file example:
 Or
 
 
-```
+```yaml
 ---
 request:
   method: GET
@@ -120,7 +120,7 @@ To configure Mmock, use command line flags described in help.
 
 Mock definition:
 
-```
+```json
 {
 	"description": "Some text that describes the intended usage of the current configuration",
 	"request": {
@@ -152,12 +152,12 @@ Mock definition:
 	"control": {
 		"scenario": {
 			"name": "string (scenario name)",
-            "requiredState": [
+			"requiredState": [
 				"not_started (default state)",
-                "another_state_name"
-            ],
-            "newState": "new_stat_neme"
-        },
+				"another_state_name"
+			],
+			"newState": "new_stat_neme"
+		},
 		"proxyBaseURL": "string (original URL endpoint)",
 		"delay": "int (response delay in seconds)",
 		"crazy": "bool (return random 5xx)",
@@ -259,7 +259,7 @@ This makes it possible to verify that a request matching a specific pattern was 
 **Data Params**:  <br>
 Like stubbing this call also uses the same DSL to filter and query requests.
 
-```
+```json
 {
 	"host": "example.com",
 	"method": "GET|POST|PUT|PATCH|... (Mandatory)", 
@@ -327,7 +327,7 @@ Also there is a real time endpoint available through WebSockets that broadcast a
 
 All enpoints have the same output format:
 
-```
+```json
 [
   {
     "time": 1486563983,
@@ -372,7 +372,8 @@ Request data:
  - request.cookie."*key*"
  - request.url
  - request.body
-
+ - request.body."*key*" (both `application/json` and `application/x-www-form-urlencoded requests)
+ - request.body."*deep*"."*key*" (only for `application/json` requests)
 
 [Fake](https://godoc.org/github.com/icrowley/fake) data:
 
