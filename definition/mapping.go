@@ -46,6 +46,7 @@ type ConfigMapping struct {
 func NewConfigMapping(path string, mapper *ConfigMapper, fsUpdate chan struct{}) *ConfigMapping {
 	cm := &ConfigMapping{path: path, mapper: mapper, mapping: make(map[string]Mock), fsUpdate: fsUpdate}
 	cm.populate()
+	cm.fsBind()
 	go cm.listenFsChanges()
 	return cm
 }
