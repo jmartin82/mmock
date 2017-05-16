@@ -46,5 +46,5 @@ get-deps:
 	glide install
 
 release:
-	docker build -t $(NS)/$(PKG_NAME):$(VERSION) .
+	docker build --no-cache=true  -t $(NS)/$(PKG_NAME):$(VERSION) .
 	docker push $(NS)/$(PKG_NAME):$(VERSION)
