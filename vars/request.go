@@ -1,8 +1,10 @@
 package vars
 
 import (
+	"strconv"
 	"strings"
 
+	"github.com/Jeffail/gabs"
 	urlmatcher "github.com/azer/url-router"
 	"github.com/jmartin82/mmock/definition"
 )
@@ -18,9 +20,8 @@ func (rp Request) Fill(holders []string) map[string]string {
 	for _, tag := range holders {
 		found := false
 		s := ""
-		if tag == "request.body" && rp.Request.Body != "" {
-			s = rp.Request.Body
-			found = true
+		if strings.HasPrefix(tag, "request.body") && rp.Request.Body != "" {
+			s, found = rp.getFromBodyByPath(tag)
 		} else if i := strings.Index(tag, "request.query."); i == 0 {
 			s, found = rp.getQueryStringParam(rp.Request, tag[14:])
 		} else if i := strings.Index(tag, "request.path."); i == 0 {
@@ -74,4 +75,31 @@ func (rp Request) getCookieParam(req *definition.Request, name string) (string, 
 	}
 
 	return value, true
+}
+
+func (rp Request) getFromBodyByPath(path string) (string, bool) {
+	if path == "request.body" {
+		return rp.Request.Body, true
+	}
+
+	jsonParsed, err := gabs.ParseJSON([]byte(rp.Request.Body))
+	if err != nil {
+		return "", false
+	}
+
+	pathParts := strings.Split(strings.TrimPrefix(path, "request.body."), ".")
+	for _, part := range pathParts {
+		if marray, ok := jsonParsed.Data().([]interface{}); ok {
+			index, err := strconv.Atoi(part)
+			if err != nil && marray != nil {
+				jsonParsed = jsonParsed.Path(part)
+			} else {
+				jsonParsed = jsonParsed.Index(index)
+			}
+		} else {
+			jsonParsed = jsonParsed.Path(part)
+		}
+	}
+
+	return jsonParsed.String(), true
 }
