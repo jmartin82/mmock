@@ -101,5 +101,9 @@ func (rp Request) getFromBodyByPath(path string) (string, bool) {
 		}
 	}
 
-	return jsonParsed.String(), true
+	if jsonParsed.Exists() {
+		return jsonParsed.String(), true
+	}
+
+	return "", false
 }

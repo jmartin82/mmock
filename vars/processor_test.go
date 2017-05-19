@@ -324,3 +324,35 @@ func TestReplaceMissingTags(t *testing.T) {
 		t.Error("Replaced missing tags not match", mock.Response.Body)
 	}
 }
+
+func TestReplaceExistingBodyTag(t *testing.T) {
+	req := definition.Request{}
+	req.Body = "{\"persons\":{\"bodies\":[{\"body\":\"is my body\"}, {\"body\":\"is your body\"}]}}"
+
+	res := definition.Response{}
+	res.Body = "Request Body {{request.body.persons.bodies.1.body}}"
+
+	mock := definition.Mock{Request: req, Response: res}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != "Request Body \"is your body\"" {
+		t.Error("Replaced missing tags not match", mock.Response.Body)
+	}
+}
+
+func TestReplaceUnExistingBodyTag(t *testing.T) {
+	req := definition.Request{}
+	req.Body = "{\"persons\":{\"bodies\":[{\"body\":\"is my body\"}, {\"body\":\"is your body\"}]}}"
+
+	res := definition.Response{}
+	res.Body = "Request Body {{request.body.whatever}}"
+
+	mock := definition.Mock{Request: req, Response: res}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != "Request Body {{request.body.whatever}}" {
+		t.Error("Unexisting tags in body match", mock.Response.Body)
+	}
+}
