@@ -63,6 +63,7 @@ func (di *Dispatcher) Start() {
 	statics := http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "tmpl"})
 	e.GET("/js/*", echo.WrapHandler(statics))
 	e.GET("/css/*", echo.WrapHandler(statics))
+	e.GET("/swagger.json", di.swaggerHandler)
 	e.GET("/", di.consoleHandler)
 
 	//verification
@@ -94,6 +95,11 @@ func (di *Dispatcher) consoleHandler(c echo.Context) error {
 	tmpl, _ := Asset("tmpl/index.html")
 	content := string(tmpl)
 	return c.HTML(http.StatusOK, content)
+}
+
+func (di *Dispatcher) swaggerHandler(c echo.Context) error {
+	tmpl, _ := Asset("tmpl/swagger.json")
+	return c.JSONBlob(http.StatusOK, tmpl)
 }
 
 func (di *Dispatcher) webSocketHandler(c echo.Context) error {
