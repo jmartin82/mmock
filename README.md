@@ -113,7 +113,11 @@ To configure Mmock, use command line flags described in help.
       -server-ip string
           Mock server IP (default "public_ip")
       -server-port int
-          Mock Server Port (default 8083)
+          Mock server Port (default 8083)
+      -server-tls-port int
+          Mock HTTPS server Port (default 8084)
+	  -tls-path
+		  TLS config folder (server.crt and server.key should be inside)
 ```
 
 ### Mock
