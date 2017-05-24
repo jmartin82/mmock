@@ -114,11 +114,12 @@ func getVarsProcessor() vars.Processor {
 	return vars.Processor{FillerFactory: vars.MockFillerFactory{FakeAdapter: fakedata.FakeAdapter{}}}
 }
 
-func startServer(ip string, port, portTLS int, done chan bool, router server.Resolver, mLog chan definition.Match, scenario scenario.Director, varsProcessor vars.Processor, spier match.Spier) {
+func startServer(ip string, port, portTLS int, configTLS string, done chan bool, router server.Resolver, mLog chan definition.Match, scenario scenario.Director, varsProcessor vars.Processor, spier match.Spier) {
 	dispatcher := server.Dispatcher{
 		IP:         ip,
 		Port:       port,
 		PortTLS:    portTLS,
+		ConfigTLS:  configTLS,
 		Resolver:   router,
 		Translator: translate.HTTP{},
 		Processor:  varsProcessor,
@@ -145,6 +146,7 @@ func main() {
 	banner()
 	outIP := getOutboundIP()
 	path, err := filepath.Abs("./config")
+	TLS, err := filepath.Abs("./tls")
 	if err != nil {
 		panic(ErrNotFoundDefaultPath)
 	}
@@ -157,6 +159,7 @@ func main() {
 	cPort := flag.Int("console-port", 8082, "Console server Port")
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
 	cPath := flag.String("config-path", path, "Mocks definition folder")
+	cTLS := flag.String("tls-path", TLS, "TLS config folder (server.crt and server.key should be inside)")
 
 	flag.Parse()
 
@@ -180,7 +183,7 @@ func main() {
 	}
 	defer statistics.Stop()
 
-	go startServer(*sIP, *sPort, *sPortTLS, done, router, mLog, scenario, varsProcessor, spy)
+	go startServer(*sIP, *sPort, *sPortTLS, *cTLS, done, router, mLog, scenario, varsProcessor, spy)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	log.Printf("HTTPS Server running at %s:%d\n", *sIP, *sPortTLS)
 	if *console {

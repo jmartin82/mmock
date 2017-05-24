@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"path"
 	"strconv"
 	"time"
 
@@ -22,6 +23,7 @@ type Dispatcher struct {
 	IP         string
 	Port       int
 	PortTLS    int
+	ConfigTLS  string
 	Resolver   Resolver
 	Translator translate.MessageTranslator
 	Processor  vars.Processor
@@ -113,6 +115,8 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 func (di Dispatcher) Start() {
 	addr := fmt.Sprintf("%s:%d", di.IP, di.Port)
 	addrTLS := fmt.Sprintf("%s:%d", di.IP, di.PortTLS)
+	crt := path.Join(di.ConfigTLS, "server.crt")
+	key := path.Join(di.ConfigTLS, "server.key")
 
 	errCh := make(chan error)
 
@@ -121,7 +125,7 @@ func (di Dispatcher) Start() {
 	}()
 
 	go func() {
-		errCh <- http.ListenAndServeTLS(addrTLS, "server.crt", "server.key", &di)
+		errCh <- http.ListenAndServeTLS(addrTLS, crt, key, &di)
 	}()
 
 	err := <-errCh
