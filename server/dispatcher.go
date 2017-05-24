@@ -21,6 +21,7 @@ import (
 type Dispatcher struct {
 	IP         string
 	Port       int
+	PortTLS    int
 	Resolver   Resolver
 	Translator translate.MessageTranslator
 	Processor  vars.Processor
@@ -111,9 +112,22 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 //Start initialize the HTTP mock server
 func (di Dispatcher) Start() {
 	addr := fmt.Sprintf("%s:%d", di.IP, di.Port)
+	addrTLS := fmt.Sprintf("%s:%d", di.IP, di.PortTLS)
 
-	err := http.ListenAndServe(addr, &di)
+	errCh := make(chan error)
+
+	go func() {
+		errCh <- http.ListenAndServe(addr, &di)
+	}()
+
+	go func() {
+		errCh <- http.ListenAndServeTLS(addrTLS, "server.crt", "server.key", &di)
+	}()
+
+	err := <-errCh
+
 	if err != nil {
 		log.Fatalf("ListenAndServe: " + err.Error())
 	}
+
 }

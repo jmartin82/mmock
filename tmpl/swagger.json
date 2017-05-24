@@ -48,12 +48,9 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Array of request",
+            "description": "Array of match",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/MockDefinition"
-              }
+              "$ref": "#/definitions/MockMatchList"
             }
           }
         }
@@ -72,12 +69,9 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Array of request",
+            "description": "Array of match",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/MockDefinition"
-              }
+              "$ref": "#/definitions/MockMatchList"
             }
           }
         }
@@ -96,7 +90,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Result message"
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ActionResponse"
+            }
           }
         }
       }
@@ -114,12 +111,9 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Array of request",
+            "description": "Array of match",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/MockDefinition"
-              }
+              "$ref": "#/definitions/MockMatchList"
             }
           }
         },
@@ -138,10 +132,9 @@
         ],
         "parameters": [
           {
-            "name": "Body",
+            "name": "request",
             "in": "body",
             "required": true,
-            "description": "",
             "schema": {
               "$ref": "#/definitions/Request"
             }
@@ -149,12 +142,9 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of request",
+            "description": "Array of match",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/MockDefinition"
-              }
+              "$ref": "#/definitions/MockMatchList"
             }
           }
         }
@@ -194,12 +184,9 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Mock definition list",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/MockDefinition"
-              }
+              "$ref": "#/definitions/MockDefinitionList"
             }
           }
         }
@@ -226,9 +213,9 @@
         ],
         "responses": {
           "200": {
-            "description": "Mock definition",
+            "description": "Mock definition list",
             "schema": {
-              "$ref": "#/definitions/ActionResponse"
+              "$ref": "#/definitions/MockDefinition"
             }
           }
         }
@@ -244,6 +231,13 @@
         ],
         "parameters": [
           {
+            "name": "mock_path",
+            "in": "path",
+            "description": "Mock path",
+            "type": "string",
+            "required": true
+          },
+          {
             "name": "Body",
             "in": "body",
             "required": true,
@@ -255,7 +249,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Mock definition",
+            "description": "Action result",
             "schema": {
               "$ref": "#/definitions/ActionResponse"
             }
@@ -271,10 +265,18 @@
         "produces": [
           "application/json"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "mock_path",
+            "in": "path",
+            "description": "Mock path",
+            "type": "string",
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Action result",
             "schema": {
               "$ref": "#/definitions/ActionResponse"
             }
@@ -284,6 +286,20 @@
     }
   },
   "definitions": {
+    "MockDefinitionList": {
+      "title": "Mock List",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/MockDefinition"
+      }
+    },
+    "MockMatchList": {
+      "title": "Match List",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/MockDefinition"
+      }
+    },
     "MockDefinition": {
       "title": "Mock definition",
       "type": "object",
@@ -337,16 +353,7 @@
           "$ref": "#/definitions/KeyArray"
         },
         "cookies": {
-          "type": "object",
-          "description": "",
-          "properties": {
-            "key": {
-              "type": "string"
-            },
-            "value": {
-              "type": "string"
-            }
-          }
+          "$ref": "#/definitions/Cookie"
         },
         "body": {
           "description": "",
@@ -362,7 +369,6 @@
       "$ref": "#/definitions/KeyArray"
     },
     "Response": {
-      "title": "Response",
       "type": "object",
       "properties": {
         "statusCode": {
@@ -374,16 +380,7 @@
           "$ref": "#/definitions/KeyArray"
         },
         "cookies": {
-          "type": "object",
-          "description": "",
-          "properties": {
-            "key": {
-              "type": "string"
-            },
-            "value": {
-              "type": "string"
-            }
-          }
+          "$ref": "#/definitions/Cookie"
         },
         "body": {
           "description": "",
@@ -395,7 +392,6 @@
       ]
     },
     "KeyArray": {
-      "title": "Values",
       "type": "object",
       "properties": {
         "key": {
@@ -407,8 +403,19 @@
         }
       }
     },
+    "Cookie": {
+      "type": "object",
+      "description": "",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
     "Control": {
-      "title": "Control",
       "type": "object",
       "properties": {
         "priority": {
@@ -435,7 +442,6 @@
       }
     },
     "Scenario": {
-      "title": "Scenario",
       "type": "object",
       "properties": {
         "name": {
@@ -456,7 +462,6 @@
       }
     },
     "ActionResponse": {
-      "title": "Result",
       "type": "object",
       "properties": {
         "result": {

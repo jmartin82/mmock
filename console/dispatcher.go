@@ -68,7 +68,7 @@ func (di *Dispatcher) Start() {
 
 	//verification
 	e.GET("/api/request/reset", di.requestResetHandler)
-	e.GET("/api/request/verify", di.requestVerifyHandler)
+	e.POST("/api/request/verify", di.requestVerifyHandler)
 	e.GET("/api/request/all", di.requestAllHandler)
 	e.GET("/api/request/matched", di.requestMatchedHandler)
 	e.GET("/api/request/unmatched", di.requestUnMatchedHandler)

@@ -17,6 +17,9 @@ RUN mkdir /config
 
 VOLUME /config
 
-EXPOSE 8082 8083
+ADD server.crt / 
+ADD server.key / 
+
+EXPOSE 8082 8083 8084
 
 ENTRYPOINT ["mmock","-config-path","/config"]

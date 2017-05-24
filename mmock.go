@@ -114,10 +114,11 @@ func getVarsProcessor() vars.Processor {
 	return vars.Processor{FillerFactory: vars.MockFillerFactory{FakeAdapter: fakedata.FakeAdapter{}}}
 }
 
-func startServer(ip string, port int, done chan bool, router server.Resolver, mLog chan definition.Match, scenario scenario.Director, varsProcessor vars.Processor, spier match.Spier) {
+func startServer(ip string, port, portTLS int, done chan bool, router server.Resolver, mLog chan definition.Match, scenario scenario.Director, varsProcessor vars.Processor, spier match.Spier) {
 	dispatcher := server.Dispatcher{
 		IP:         ip,
 		Port:       port,
+		PortTLS:    portTLS,
 		Resolver:   router,
 		Translator: translate.HTTP{},
 		Processor:  varsProcessor,
@@ -150,6 +151,7 @@ func main() {
 
 	sIP := flag.String("server-ip", outIP, "Mock server IP")
 	sPort := flag.Int("server-port", 8083, "Mock server Port")
+	sPortTLS := flag.Int("server-tls-port", 8084, "Mock server TLS Port")
 	sStatistics := flag.Bool("server-statistics", true, "Mock server sends anonymous statistics")
 	cIP := flag.String("console-ip", outIP, "Console server IP")
 	cPort := flag.Int("console-port", 8082, "Console server Port")
@@ -178,8 +180,9 @@ func main() {
 	}
 	defer statistics.Stop()
 
-	go startServer(*sIP, *sPort, done, router, mLog, scenario, varsProcessor, spy)
+	go startServer(*sIP, *sPort, *sPortTLS, done, router, mLog, scenario, varsProcessor, spy)
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
+	log.Printf("HTTPS Server running at %s:%d\n", *sIP, *sPortTLS)
 	if *console {
 		go startConsole(*cIP, *cPort, spy, scenario, mapping, done, mLog)
 		log.Printf("Console running at %s:%d\n", *cIP, *cPort)
