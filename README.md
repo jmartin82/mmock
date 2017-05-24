@@ -116,8 +116,8 @@ To configure Mmock, use command line flags described in help.
           Mock server Port (default 8083)
       -server-tls-port int
           Mock HTTPS server Port (default 8084)
-	  -tls-path
-		  TLS config folder (server.crt and server.key should be inside)
+      -tls-path
+          TLS config folder (server.crt and server.key should be inside)
 ```
 
 ### Mock
@@ -229,6 +229,12 @@ Example of REST services using scenarios:
 ```
 
 Working examples [here](/config/crud)
+
+## API Specification
+
+MMock uses the Open API Specification (OAI, formerly known as Swagger) to describe its APIs. Our OAI specification schema is hosted at /swagger.json and serves as the canonical definition and comprehensive declaration of all available endpoints.
+The OAI specification makes writing client applications easier by: auto-generating boilerplate code (like data object classes) and dealing with authentication and error handling.
+You can find a comprehensive set of open tools for the OAI specification at: https://github.com/swagger-api.
 
 #### REST Endpoints
 
