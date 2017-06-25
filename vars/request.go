@@ -1,13 +1,13 @@
 package vars
 
 import (
+	"encoding/json"
+	"net/url"
+	"strconv"
 	"strings"
 
 	urlmatcher "github.com/azer/url-router"
 	"github.com/jmartin82/mmock/definition"
-	"net/url"
-	"encoding/json"
-	"strconv"
 )
 
 type Request struct {
@@ -24,13 +24,13 @@ func (rp Request) Fill(holders []string) map[string]string {
 		if tag == "request.body" && rp.Request.Body != "" {
 			s = rp.Request.Body
 			found = true
-		} else if i := strings.Index(tag, "request.body."); i == 0 {
+		} else if strings.HasPrefix(tag, "request.body.") {
 			s, found = rp.getBodyParam(rp.Request, tag[13:])
-		} else if i := strings.Index(tag, "request.query."); i == 0 {
+		} else if strings.HasPrefix(tag, "request.query.") {
 			s, found = rp.getQueryStringParam(rp.Request, tag[14:])
-		} else if i := strings.Index(tag, "request.path."); i == 0 {
+		} else if strings.HasPrefix(tag, "request.path.") {
 			s, found = rp.getPathParam(rp.Mock, rp.Request, tag[13:])
-		} else if i := strings.Index(tag, "request.cookie."); i == 0 {
+		} else if strings.HasPrefix(tag, "request.cookie.") {
 			s, found = rp.getCookieParam(rp.Request, tag[15:])
 		}
 
@@ -83,14 +83,14 @@ func (rp Request) getCookieParam(req *definition.Request, name string) (string, 
 
 func (rp Request) getBodyParam(req *definition.Request, name string) (string, bool) {
 
-	contentType, found := req.Headers["Content-Type"] 
+	contentType, found := req.Headers["Content-Type"]
 	if !found {
 		return "", false
 	}
 
-	if i := strings.Index(contentType[0], "application/x-www-form-urlencoded"); i == 0 {
+	if strings.HasPrefix(contentType[0], "application/x-www-form-urlencoded") {
 		return rp.getUrlEncodedFormBodyParam(rp.Request, name)
-	} else if i := strings.Index(contentType[0], "application/json"); i == 0 {
+	} else if strings.HasPrefix(contentType[0], "application/json") {
 		return rp.getJsonBodyParam(rp.Request, name)
 	}
 
@@ -114,68 +114,51 @@ func (rp Request) getUrlEncodedFormBodyParam(req *definition.Request, name strin
 
 func (rp Request) getJsonBodyParam(req *definition.Request, name string) (string, bool) {
 
-	var payload map[string]*json.RawMessage
+	hierarchy := strings.Split(name, ".")
+
+	var payload interface{}
 	if err := json.Unmarshal([]byte(req.Body), &payload); err != nil {
 		return "", false
 	}
 
-	return rp.getJsonObjectParamRecursive(payload, name, 100)
+	for _, value := range hierarchy {
+		if mapper, ok := payload.(map[string]interface{}); ok {
+			payload, ok = mapper[value]
+
+			if !ok {
+				return "", false
+			}
+
+			continue
+		}
+
+		if arrayMapper, ok := payload.([]interface{}); ok {
+			index, err := strconv.Atoi(value)
+
+			if err != nil {
+				return "", false
+			}
+
+			payload = arrayMapper[index]
+			continue
+		}
+	}
+
+	return rp.getJsonValue(payload)
 }
 
-func (rp Request) getJsonObjectParamRecursive(payload map[string]*json.RawMessage, name string, levelsLeft uint) (string, bool) {
+func (rp Request) getJsonValue(object interface{}) (string, bool) {
 
-	parts := strings.SplitN(name, ".", 2)
-	value, found := payload[parts[0]]; 
-	if !found {
-		return "", false
+	stringContent, ok := object.(string)
+
+	if ok {
+		return stringContent, true
 	}
 
-	if len(parts) == 1 {
-		return rp.getJsonValue(value)
-	}
+	genericContent, err := json.Marshal(object)
 
-	levelsLeft = levelsLeft - 1
-	if levelsLeft == 0 {
-		return "", false
-	}
-
-	var nested map[string]*json.RawMessage
-	if err := json.Unmarshal(*value, &nested); err != nil {
-		return "", false
-	}
-
-	return rp.getJsonObjectParamRecursive(nested, parts[1], levelsLeft)
-}
-
-func (rp Request) getJsonValue(value *json.RawMessage) (string, bool) {
-
-	if value == nil {
-		return "null", true
-	}
-
-	var toNumber json.Number
-	if err := json.Unmarshal(*value, &toNumber); err == nil {
-		return toNumber.String(), true
-	}
-
-	var toBoolean bool
-	if err := json.Unmarshal(*value, &toBoolean); err == nil {
-		return strconv.FormatBool(toBoolean), true
-	}
-
-	var toString string
-	if err := json.Unmarshal(*value, &toString); err == nil {
-		return toString, true
-	}
-
-	var toArray []*json.RawMessage
-	if err := json.Unmarshal(*value, &toArray); err == nil {
-		return string(*value), true 
-	}
-
-	var toObject map[string]*json.RawMessage
-	if err := json.Unmarshal(*value, &toObject); err == nil {
-		return string(*value), true
+	if err == nil {
+		return string(genericContent), true
 	}
 
 	return "", false
