@@ -135,7 +135,7 @@ func (rp Request) getJsonBodyParam(req *definition.Request, name string) (string
 		if arrayMapper, ok := payload.([]interface{}); ok {
 			index, err := strconv.Atoi(value)
 
-			if err != nil {
+			if err != nil || index >= len(arrayMapper) {
 				return "", false
 			}
 
