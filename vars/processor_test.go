@@ -382,6 +382,8 @@ func TestReplaceJsonBodyEncodedTags(t *testing.T) {
   "active": {{request.body.active}},
   "level": {{request.body.level}},
   "friends": {{request.body.friends}},
+  "first-friend": "{{request.body.friends.0}}",
+  "last-friend": "{{request.body.friends.1}}",
   "attributes": {{request.body.attributes}},
   "tracking": {
     "uuid": "{{request.body.tracking.uuid}}",
@@ -400,14 +402,10 @@ func TestReplaceJsonBodyEncodedTags(t *testing.T) {
   "weight": null,
   "active": true,
   "level": -8,
-  "friends": [
-    "jordi.martin@gmail.com", 
-    "alfons.faubert@gmail.com"
-  ],
-  "attributes": {
-    "programming": 15,
-    "trolling": 27
-  },
+  "friends": ["jordi.martin@gmail.com","alfons.faubert@gmail.com"],
+  "first-friend": "jordi.martin@gmail.com",
+  "last-friend": "alfons.faubert@gmail.com",
+  "attributes": {"programming":15,"trolling":27},
   "tracking": {
     "uuid": "0bd74115-2307-458f-8288-b726724045ef",
     "deeper": {
