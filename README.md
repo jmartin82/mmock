@@ -117,7 +117,7 @@ To configure Mmock, use command line flags described in help.
       -server-tls-port int
           Mock HTTPS server Port (default 8084)
       -tls-path
-          TLS config folder (server.crt and server.key should be inside)
+          TLS config folder (It will load any crt/key combination, for example server.crt/server.key)
 ```
 
 ### Mock
@@ -165,7 +165,8 @@ Mock definition:
 		"proxyBaseURL": "string (original URL endpoint)",
 		"delay": "int (response delay in seconds)",
 		"crazy": "bool (return random 5xx)",
-		"priority": "int (matching priority)"
+		"priority": "int (matching priority)",
+		"webHookURL" : "string (URL endpoint)"
 	}
 }
 
@@ -199,6 +200,7 @@ In case of queryStringParameters, headers and cookies, the request can be matche
 * *delay*: Delay the response in seconds. Simulate bad connection or bad server performance.
 * *crazy*: Return random server errors (5xx) in some request. Simulate server problems.
 * *priority*: Set the priority to avoid match in less restrictive mocks. Higher, more priority.
+* *webHookURL*: After any match if this option is defined it will notify the match to the desired endpoint.
 
 ### Scenarios
 
@@ -444,6 +446,7 @@ Request data:
 ### Contributors
 - Amazing request body parsing form [@hmoragrega](https://github.com/hmoragrega)
 - Awesome use statistics from [@alfonsfoubert](https://github.com/alfonsfoubert)
+- Added the possibility of access to an array index in dynamic responses [@jaimelopez](https://github.com/jaimelopez)
 - Is this not enough? [@vtrifonov](https://github.com/vtrifonov) is working in a fork with a really advanced features. [HTTP API Mock](https://github.com/vtrifonov/http-api-mock)
 
 ### Contributing

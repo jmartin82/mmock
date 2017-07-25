@@ -36,6 +36,7 @@ type Control struct {
 	Crazy        bool     `json:"crazy"`
 	Scenario     Scenario `json:"scenario"`
 	ProxyBaseURL string   `json:"proxyBaseURL"`
+	WebHookURL   string   `json:"webHookURL"`
 }
 
 //Mock contains the user mock definition

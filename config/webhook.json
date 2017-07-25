@@ -1,0 +1,14 @@
+{
+	"description": "It calls a webhook after the call",
+	"request": {
+		"method": "GET",
+		"path": "/something/webhook"
+	},
+	"response": {
+		"statusCode": 200,
+		"body": "I'm throwing a webhook!!"
+	},
+    "control" : {
+        "webHookURL" : "http://127.0.0.1:9999/webhook"
+    }
+}

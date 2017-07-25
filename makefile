@@ -48,3 +48,7 @@ get-deps:
 release:
 	docker build --no-cache=true  -t $(NS)/$(PKG_NAME):$(VERSION) .
 	docker push $(NS)/$(PKG_NAME):$(VERSION)
+
+release-beta:
+	docker build --no-cache=true  -t $(NS)/$(PKG_NAME):beta .
+	docker push $(NS)/$(PKG_NAME):beta

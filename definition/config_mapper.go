@@ -18,6 +18,7 @@ type Reader interface {
 	Read(string) (Mock, error)
 }
 
+//Write interface contains the function persiste mock definitions.
 type Writer interface {
 	Write(string, Mock) error
 }

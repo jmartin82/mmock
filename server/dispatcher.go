@@ -1,11 +1,14 @@
 package server
 
 import (
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
-	"path"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -44,6 +47,22 @@ func (di Dispatcher) randomStatusCode(currentStatus int) int {
 	return currentStatus
 }
 
+func (di Dispatcher) callWebHook(url string, match *definition.Match) {
+	log.Printf("Running webhook: %s\n", url)
+	content, err := json.Marshal(match)
+	if err != nil {
+		log.Println("Impossible encode the WebHook payload")
+		return
+	}
+	reader := bytes.NewReader(content)
+	resp, err := http.Post(url, "application/json", reader)
+	if err != nil {
+		log.Printf("Impossible send payload to: %s\n", url)
+		return
+	}
+	log.Print("WebHook response: %s\n", resp.StatusCode)
+}
+
 //ServerHTTP is the mock http server request handler.
 //It uses the router to decide the matching mock and translator as adapter between the HTTP impelementation and the mock definition.
 func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -64,6 +83,10 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if mock.Control.Scenario.NewState != "" {
 		statistics.TrackScenarioFeature()
 		di.Scenario.SetState(mock.Control.Scenario.Name, mock.Control.Scenario.NewState)
+	}
+
+	if mock.Control.WebHookURL != "" {
+		go di.callWebHook(mock.Control.WebHookURL, match)
 	}
 
 	//translate request
@@ -101,22 +124,25 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 				log.Printf("Adding a delay")
 				time.Sleep(time.Duration(mock.Control.Delay) * time.Second)
 			}
+
 			response = &mock.Response
 		}
+
 		statistics.TrackMockRequest()
 	} else {
 		response = &mock.Response
 	}
 
-	return mock, &definition.Match{Time: time.Now().Unix(), Request: request, Response: response, Result: result}
+	match := &definition.Match{Time: time.Now().Unix(), Request: request, Response: response, Result: result}
+
+	return mock, match
+
 }
 
 //Start initialize the HTTP mock server
 func (di Dispatcher) Start() {
 	addr := fmt.Sprintf("%s:%d", di.IP, di.Port)
 	addrTLS := fmt.Sprintf("%s:%d", di.IP, di.PortTLS)
-	crt := path.Join(di.ConfigTLS, "server.crt")
-	key := path.Join(di.ConfigTLS, "server.key")
 
 	errCh := make(chan error)
 
@@ -125,7 +151,7 @@ func (di Dispatcher) Start() {
 	}()
 
 	go func() {
-		errCh <- http.ListenAndServeTLS(addrTLS, crt, key, &di)
+		errCh <- di.listenAndServeTLS(addrTLS)
 	}()
 
 	err := <-errCh
@@ -134,4 +160,30 @@ func (di Dispatcher) Start() {
 		log.Fatalf("ListenAndServe: " + err.Error())
 	}
 
+}
+
+func (di Dispatcher) listenAndServeTLS(addrTLS string) error {
+	tlsConfig := &tls.Config{}
+	pattern := fmt.Sprintf("%s/*.crt", di.ConfigTLS)
+	files, _ := filepath.Glob(pattern)
+	for _, crt := range files {
+		extension := filepath.Ext(crt)
+		name := crt[0 : len(crt)-len(extension)]
+		key := fmt.Sprint(name, ".key")
+		log.Printf("Loading X509KeyPair (%s/%s)\n", filepath.Base(crt), filepath.Base(key))
+		certificate, err := tls.LoadX509KeyPair(crt, key)
+		if err != nil {
+			log.Fatalf("Invalid certificate: " + crt)
+		}
+		tlsConfig.Certificates = append(tlsConfig.Certificates, certificate)
+	}
+	tlsConfig.BuildNameToCertificate()
+
+	server := http.Server{
+		Addr:      addrTLS,
+		TLSConfig: tlsConfig,
+		Handler:   &di,
+	}
+
+	return server.ListenAndServeTLS("", "")
 }
