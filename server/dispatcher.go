@@ -170,7 +170,7 @@ func (di Dispatcher) listenAndServeTLS(addrTLS string) error {
 	tlsConfig := &tls.Config{}
 	pattern := fmt.Sprintf("%s/*.crt", di.ConfigTLS)
 	files, err := filepath.Glob(pattern)
-	if err != nil {
+	if err != nil || len(files) == 0 {
 		log.Println("TLS certificates not found, impossible to start the TLS server.")
 		return nil
 	}
