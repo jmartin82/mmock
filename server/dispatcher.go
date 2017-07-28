@@ -151,7 +151,11 @@ func (di Dispatcher) Start() {
 	}()
 
 	go func() {
-		errCh <- di.listenAndServeTLS(addrTLS)
+		err := di.listenAndServeTLS(addrTLS)
+		if err != nil {
+			log.Println("Impossible start the application.")
+			errCh <- err
+		}
 	}()
 
 	err := <-errCh
@@ -165,7 +169,12 @@ func (di Dispatcher) Start() {
 func (di Dispatcher) listenAndServeTLS(addrTLS string) error {
 	tlsConfig := &tls.Config{}
 	pattern := fmt.Sprintf("%s/*.crt", di.ConfigTLS)
-	files, _ := filepath.Glob(pattern)
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		log.Println("TLS certificates not found, impossible to start the TLS server.")
+		return nil
+	}
+
 	for _, crt := range files {
 		extension := filepath.Ext(crt)
 		name := crt[0 : len(crt)-len(extension)]
@@ -173,7 +182,7 @@ func (di Dispatcher) listenAndServeTLS(addrTLS string) error {
 		log.Printf("Loading X509KeyPair (%s/%s)\n", filepath.Base(crt), filepath.Base(key))
 		certificate, err := tls.LoadX509KeyPair(crt, key)
 		if err != nil {
-			log.Fatalf("Invalid certificate: " + crt)
+			return fmt.Errorf("Invalid certificate: %v", crt)
 		}
 		tlsConfig.Certificates = append(tlsConfig.Certificates, certificate)
 	}
