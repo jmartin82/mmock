@@ -24,6 +24,18 @@ func (rp Request) Fill(holders []string) map[string]string {
 		if tag == "request.body" && rp.Request.Body != "" {
 			s = rp.Request.Body
 			found = true
+		} else if tag == "request.scheme" {
+			s, found = rp.getScheme()
+		} else if tag == "request.port" {
+			s, found = rp.getPort()
+		} else if tag == "request.url" {
+			s, found = rp.getUrl(rp.Request)
+		} else if tag == "request.url.short" {
+			s, found = rp.getUrlShort()
+		} else if tag == "request.hostname" {
+			s, found = rp.getHostname(rp.Mock, rp.Request)
+		} else if tag == "request.path" {
+			s, found = rp.getRootPath(rp.Mock, rp.Request)
 		} else if strings.HasPrefix(tag, "request.body.") {
 			s, found = rp.getBodyParam(rp.Request, tag[13:])
 		} else if strings.HasPrefix(tag, "request.query.") {
@@ -40,6 +52,97 @@ func (rp Request) Fill(holders []string) map[string]string {
 
 	}
 	return vars
+}
+
+func (rp Request) getScheme() (string, bool) {
+	if rp.Request.OriginalRequest.TLS != nil {
+		return "https", true
+	}
+
+	return "http", true
+}
+
+func (rp Request) getHostname(m *definition.Mock, req *definition.Request) (string, bool) {
+	if len(rp.Request.Host) == 0 {
+		return "", false
+	}
+	value := rp.Request.Host
+
+	return value, true
+}
+
+func (rp Request) getPort() (string, bool) {
+	host := rp.Request.OriginalRequest.Host
+	if len(host) == 0 {
+		return "", false
+	}
+
+	index := strings.Index(host, ":")
+	if index > -1 {
+		return host[index+1:], true
+	}
+
+	return "", false
+}
+
+func (rp Request) getUrlShort() (string, bool) {
+	host := rp.Request.OriginalRequest.Host
+	if len(host) == 0 {
+		return "", false
+	}
+
+	scheme, _ := rp.getScheme()
+	value := scheme + "://" + host
+
+	return value, true
+}
+
+func (rp Request) getUrl(req *definition.Request) (string, bool) {
+	value, f := rp.getUrlShort()
+	if !f {
+		return "", false
+	}
+
+	path := rp.Request.OriginalRequest.URL.Path
+
+	if len(path) != 0 {
+		value += path
+	}
+
+	queryStringParams := req.QueryStringParameters
+
+	if len(queryStringParams) != 0 {
+		var queryString string
+		count := len(queryStringParams)
+		index := 0
+		for key, value := range queryStringParams {
+			queryString += key + "=" + value[0]
+			index++
+
+			if count != index {
+				queryString += "&"
+			}
+		}
+
+		value += "?" + queryString
+	}
+
+	return value, true
+}
+
+func (rp Request) getRootPath(m *definition.Mock, req *definition.Request) (string, bool) {
+
+	routes := urlmatcher.New("/:path")
+	mparm := routes.Match(req.Path)
+
+	value, f := mparm.Params["path"]
+	if !f {
+		return "", false
+	}
+
+	value = "/" + value
+
+	return value, true
 }
 
 func (rp Request) getPathParam(m *definition.Mock, req *definition.Request, name string) (string, bool) {

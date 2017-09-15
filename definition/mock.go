@@ -1,5 +1,9 @@
 package definition
 
+import (
+	"net/http"
+)
+
 type Values map[string][]string
 
 type Cookies map[string]string
@@ -15,7 +19,8 @@ type Request struct {
 	Path                  string `json:"path"`
 	QueryStringParameters Values `json:"queryStringParameters"`
 	HttpHeaders
-	Body string `json:"body"`
+	Body            string `json:"body"`
+	OriginalRequest *http.Request
 }
 
 type Response struct {
