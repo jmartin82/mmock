@@ -381,10 +381,15 @@ You can use variable data (random data or request data) in response. The variabl
 
 Request data:
 
- - request.query."*key*"
+ - request.scheme
+ - request.hostname
+ - request.port
+ - request.path (full path)
  - request.path."*key*"
+ - request.query."*key*"
  - request.cookie."*key*"
- - request.url
+ - request.url (full url with scheme, hostname, port, path and query parameters)
+ - request.url.short (return scheme and hostname only)
  - request.body
  - request.body."*key*" (both `application/json` and `application/x-www-form-urlencoded requests)
  - request.body."*deep*"."*key*" (only for `application/json` requests)

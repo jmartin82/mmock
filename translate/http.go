@@ -40,6 +40,8 @@ func (t HTTP) BuildRequestDefinitionFromHTTP(req *http.Request) definition.Reque
 
 	body, _ := ioutil.ReadAll(req.Body)
 	res.Body = string(body)
+	res.OriginalRequest = req
+
 	return res
 }
 
