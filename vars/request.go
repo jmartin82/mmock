@@ -86,7 +86,7 @@ func (rp Request) getPort() (string, bool) {
 }
 
 func (rp Request) getUrlShort() (string, bool) {
-	host := rp.Request.OriginalRequest.Host
+	host := strings.Split(rp.Request.OriginalRequest.Host, ":")[0]
 	if len(host) == 0 {
 		return "", false
 	}
