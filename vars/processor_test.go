@@ -345,8 +345,6 @@ func TestReplaceFormUrlEncodedBodyTags(t *testing.T) {
 
 func TestReplaceUrlInfo(t *testing.T) {
 
-	// "request.url.short" {
-
 	req := definition.Request{}
 	req.Path = "/home"
 	req.Schema = "ws"

@@ -57,7 +57,7 @@ func getScheme(req *http.Request) string {
 func getHostAndPort(req *http.Request) (string, string) {
 	host := req.Host
 	if len(host) == 0 {
-		return "localhost", ""
+		return "localhost", "80"
 	}
 
 	index := strings.Index(host, ":")
@@ -65,7 +65,7 @@ func getHostAndPort(req *http.Request) (string, string) {
 		return host[0:index], host[index+1:]
 	}
 
-	return host, ""
+	return host, "80"
 }
 
 //WriteHTTPResponseFromDefinition read a mock response and write a http response.
