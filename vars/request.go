@@ -2,6 +2,7 @@ package vars
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -24,26 +25,26 @@ func (rp Request) Fill(holders []string) map[string]string {
 		if tag == "request.body" && rp.Request.Body != "" {
 			s = rp.Request.Body
 			found = true
-		} else if tag == "request.scheme" {
-			s, found = rp.getScheme()
+		} else if tag == "request.schema" {
+			s, found = rp.Request.Schema, true
 		} else if tag == "request.port" {
-			s, found = rp.getPort()
+			s, found = rp.Request.Port, true
 		} else if tag == "request.url" {
-			s, found = rp.getUrl(rp.Request)
+			s, found = rp.getUrl()
 		} else if tag == "request.url.short" {
 			s, found = rp.getUrlShort()
 		} else if tag == "request.hostname" {
-			s, found = rp.getHostname(rp.Mock, rp.Request)
+			s, found = rp.Request.Host, true
 		} else if tag == "request.path" {
-			s, found = rp.getRootPath(rp.Mock, rp.Request)
+			s, found = rp.Request.Path, true
 		} else if strings.HasPrefix(tag, "request.body.") {
-			s, found = rp.getBodyParam(rp.Request, tag[13:])
+			s, found = rp.getBodyParam(tag[13:])
 		} else if strings.HasPrefix(tag, "request.query.") {
-			s, found = rp.getQueryStringParam(rp.Request, tag[14:])
+			s, found = rp.getQueryStringParam(tag[14:])
 		} else if strings.HasPrefix(tag, "request.path.") {
-			s, found = rp.getPathParam(rp.Mock, rp.Request, tag[13:])
+			s, found = rp.getPathParam(tag[13:])
 		} else if strings.HasPrefix(tag, "request.cookie.") {
-			s, found = rp.getCookieParam(rp.Request, tag[15:])
+			s, found = rp.getCookieParam(tag[15:])
 		}
 
 		if found {
@@ -54,62 +55,27 @@ func (rp Request) Fill(holders []string) map[string]string {
 	return vars
 }
 
-func (rp Request) getScheme() (string, bool) {
-	if rp.Request.OriginalRequest.TLS != nil {
-		return "https", true
-	}
-
-	return "http", true
-}
-
-func (rp Request) getHostname(m *definition.Mock, req *definition.Request) (string, bool) {
-	if len(rp.Request.Host) == 0 {
-		return "", false
-	}
-	value := rp.Request.Host
-
-	return value, true
-}
-
-func (rp Request) getPort() (string, bool) {
-	host := rp.Request.OriginalRequest.Host
-	if len(host) == 0 {
-		return "", false
-	}
-
-	index := strings.Index(host, ":")
-	if index > -1 {
-		return host[index+1:], true
-	}
-
-	return "", false
-}
-
 func (rp Request) getUrlShort() (string, bool) {
-	host := strings.Split(rp.Request.OriginalRequest.Host, ":")[0]
-	if len(host) == 0 {
-		return "", false
+	if len(rp.Request.Port) == 0 || rp.Request.Port == "80" {
+		return fmt.Sprintf("%s://%s", rp.Request.Schema, rp.Request.Host), true
 	}
 
-	scheme, _ := rp.getScheme()
-	value := scheme + "://" + host
-
-	return value, true
+	return fmt.Sprintf("%s://%s:%s", rp.Request.Schema, rp.Request.Host, rp.Request.Port), true
 }
 
-func (rp Request) getUrl(req *definition.Request) (string, bool) {
+func (rp Request) getUrl() (string, bool) {
 	value, f := rp.getUrlShort()
 	if !f {
 		return "", false
 	}
 
-	path := rp.Request.OriginalRequest.URL.Path
+	path := rp.Request.Path
 
 	if len(path) != 0 {
-		value += path
+		value += rp.Request.Path
 	}
 
-	queryStringParams := req.QueryStringParameters
+	queryStringParams := rp.Request.QueryStringParameters
 
 	if len(queryStringParams) != 0 {
 		var queryString string
@@ -130,25 +96,10 @@ func (rp Request) getUrl(req *definition.Request) (string, bool) {
 	return value, true
 }
 
-func (rp Request) getRootPath(m *definition.Mock, req *definition.Request) (string, bool) {
+func (rp Request) getPathParam(name string) (string, bool) {
 
-	routes := urlmatcher.New("/:path")
-	mparm := routes.Match(req.Path)
-
-	value, f := mparm.Params["path"]
-	if !f {
-		return "", false
-	}
-
-	value = "/" + value
-
-	return value, true
-}
-
-func (rp Request) getPathParam(m *definition.Mock, req *definition.Request, name string) (string, bool) {
-
-	routes := urlmatcher.New(m.Request.Path)
-	mparm := routes.Match(req.Path)
+	routes := urlmatcher.New(rp.Mock.Request.Path)
+	mparm := routes.Match(rp.Request.Path)
 
 	value, f := mparm.Params[name]
 	if !f {
@@ -158,7 +109,7 @@ func (rp Request) getPathParam(m *definition.Mock, req *definition.Request, name
 	return value, true
 }
 
-func (rp Request) getQueryStringParam(req *definition.Request, name string) (string, bool) {
+func (rp Request) getQueryStringParam(name string) (string, bool) {
 
 	if len(rp.Request.QueryStringParameters) == 0 {
 		return "", false
@@ -171,7 +122,7 @@ func (rp Request) getQueryStringParam(req *definition.Request, name string) (str
 	return value[0], true
 }
 
-func (rp Request) getCookieParam(req *definition.Request, name string) (string, bool) {
+func (rp Request) getCookieParam(name string) (string, bool) {
 
 	if len(rp.Request.Cookies) == 0 {
 		return "", false
@@ -184,25 +135,25 @@ func (rp Request) getCookieParam(req *definition.Request, name string) (string, 
 	return value, true
 }
 
-func (rp Request) getBodyParam(req *definition.Request, name string) (string, bool) {
+func (rp Request) getBodyParam(name string) (string, bool) {
 
-	contentType, found := req.Headers["Content-Type"]
+	contentType, found := rp.Request.Headers["Content-Type"]
 	if !found {
 		return "", false
 	}
 
 	if strings.HasPrefix(contentType[0], "application/x-www-form-urlencoded") {
-		return rp.getUrlEncodedFormBodyParam(rp.Request, name)
+		return rp.getUrlEncodedFormBodyParam(name)
 	} else if strings.HasPrefix(contentType[0], "application/json") {
-		return rp.getJsonBodyParam(rp.Request, name)
+		return rp.getJsonBodyParam(name)
 	}
 
 	return "", false
 }
 
-func (rp Request) getUrlEncodedFormBodyParam(req *definition.Request, name string) (string, bool) {
+func (rp Request) getUrlEncodedFormBodyParam(name string) (string, bool) {
 
-	values, err := url.ParseQuery(req.Body)
+	values, err := url.ParseQuery(rp.Request.Body)
 	if err != nil {
 		return "", false
 	}
@@ -215,12 +166,12 @@ func (rp Request) getUrlEncodedFormBodyParam(req *definition.Request, name strin
 	return value, true
 }
 
-func (rp Request) getJsonBodyParam(req *definition.Request, name string) (string, bool) {
+func (rp Request) getJsonBodyParam(name string) (string, bool) {
 
 	hierarchy := strings.Split(name, ".")
 
 	var payload interface{}
-	if err := json.Unmarshal([]byte(req.Body), &payload); err != nil {
+	if err := json.Unmarshal([]byte(rp.Request.Body), &payload); err != nil {
 		return "", false
 	}
 

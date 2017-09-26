@@ -2,19 +2,29 @@ package translate
 
 import (
 	"bytes"
+	"crypto/tls"
 	"net/http"
 	"testing"
 )
 
 func TestBuildRequestDefinitionFromHTTP(t *testing.T) {
 	b := bytes.NewBufferString("body text")
-	req, _ := http.NewRequest("POST", "http://domain.tld/test.php?aa=bb", b)
+	req, _ := http.NewRequest("POST", "https://domain.tld:99901/test.php?aa=bb", b)
+	req.TLS = &tls.ConnectionState{}
 	req.Header.Add("X-TEST-HEADER", "random value")
 	cookie := http.Cookie{Name: "cookie_name", Value: "cookie_value"}
 	req.AddCookie(&cookie)
 
 	tr := HTTP{}
 	def := tr.BuildRequestDefinitionFromHTTP(req)
+
+	if def.Schema != "https" {
+		t.Fatalf("Invalid schema")
+	}
+
+	if def.Port != "99901" {
+		t.Fatalf("Invalid Port")
+	}
 
 	if def.Method != "POST" {
 		t.Fatalf("Invalid Method")

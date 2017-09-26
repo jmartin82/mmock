@@ -1,9 +1,5 @@
 package definition
 
-import (
-	"net/http"
-)
-
 type Values map[string][]string
 
 type Cookies map[string]string
@@ -14,13 +10,14 @@ type HttpHeaders struct {
 }
 
 type Request struct {
+	Schema                string `json:"scheme"`
 	Host                  string `json:"host"`
+	Port                  string `json:"port"`
 	Method                string `json:"method"`
 	Path                  string `json:"path"`
 	QueryStringParameters Values `json:"queryStringParameters"`
 	HttpHeaders
-	Body            string `json:"body"`
-	OriginalRequest *http.Request
+	Body string `json:"body"`
 }
 
 type Response struct {

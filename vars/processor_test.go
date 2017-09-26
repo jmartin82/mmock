@@ -343,6 +343,49 @@ func TestReplaceFormUrlEncodedBodyTags(t *testing.T) {
 	}
 }
 
+func TestReplaceUrlInfo(t *testing.T) {
+
+	// "request.url.short" {
+
+	req := definition.Request{}
+	req.Path = "/home"
+	req.Schema = "ws"
+	req.Host = "example.com"
+	req.Port = "8001"
+
+	res := definition.Response{}
+	res.Body = "{{request.schema}}://{{request.hostname}}:{{request.port}}{{request.path}}"
+
+	mock := definition.Mock{Request: req, Response: res}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != "ws://example.com:8001/home" {
+		t.Error("Replaced url info from body do not match", mock.Response.Body)
+	}
+
+	res = definition.Response{}
+	res.Body = "{{request.url}}"
+
+	mock = definition.Mock{Request: req, Response: res}
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != "ws://example.com:8001/home" {
+		t.Error("Replaced url info from body do not match", mock.Response.Body)
+	}
+
+	res = definition.Response{}
+	res.Body = "{{request.url.short}}"
+
+	mock = definition.Mock{Request: req, Response: res}
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != "ws://example.com:8001" {
+		t.Error("Replaced url info from body do not match", mock.Response.Body)
+	}
+
+}
+
 func TestReplaceJsonBodyEncodedTags(t *testing.T) {
 	req := definition.Request{}
 	req.Headers = make(definition.Values)

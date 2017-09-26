@@ -18,9 +18,11 @@ type HTTP struct {
 func (t HTTP) BuildRequestDefinitionFromHTTP(req *http.Request) definition.Request {
 
 	res := definition.Request{}
-	res.Host = strings.Split(req.Host, ":")[0]
+	res.Schema = getScheme(req)
+	res.Host, res.Port = getHostAndPort(req)
 	res.Method = req.Method
 	res.Path = req.URL.Path
+
 	res.Headers = make(definition.Values)
 	for header, values := range req.Header {
 		if header != "Cookie" {
@@ -40,9 +42,30 @@ func (t HTTP) BuildRequestDefinitionFromHTTP(req *http.Request) definition.Reque
 
 	body, _ := ioutil.ReadAll(req.Body)
 	res.Body = string(body)
-	res.OriginalRequest = req
 
 	return res
+}
+
+func getScheme(req *http.Request) string {
+	if req.TLS != nil {
+		return "https"
+	}
+
+	return "http"
+}
+
+func getHostAndPort(req *http.Request) (string, string) {
+	host := req.Host
+	if len(host) == 0 {
+		return "localhost", ""
+	}
+
+	index := strings.Index(host, ":")
+	if index > -1 {
+		return host[0:index], host[index+1:]
+	}
+
+	return host, ""
 }
 
 //WriteHTTPResponseFromDefinition read a mock response and write a http response.
