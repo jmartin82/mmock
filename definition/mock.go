@@ -16,6 +16,7 @@ type Request struct {
 	Method                string `json:"method"`
 	Path                  string `json:"path"`
 	QueryStringParameters Values `json:"queryStringParameters"`
+	Fragment              string `json:"fragment"`
 	HttpHeaders
 	Body string `json:"body"`
 }

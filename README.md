@@ -388,8 +388,9 @@ Request data:
  - request.path."*key*"
  - request.query."*key*"
  - request.cookie."*key*"
+- request.fragment
  - request.url (full url with scheme, hostname, port, path and query parameters)
- - request.url.short (return scheme and hostname only)
+ - request.autority (return scheme, hostname and port (optional))
  - request.body
  - request.body."*key*" (both `application/json` and `application/x-www-form-urlencoded requests)
  - request.body."*deep*"."*key*" (only for `application/json` requests)

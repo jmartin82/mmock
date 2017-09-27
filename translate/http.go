@@ -22,6 +22,7 @@ func (t HTTP) BuildRequestDefinitionFromHTTP(req *http.Request) definition.Reque
 	res.Host, res.Port = getHostAndPort(req)
 	res.Method = req.Method
 	res.Path = req.URL.Path
+	res.Fragment = req.URL.Fragment
 
 	res.Headers = make(definition.Values)
 	for header, values := range req.Header {

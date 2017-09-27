@@ -31,12 +31,14 @@ func (rp Request) Fill(holders []string) map[string]string {
 			s, found = rp.Request.Port, true
 		} else if tag == "request.url" {
 			s, found = rp.getUrl()
-		} else if tag == "request.url.short" {
-			s, found = rp.getUrlShort()
+		} else if tag == "request.authority" {
+			s, found = rp.getAuthority()
 		} else if tag == "request.hostname" {
 			s, found = rp.Request.Host, true
 		} else if tag == "request.path" {
 			s, found = rp.Request.Path, true
+		} else if tag == "request.fragment" {
+			s, found = rp.Request.Fragment, true
 		} else if strings.HasPrefix(tag, "request.body.") {
 			s, found = rp.getBodyParam(tag[13:])
 		} else if strings.HasPrefix(tag, "request.query.") {
@@ -55,7 +57,7 @@ func (rp Request) Fill(holders []string) map[string]string {
 	return vars
 }
 
-func (rp Request) getUrlShort() (string, bool) {
+func (rp Request) getAuthority() (string, bool) {
 	if len(rp.Request.Port) == 0 || rp.Request.Port == "80" {
 		return fmt.Sprintf("%s://%s", rp.Request.Scheme, rp.Request.Host), true
 	}
@@ -64,7 +66,7 @@ func (rp Request) getUrlShort() (string, bool) {
 }
 
 func (rp Request) getUrl() (string, bool) {
-	value, f := rp.getUrlShort()
+	value, f := rp.getAuthority()
 	if !f {
 		return "", false
 	}
@@ -78,19 +80,17 @@ func (rp Request) getUrl() (string, bool) {
 	queryStringParams := rp.Request.QueryStringParameters
 
 	if len(queryStringParams) != 0 {
-		var queryString string
-		count := len(queryStringParams)
-		index := 0
-		for key, value := range queryStringParams {
-			queryString += key + "=" + value[0]
-			index++
-
-			if count != index {
-				queryString += "&"
+		queryVars := []string{}
+		for key, values := range queryStringParams {
+			for _, value := range values {
+				queryVars = append(queryVars, fmt.Sprintf("%s=%s", key, value))
 			}
 		}
+		value += "?" + strings.Join(queryVars, "&")
+	}
 
-		value += "?" + queryString
+	if len(rp.Request.Fragment) != 0 {
+		value += "#" + rp.Request.Fragment
 	}
 
 	return value, true
