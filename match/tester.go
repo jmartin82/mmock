@@ -13,7 +13,7 @@ import (
 
 var (
 	ErrHostNotMatch     = errors.New("Host not match")
-	ErrSchemaNotMatch   = errors.New("Schema not match")
+	ErrSchemeNotMatch   = errors.New("Scheme not match")
 	ErrMethodNotMatch   = errors.New("Method not match")
 	ErrPathNotMatch     = errors.New("Path not match")
 	ErrQueryStringMatch = errors.New("Query string not match")
@@ -109,8 +109,8 @@ func (mm Tester) Check(req *definition.Request, mock *definition.Mock, scenarioA
 		return false, ErrHostNotMatch
 	}
 
-	if !mm.matchOnEqualsOrIfEmpty(req.Schema, mock.Request.Schema) {
-		return false, ErrSchemaNotMatch
+	if !mm.matchOnEqualsOrIfEmpty(req.Scheme, mock.Request.Scheme) {
+		return false, ErrSchemeNotMatch
 	}
 
 	if !glob.Glob(mock.Request.Path, req.Path) && routes.Match(req.Path) == nil {

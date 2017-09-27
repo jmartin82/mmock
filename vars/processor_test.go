@@ -347,12 +347,12 @@ func TestReplaceUrlInfo(t *testing.T) {
 
 	req := definition.Request{}
 	req.Path = "/home"
-	req.Schema = "ws"
+	req.Scheme = "ws"
 	req.Host = "example.com"
 	req.Port = "8001"
 
 	res := definition.Response{}
-	res.Body = "{{request.schema}}://{{request.hostname}}:{{request.port}}{{request.path}}"
+	res.Body = "{{request.scheme}}://{{request.hostname}}:{{request.port}}{{request.path}}"
 
 	mock := definition.Mock{Request: req, Response: res}
 	varsProcessor := getProcessor()

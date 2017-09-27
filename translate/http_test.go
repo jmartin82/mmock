@@ -18,8 +18,8 @@ func TestBuildRequestDefinitionFromHTTP(t *testing.T) {
 	tr := HTTP{}
 	def := tr.BuildRequestDefinitionFromHTTP(req)
 
-	if def.Schema != "https" {
-		t.Fatalf("Invalid schema")
+	if def.Scheme != "https" {
+		t.Fatalf("Invalid scheme")
 	}
 
 	if def.Port != "99901" {

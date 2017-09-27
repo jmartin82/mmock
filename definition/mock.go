@@ -10,7 +10,7 @@ type HttpHeaders struct {
 }
 
 type Request struct {
-	Schema                string `json:"scheme"`
+	Scheme                string `json:"scheme"`
 	Host                  string `json:"host"`
 	Port                  string `json:"port"`
 	Method                string `json:"method"`

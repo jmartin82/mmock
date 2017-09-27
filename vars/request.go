@@ -25,8 +25,8 @@ func (rp Request) Fill(holders []string) map[string]string {
 		if tag == "request.body" && rp.Request.Body != "" {
 			s = rp.Request.Body
 			found = true
-		} else if tag == "request.schema" {
-			s, found = rp.Request.Schema, true
+		} else if tag == "request.scheme" {
+			s, found = rp.Request.Scheme, true
 		} else if tag == "request.port" {
 			s, found = rp.Request.Port, true
 		} else if tag == "request.url" {
@@ -57,10 +57,10 @@ func (rp Request) Fill(holders []string) map[string]string {
 
 func (rp Request) getUrlShort() (string, bool) {
 	if len(rp.Request.Port) == 0 || rp.Request.Port == "80" {
-		return fmt.Sprintf("%s://%s", rp.Request.Schema, rp.Request.Host), true
+		return fmt.Sprintf("%s://%s", rp.Request.Scheme, rp.Request.Host), true
 	}
 
-	return fmt.Sprintf("%s://%s:%s", rp.Request.Schema, rp.Request.Host, rp.Request.Port), true
+	return fmt.Sprintf("%s://%s:%s", rp.Request.Scheme, rp.Request.Host, rp.Request.Port), true
 }
 
 func (rp Request) getUrl() (string, bool) {

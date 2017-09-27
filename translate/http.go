@@ -18,7 +18,7 @@ type HTTP struct {
 func (t HTTP) BuildRequestDefinitionFromHTTP(req *http.Request) definition.Request {
 
 	res := definition.Request{}
-	res.Schema = getScheme(req)
+	res.Scheme = getScheme(req)
 	res.Host, res.Port = getHostAndPort(req)
 	res.Method = req.Method
 	res.Path = req.URL.Path

@@ -25,19 +25,19 @@ func TestMatchMethod(t *testing.T) {
 	}
 }
 
-func TestMatchSchema(t *testing.T) {
+func TestMatchScheme(t *testing.T) {
 	req := definition.Request{}
-	req.Schema = "https"
+	req.Scheme = "https"
 
 	m := definition.Mock{}
-	m.Request.Schema = "https"
+	m.Request.Scheme = "https"
 
 	mm := Tester{}
 	if b, err := mm.Check(&req, &m, true); !b {
 		t.Error(err)
 	}
 
-	req.Schema = "http"
+	req.Scheme = "http"
 	if b, err := mm.Check(&req, &m, true); b {
 		t.Error(err)
 	}
