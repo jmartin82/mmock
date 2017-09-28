@@ -3,8 +3,6 @@ package match
 import (
 	"errors"
 	"strings"
-	"fmt"
-	"strconv"
 
 	"github.com/jmartin82/mmock/scenario"
 
