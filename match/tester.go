@@ -13,6 +13,8 @@ import (
 
 var (
 	ErrHostNotMatch     = errors.New("Host not match")
+	ErrSchemeNotMatch   = errors.New("Scheme not match")
+	ErrFragmentNotMatch = errors.New("Fragment not match")
 	ErrMethodNotMatch   = errors.New("Method not match")
 	ErrPathNotMatch     = errors.New("Path not match")
 	ErrQueryStringMatch = errors.New("Query string not match")
@@ -69,11 +71,11 @@ func (mm Tester) matchKeyAndValue(reqMap definition.Cookies, mockMap definition.
 	return true
 }
 
-func (mm Tester) mockMatchHost(host string, mock *definition.Request) bool {
-	if len(mock.Host) == 0 {
+func (mm Tester) matchOnEqualsOrIfEmpty(mockVal string, reqVal string) bool {
+	if len(mockVal) == 0 {
 		return true
 	}
-	return strings.ToLower(host) == strings.ToLower(mock.Host)
+	return strings.ToLower(mockVal) == strings.ToLower(reqVal)
 }
 
 func (mm Tester) mockIncludesMethod(method string, mock *definition.Request) bool {
@@ -104,8 +106,16 @@ func (mm Tester) Check(req *definition.Request, mock *definition.Mock, scenarioA
 
 	routes := urlmatcher.New(mock.Request.Path)
 
-	if !mm.mockMatchHost(req.Host, &mock.Request) {
+	if !mm.matchOnEqualsOrIfEmpty(req.Host, mock.Request.Host) {
 		return false, ErrHostNotMatch
+	}
+
+	if !mm.matchOnEqualsOrIfEmpty(req.Scheme, mock.Request.Scheme) {
+		return false, ErrSchemeNotMatch
+	}
+
+	if !mm.matchOnEqualsOrIfEmpty(req.Fragment, mock.Request.Fragment) {
+		return false, ErrFragmentNotMatch
 	}
 
 	if !glob.Glob(mock.Request.Path, req.Path) && routes.Match(req.Path) == nil {
