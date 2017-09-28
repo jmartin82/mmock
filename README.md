@@ -388,8 +388,9 @@ Request data:
  - request.path."*key*"
  - request.query."*key*"
  - request.cookie."*key*"
+- request.fragment
  - request.url (full url with scheme, hostname, port, path and query parameters)
- - request.url.short (return scheme and hostname only)
+ - request.autority (return scheme, hostname and port (optional))
  - request.body
  - request.body."*key*" (both `application/json` and `application/x-www-form-urlencoded requests)
  - request.body."*deep*"."*key*" (only for `application/json` requests)
@@ -451,6 +452,7 @@ Request data:
 ### Contributors
 - Amazing request body parsing form [@hmoragrega](https://github.com/hmoragrega)
 - Awesome use statistics from [@alfonsfoubert](https://github.com/alfonsfoubert)
+- More request variables available thanks to [@Bartek-CMP ](https://github.com/Bartek-CMP)
 - Added the possibility of access to an array index in dynamic responses [@jaimelopez](https://github.com/jaimelopez)
 - Is this not enough? [@vtrifonov](https://github.com/vtrifonov) is working in a fork with a really advanced features. [HTTP API Mock](https://github.com/vtrifonov/http-api-mock)
 

@@ -2,19 +2,29 @@ package translate
 
 import (
 	"bytes"
+	"crypto/tls"
 	"net/http"
 	"testing"
 )
 
 func TestBuildRequestDefinitionFromHTTP(t *testing.T) {
 	b := bytes.NewBufferString("body text")
-	req, _ := http.NewRequest("POST", "http://domain.tld/test.php?aa=bb", b)
+	req, _ := http.NewRequest("POST", "https://domain.tld:99901/test.php?aa=bb#fragment", b)
+	req.TLS = &tls.ConnectionState{}
 	req.Header.Add("X-TEST-HEADER", "random value")
 	cookie := http.Cookie{Name: "cookie_name", Value: "cookie_value"}
 	req.AddCookie(&cookie)
 
 	tr := HTTP{}
 	def := tr.BuildRequestDefinitionFromHTTP(req)
+
+	if def.Scheme != "https" {
+		t.Fatalf("Invalid scheme")
+	}
+
+	if def.Port != "99901" {
+		t.Fatalf("Invalid Port")
+	}
 
 	if def.Method != "POST" {
 		t.Fatalf("Invalid Method")
@@ -43,4 +53,9 @@ func TestBuildRequestDefinitionFromHTTP(t *testing.T) {
 	if def.Host != "domain.tld" {
 		t.Fatalf("Invalid Host %v", def.Host)
 	}
+
+	if def.Fragment != "fragment" {
+		t.Fatalf("Invalid Fragment %v", def.Fragment)
+	}
+
 }

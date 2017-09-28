@@ -25,6 +25,42 @@ func TestMatchMethod(t *testing.T) {
 	}
 }
 
+func TestMatchScheme(t *testing.T) {
+	req := definition.Request{}
+	req.Scheme = "https"
+
+	m := definition.Mock{}
+	m.Request.Scheme = "https"
+
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
+		t.Error(err)
+	}
+
+	req.Scheme = "http"
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
+}
+
+func TestMatchFragment(t *testing.T) {
+	req := definition.Request{}
+	req.Fragment = "fragment"
+
+	m := definition.Mock{}
+	m.Request.Fragment = "fragment"
+
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
+		t.Error(err)
+	}
+
+	req.Fragment = "nothing"
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
+}
+
 func TestMatchPath(t *testing.T) {
 
 	req := definition.Request{}
