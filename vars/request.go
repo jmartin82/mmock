@@ -67,6 +67,7 @@ func (rp Request) getAuthority() (string, bool) {
 
 func (rp Request) getUrl() (string, bool) {
 	value, f := rp.getAuthority()
+
 	if !f {
 		return "", false
 	}

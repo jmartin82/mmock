@@ -71,7 +71,7 @@ func (mm Tester) matchKeyAndValue(reqMap definition.Cookies, mockMap definition.
 	return true
 }
 
-func (mm Tester) matchOnEqualsOrIfEmpty(mockVal string, reqVal string) bool {
+func (mm Tester) matchOnEqualsOrIfEmpty(reqVal string, mockVal string) bool {
 	if len(mockVal) == 0 {
 		return true
 	}
