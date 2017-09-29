@@ -29,6 +29,7 @@ function sortTable(tableSelector, f, n){
 }
 
 var mappingElements = ['#uri', '#desc', '#method', '#path', '#result'];
+var defaultSortingElement = '#uri';
 var mappingTableSelector = '#mapping-table';
 var selectorUp = '.glyphicon-chevron-up';
 var selectorDown = '.glyphicon-chevron-down';
@@ -59,4 +60,8 @@ function clearSelectedClass() {
 
 function attachListeners() {
     mappingElements.forEach(attachListener);
+}
+
+function applyDefaultSorting() {
+    $(defaultSortingElement).find(selectorDown).click();
 }
