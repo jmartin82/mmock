@@ -33,8 +33,18 @@
 
             var mapping = new Mapping(location.host);
             mapping.fillList();
-            attachListeners();
-            applyDefaultSorting();
+
+            //Mapping table sorting
+            let mappingTableId = "#mapping-table";
+            let headerElements = [];
+
+            $(mappingTableId).find('th').toArray().forEach(function(element) {
+                let id = element.id;
+                if (id !== '') {headerElements.push('#' + id)}
+            });
+
+            let sorting = new Sorting(mappingTableId, headerElements);
+            sorting.init();
         });
 
     </script>

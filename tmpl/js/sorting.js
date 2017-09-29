@@ -1,67 +1,67 @@
-function sortTable(tableSelector, f, n){
-	var rows = $(tableSelector + ' tbody  tr').get();
+function Sorting(tableSelector, tableElements) {
 
-	rows.sort(function(a, b) {
+    let selectorUp = '.glyphicon-chevron-up';
+    let selectorDown = '.glyphicon-chevron-down';
+    let selectedClassName = 'selected';
 
-		var A = getVal(a);
-		var B = getVal(b);
+    function sortTable(order, itemsCount){
+        let rows = $(tableSelector + ' tbody  tr').get();
 
-		if(A < B) {
-			return -1*f;
-		}
-		if(A > B) {
-			return 1*f;
-		}
-		return 0;
-	});
+        rows.sort(function(a, b) {
 
-	function getVal(elm){
-		var v = $(elm).children('td').eq(n).text().toUpperCase();
-		if($.isNumeric(v)){
-			v = parseInt(v,10);
-		}
-		return v;
-	}
+            let A = getVal(a);
+            let B = getVal(b);
 
-	$.each(rows, function(index, row) {
-		$(tableSelector).children('tbody').append(row);
-	});
-}
+            if(A < B) {
+                return -1*order;
+            }
+            if(A > B) {
+                return 1*order;
+            }
+            return 0;
+        });
 
-var mappingElements = ['#uri', '#desc', '#method', '#path', '#result'];
-var defaultSortingElement = '#uri';
-var mappingTableSelector = '#mapping-table';
-var selectorUp = '.glyphicon-chevron-up';
-var selectorDown = '.glyphicon-chevron-down';
-var selectedClassName = 'selected';
+        function getVal(elm){
+            let v = $(elm).children('td').eq(itemsCount).text().toUpperCase();
+            if($.isNumeric(v)){
+                v = parseInt(v,10);
+            }
+            return v;
+        }
 
-function attachListener(item, index, elements){
-    $(item).find(selectorUp).on('click', function(){
-        var n = $(item).prevAll().length;
-        sortTable(mappingTableSelector, -1 ,n);
-        markAsSelected($(this));
-    });
-    $(item).find(selectorDown).on('click', function(){
-        var n = $(item).prevAll().length;
-        sortTable(mappingTableSelector, 1 ,n);
-        markAsSelected($(this));
-    });
-}
+        $.each(rows, function(index, row) {
+            $(tableSelector).children('tbody').append(row);
+        });
+    }
 
-function markAsSelected(object) {
-	clearSelectedClass();
-	object.addClass(selectedClassName);
-}
+    function attachListener(item, index, elements){
+        $(item).find(selectorUp).on('click', function(){
+            let itemsCount = $(item).prevAll().length;
+            sortTable(-1 ,itemsCount);
+            markAsSelected($(this));
+        });
+        $(item).find(selectorDown).on('click', function(){
+            let itemsCount = $(item).prevAll().length;
+            sortTable(1 ,itemsCount);
+            markAsSelected($(this));
+        });
+    }
 
-function clearSelectedClass() {
-	$(selectorUp).removeClass(selectedClassName);
-	$(selectorDown).removeClass(selectedClassName);
-}
+    function markAsSelected(object) {
+        clearSelectedClass();
+        object.addClass(selectedClassName);
+    }
 
-function attachListeners() {
-    mappingElements.forEach(attachListener);
-}
+    function clearSelectedClass() {
+        $(selectorUp).removeClass(selectedClassName);
+        $(selectorDown).removeClass(selectedClassName);
+    }
 
-function applyDefaultSorting() {
-    $(defaultSortingElement).find(selectorDown).click();
+    function init() {
+        tableElements.forEach(attachListener);
+    }
+
+    return {
+        init : init
+    }
 }
