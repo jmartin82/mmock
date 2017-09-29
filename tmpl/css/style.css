@@ -28,3 +28,13 @@ table .collapse.in {
 .select-row > td {
     background-color: #fff;
 }
+
+.sorting_icons {
+    padding-left: 5px;
+    color: #aaa;
+    font-size:0.8em;
+}
+
+.selected {
+    color: #d9534f;
+}
