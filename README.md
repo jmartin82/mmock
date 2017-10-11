@@ -184,7 +184,15 @@ A core feature of Mmock is the ability to return canned HTTP responses for reque
 * *cookies*: Array of cookies.
 * *body*: Body string. It allows * pattern.
 
-In case of queryStringParameters, headers and cookies, the request can be matched only if all defined keys in mock will be present with the exact value.
+In case of queryStringParameters, headers and cookies, the request can be matched only if all defined keys in mock will be present with the exact or glob value.
+
+Glob matching is available for:
+* host
+* path
+* headers
+* cookies
+* query strings
+* body
 
 #### Response (Optional on proxy call)
 
@@ -388,7 +396,7 @@ Request data:
  - request.path."*key*"
  - request.query."*key*"
  - request.cookie."*key*"
-- request.fragment
+ - request.fragment
  - request.url (full url with scheme, hostname, port, path and query parameters)
  - request.autority (return scheme, hostname and port (optional))
  - request.body

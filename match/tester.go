@@ -47,14 +47,8 @@ func (mm Tester) matchKeyAndValues(reqMap definition.Values, mockMap definition.
 			}
 
 			for i, v := range mval {
-				if !strings.Contains(v, glob.GLOB) {
-					if v != rval[i] {
+				if (!strings.Contains(v, glob.GLOB) && v != rval[i]) || !glob.Glob(v, rval[i]) {
 						return false
-					}
-				} else {
-					if !glob.Glob(v, rval[i]) {
-						return false
-					}
 				}
 			}
 
@@ -70,7 +64,7 @@ func (mm Tester) matchKeyAndValue(reqMap definition.Cookies, mockMap definition.
 		return false
 	}
 	for key, mval := range mockMap {
-		if rval, exists := reqMap[key]; !exists || mval != rval {
+		if rval, exists := reqMap[key]; !exists || (!strings.Contains(mval, glob.GLOB) && mval != rval) || !glob.Glob(mval, rval) {
 			return false
 		}
 	}
@@ -82,6 +76,16 @@ func (mm Tester) matchOnEqualsOrIfEmpty(reqVal string, mockVal string) bool {
 		return true
 	}
 	return strings.ToLower(mockVal) == strings.ToLower(reqVal)
+}
+
+func (mm Tester) matchOnEqualsOrIfEmptyOrGlob(reqVal string, mockVal string) bool {
+	if len(mockVal) == 0 {
+		return true
+	}
+	mockHost := strings.ToLower(mockVal);
+	reqHost := strings.ToLower(reqVal);
+
+	return (mockHost == reqHost) || glob.Glob(mockHost, reqHost)
 }
 
 func (mm Tester) mockIncludesMethod(method string, mock *definition.Request) bool {
@@ -112,7 +116,7 @@ func (mm Tester) Check(req *definition.Request, mock *definition.Mock, scenarioA
 
 	routes := urlmatcher.New(mock.Request.Path)
 
-	if !mm.matchOnEqualsOrIfEmpty(req.Host, mock.Request.Host) {
+	if !mm.matchOnEqualsOrIfEmptyOrGlob(req.Host, mock.Request.Host) {
 		return false, ErrHostNotMatch
 	}
 

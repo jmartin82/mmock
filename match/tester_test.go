@@ -128,7 +128,86 @@ func TestMatchQueryString(t *testing.T) {
 	if b, err := mm.Check(&req, &m, true); b {
 		t.Error(err)
 	}
+}
 
+func TestMatchQueryStringLenMismatch(t *testing.T) {
+	rval := make(definition.Values)
+	rval["test"] = []string{"test"}
+	req := definition.Request{}
+	req.QueryStringParameters = rval
+
+	m := definition.Mock{}
+	mval := make(definition.Values)
+	mval["test"] = []string{"test", "test2"}
+	m.Request.QueryStringParameters = mval
+
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
+}
+
+func TestMatchQueryStringNonExisting(t *testing.T) {
+	rval := make(definition.Values)
+	rval["test2"] = []string{"test"}
+	req := definition.Request{}
+	req.QueryStringParameters = rval
+
+	m := definition.Mock{}
+	mval := make(definition.Values)
+	mval["test"] = []string{"test"}
+	m.Request.QueryStringParameters = mval
+
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
+}
+func TestMatchQueryStringGlob(t *testing.T) {
+	rval := make(definition.Values)
+	rval["test"] = []string{"test"}
+	req := definition.Request{}
+	req.QueryStringParameters = rval
+
+	m := definition.Mock{}
+	mval := make(definition.Values)
+	mval["test"] = []string{"*es*"}
+	m.Request.QueryStringParameters = mval
+
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
+		t.Error(err)
+	}
+
+	mval["test2"] = []string{"tes*"}
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
+}
+
+func TestMatchQueryMultiStringGlob(t *testing.T) {
+	rval := make(definition.Values)
+	rval["first"] = []string{"test"}
+	rval["second"] = []string{"another_test"}
+	req := definition.Request{}
+	req.QueryStringParameters = rval
+
+	m := definition.Mock{}
+	mval := make(definition.Values)
+	mval["first"] = []string{"t*"}
+	mval["second"] = []string{"another_test"}
+	m.Request.QueryStringParameters = mval
+
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
+		t.Error(err)
+	}
+
+	mval["first"] = []string{"t*"}
+	mval["second"] = []string{"*another_test_2"}
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
 }
 
 func TestMatchCookies(t *testing.T) {
@@ -148,6 +227,45 @@ func TestMatchCookies(t *testing.T) {
 	}
 
 	mval["test2"] = "test2"
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
+}
+
+func TestMatchCookiesNonExisting(t *testing.T) {
+	rval := make(definition.Cookies)
+	rval["test2"] = "test"
+	req := definition.Request{}
+	req.Cookies = rval
+
+	m := definition.Mock{}
+	mval := make(definition.Cookies)
+	mval["test"] = "test"
+	m.Request.Cookies = mval
+
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
+}
+
+func TestMatchCookiesGlob(t *testing.T) {
+	rval := make(definition.Cookies)
+	rval["test"] = "test"
+	req := definition.Request{}
+	req.Cookies = rval
+
+	m := definition.Mock{}
+	mval := make(definition.Cookies)
+	mval["test"] = "*es*"
+	m.Request.Cookies = mval
+
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
+		t.Error(err)
+	}
+
+	mval["test2"] = "test*"
 	if b, err := mm.Check(&req, &m, true); b {
 		t.Error(err)
 	}
@@ -175,6 +293,53 @@ func TestMatchHeaders(t *testing.T) {
 	}
 }
 
+func TestMatchHeadersGlob(t *testing.T) {
+	rval := make(definition.Values)
+	rval["test"] = []string{"test"}
+	req := definition.Request{}
+	req.Headers = rval
+
+	m := definition.Mock{}
+	mval := make(definition.Values)
+	mval["test"] = []string{"*es*"}
+	m.Request.Headers = mval
+
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
+		t.Error(err)
+	}
+
+	mval["test2"] = []string{"test*"}
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
+}
+
+func TestMatchHeadersMultiGlob(t *testing.T) {
+	rval := make(definition.Values)
+	rval["first"] = []string{"test"}
+	rval["second"] = []string{"another_test"}
+	req := definition.Request{}
+	req.Headers = rval
+
+	m := definition.Mock{}
+	mval := make(definition.Values)
+	mval["first"] = []string{"*es*"}
+	mval["second"] = []string{"*ther_tes*"}
+	m.Request.Headers = mval
+
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
+		t.Error(err)
+	}
+
+	mval["first"] = []string{"*es*"}
+	mval["second"] = []string{"*tmher_es*"}
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
+}
+
 func TestMatchHost(t *testing.T) {
 
 	req := definition.Request{}
@@ -194,6 +359,25 @@ func TestMatchHost(t *testing.T) {
 	}
 }
 
+func TestMatchHostGlob(t *testing.T) {
+	
+		req := definition.Request{}
+		req.Host = "domain.com"
+	
+		m := definition.Mock{}
+		m.Request.Host = "*omain.co*"
+	
+		mm := Tester{}
+		if b, err := mm.Check(&req, &m, true); !b {
+			t.Error(err)
+		}
+	
+		req.Host = "error.com"
+		if b, err := mm.Check(&req, &m, true); b {
+			t.Error(err)
+		}
+}
+
 func TestMatchBody(t *testing.T) {
 
 	req := definition.Request{}
@@ -207,7 +391,7 @@ func TestMatchBody(t *testing.T) {
 		t.Error(err)
 	}
 
-	req.Path = "ByeBye"
+	req.Body = "ByeBye"
 	if b, err := mm.Check(&req, &m, true); b {
 		t.Error(err)
 	}
