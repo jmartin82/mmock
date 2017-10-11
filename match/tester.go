@@ -40,15 +40,21 @@ func (mm Tester) matchKeyAndValues(reqMap definition.Values, mockMap definition.
 	}
 
 	for key, mval := range mockMap {
-		if rval, exists := reqMap[key]; exists {
+		if rval, exists := reqMap[key]; exists {		
 
 			if len(mval) > len(rval) {
 				return false
 			}
 
 			for i, v := range mval {
-				if v != rval[i] {
-					return false
+				if !strings.Contains(v, glob.GLOB) {
+					if v != rval[i] {
+						return false
+					}
+				} else {
+					if !glob.Glob(v, rval[i]) {
+						return false
+					}
 				}
 			}
 
