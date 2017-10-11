@@ -48,15 +48,38 @@ func (mm Tester) matchKeyAndValues(reqMap definition.Values, mockMap definition.
 
 			for i, v := range mval {
 				if (!strings.Contains(v, glob.GLOB) && v != rval[i]) || !glob.Glob(v, rval[i]) {
-						return false
+					return false
 				}
 			}
 
 		} else {
-			return false
+			if rval, exists = mm.findByPartialKey(reqMap, key); exists {
+
+				for i, v := range mval {
+					if (!strings.Contains(v, glob.GLOB) && v != rval[i]) || !glob.Glob(v, rval[i]) {
+						return false
+					}
+				}
+			} else {
+				return false
+			}
 		}
 	}
 	return true
+}
+
+func (mm Tester) findByPartialKey(reqMap definition.Values, partialMatch string) ([]string, bool) {
+	if !strings.Contains(partialMatch, glob.GLOB) {
+		return []string{}, false
+	}
+
+	for key, _ := range reqMap {
+		if glob.Glob(partialMatch, key) {
+			return reqMap[key], true
+		}
+	}
+
+	return []string{}, false
 }
 
 func (mm Tester) matchKeyAndValue(reqMap definition.Cookies, mockMap definition.Cookies) bool {

@@ -180,7 +180,7 @@ A core feature of Mmock is the ability to return canned HTTP responses for reque
 * *method*: Request http method. It allows more than one separated by pipes "|" **Mandatory**
 * *path*: Resource identifier. It allows :value matching. **Mandatory**
 * *queryStringParameters*: Array of query strings. It allows more than one value for the same key.
-* *headers*: Array of headers. It allows more than one value for the same key.
+* *headers*: Array of headers. It allows more than one value for the same key. **Case sensitive!**
 * *cookies*: Array of cookies.
 * *body*: Body string. It allows * pattern.
 
@@ -193,6 +193,15 @@ Glob matching is available for:
 * cookies
 * query strings
 * body
+
+Query strings and headers support also global matches (*) in the header/parameter name. For example:
+```json
+		"headers": {
+			"Custom-Header-*": [
+				"partial val*"
+			]
+		}
+```
 
 #### Response (Optional on proxy call)
 

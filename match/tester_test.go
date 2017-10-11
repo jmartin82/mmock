@@ -293,7 +293,7 @@ func TestMatchHeaders(t *testing.T) {
 	}
 }
 
-func TestMatchHeadersGlob(t *testing.T) {
+func TestMatchHeadersGlobValues(t *testing.T) {
 	rval := make(definition.Values)
 	rval["test"] = []string{"test"}
 	req := definition.Request{}
@@ -315,7 +315,7 @@ func TestMatchHeadersGlob(t *testing.T) {
 	}
 }
 
-func TestMatchHeadersMultiGlob(t *testing.T) {
+func TestMatchHeadersMultiGlobValue(t *testing.T) {
 	rval := make(definition.Values)
 	rval["first"] = []string{"test"}
 	rval["second"] = []string{"another_test"}
@@ -335,6 +335,51 @@ func TestMatchHeadersMultiGlob(t *testing.T) {
 
 	mval["first"] = []string{"*es*"}
 	mval["second"] = []string{"*tmher_es*"}
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
+}
+
+func TestMatchGlobHeadersGlobValue(t *testing.T) {
+	rval := make(definition.Values)
+	rval["test"] = []string{"test"}
+	req := definition.Request{}
+	req.Headers = rval
+
+	m := definition.Mock{}
+	mval := make(definition.Values)
+	mval["*es*"] = []string{"*"}
+	m.Request.Headers = mval
+
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
+		t.Error(err)
+	}
+
+	mval["wrong_one"] = []string{"invalid*"}
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
+}
+
+func TestMatchGlobHeadersGlobValueNonExisting(t *testing.T) {
+	rval := make(definition.Values)
+	rval["test"] = []string{"test"}
+	req := definition.Request{}
+	req.Headers = rval
+
+	m := definition.Mock{}
+	mval := make(definition.Values)
+	mval["*invalid"] = []string{"*"}
+	m.Request.Headers = mval
+
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
+
+	mval = make(definition.Values)
+	mval["*es*"] = []string{"*invalid"}
 	if b, err := mm.Check(&req, &m, true); b {
 		t.Error(err)
 	}
