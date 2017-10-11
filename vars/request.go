@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -81,9 +82,17 @@ func (rp Request) getUrl() (string, bool) {
 	queryStringParams := rp.Request.QueryStringParameters
 
 	if len(queryStringParams) != 0 {
+		queryKeys := []string{}
 		queryVars := []string{}
-		for key, values := range queryStringParams {
-			for _, value := range values {
+
+		//make predictable
+		for key := range queryStringParams {
+			queryKeys = append(queryKeys, key)
+		}
+		sort.Strings(queryKeys)
+
+		for _, key := range queryKeys {
+			for _, value := range queryStringParams[key] {
 				queryVars = append(queryVars, fmt.Sprintf("%s=%s", key, value))
 			}
 		}
