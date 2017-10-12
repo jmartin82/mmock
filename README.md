@@ -180,11 +180,28 @@ A core feature of Mmock is the ability to return canned HTTP responses for reque
 * *method*: Request http method. It allows more than one separated by pipes "|" **Mandatory**
 * *path*: Resource identifier. It allows :value matching. **Mandatory**
 * *queryStringParameters*: Array of query strings. It allows more than one value for the same key.
-* *headers*: Array of headers. It allows more than one value for the same key.
+* *headers*: Array of headers. It allows more than one value for the same key. **Case sensitive!**
 * *cookies*: Array of cookies.
 * *body*: Body string. It allows * pattern.
 
-In case of queryStringParameters, headers and cookies, the request can be matched only if all defined keys in mock will be present with the exact value.
+In case of queryStringParameters, headers and cookies, the request can be matched only if all defined keys in mock will be present with the exact or glob value.
+
+Glob matching is available for:
+* host
+* path
+* headers
+* cookies
+* query strings
+* body
+
+Query strings and headers support also global matches (*) in the header/parameter name. For example:
+```json
+		"headers": {
+			"Custom-Header-*": [
+				"partial val*"
+			]
+		}
+```
 
 #### Response (Optional on proxy call)
 
@@ -388,7 +405,7 @@ Request data:
  - request.path."*key*"
  - request.query."*key*"
  - request.cookie."*key*"
-- request.fragment
+ - request.fragment
  - request.url (full url with scheme, hostname, port, path and query parameters)
  - request.autority (return scheme, hostname and port (optional))
  - request.body
