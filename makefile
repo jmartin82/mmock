@@ -19,30 +19,27 @@ doc:
 	godoc -http=:6060
 
 fmt:
-	go-ls -exec="go fmt" ./...
+	go fmt ./...
 
 # https://github.com/golang/lint
 # go get github.com/golang/lint/golint
 lint:
-	go-ls -exec="golint" ./...
+	golint ./...
 
 test:
-	go-ls -exec="go test -v" ./...
+	go test -v ./...
 	
 coverage:
-	goverage -v -covermode count -coverprofile=coverage.out
-	goveralls -coverprofile=coverage.out -service=travis-ci -ignore=console/bindata.go,vars/fakedata/fake_adapter.go,mmock.go -repotoken $$COVERALLS_TOKEN
-	#go tool cover -html=coverage.out
-
+	echo 'mode: atomic' > coverage.txt && go list ./... | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.txt'
+	rm coverage.tmp
 
 # https://godoc.org/golang.org/x/tools/cmd/vet
 vet:
-	go-ls -exec="go vet -v"
+	go vet -v
 
 get-deps:
 	go get github.com/mattn/goveralls
-	go get github.com/haya14busa/goverage
-	go get github.com/laher/gols/cmd/go-ls
+	go get -u github.com/AlekSi/gocoverutil
 	glide install
 
 release:

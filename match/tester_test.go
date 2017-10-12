@@ -405,22 +405,22 @@ func TestMatchHost(t *testing.T) {
 }
 
 func TestMatchHostGlob(t *testing.T) {
-	
-		req := definition.Request{}
-		req.Host = "domain.com"
-	
-		m := definition.Mock{}
-		m.Request.Host = "*omain.co*"
-	
-		mm := Tester{}
-		if b, err := mm.Check(&req, &m, true); !b {
-			t.Error(err)
-		}
-	
-		req.Host = "error.com"
-		if b, err := mm.Check(&req, &m, true); b {
-			t.Error(err)
-		}
+
+	req := definition.Request{}
+	req.Host = "domain.com"
+
+	m := definition.Mock{}
+	m.Request.Host = "*omain.co*"
+
+	mm := Tester{}
+	if b, err := mm.Check(&req, &m, true); !b {
+		t.Error(err)
+	}
+
+	req.Host = "error.com"
+	if b, err := mm.Check(&req, &m, true); b {
+		t.Error(err)
+	}
 }
 
 func TestMatchBody(t *testing.T) {

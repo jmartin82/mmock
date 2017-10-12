@@ -4,3 +4,4 @@ debug.test
 data/*
 /vendor
 coverage.out
+coverage.txt

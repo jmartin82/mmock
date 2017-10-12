@@ -1,4 +1,4 @@
-FROM golang:1.8-alpine
+FROM golang:1.9-alpine
 
 # Install ca-certificates, required for the "release message" feature:
 RUN apk --no-cache add \
