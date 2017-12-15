@@ -312,9 +312,24 @@ Like stubbing this call also uses the same DSL to filter and query requests.
 
 ### Scenario
 
-**Title** : Clean all scenarios status.<br>
+**Title** : Clean all scenarios status and pause state.<br>
 **URL** : /api/scenarios/reset_all<br>
 **Method** : GET<br>
+**Response Codes**: Success (200 OK)<br>
+
+**Title** : Manually progress a scenario state machine to the given state.<br>
+**URL** : /api/scenarios/set/:scenario/:state<br>
+**Method** : PUT<br>
+**Response Codes**: Success (200 OK)<br>
+
+**Title** : Pause prevents all scenarios state machines from progressing to a new state.<br>
+**URL** : /api/scenarios/pause<br>
+**Method** : PUT<br>
+**Response Codes**: Success (200 OK)<br>
+
+**Title** : Allow scenarios state machines to continue.<br>
+**URL** : /api/scenarios/unpause<br>
+**Method** : PUT<br>
 **Response Codes**: Success (200 OK)<br>
 
 ### Mapping

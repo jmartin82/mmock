@@ -2,7 +2,7 @@ package scenario
 
 import "testing"
 
-func TestBasicSenarioManage(t *testing.T) {
+func TestBasicScenarioManage(t *testing.T) {
 	ms := NewMemoryStore()
 
 	state := ms.GetState("scene1")
@@ -31,6 +31,22 @@ func TestBasicSenarioManage(t *testing.T) {
 	ms.ResetAll()
 	if ms.GetState("Scene1") != "not_started" || ms.GetState("Scene2") != "not_started" {
 		t.Errorf("Invalid initial state")
+	}
+
+}
+
+func TestScenarioManagePause(t *testing.T) {
+	ms := NewMemoryStore()
+	ms.SetPaused(true)
+
+	ms.SetState("Scene1", "some_state")
+	if ms.GetState("Scene1") == "some_state" {
+		t.Errorf("Scenario state updated after pause")
+	}
+
+	ms.ResetAll()
+	if ms.GetPaused() {
+		t.Errorf("Scenarios not unpaused after all were reset")
 	}
 
 }
