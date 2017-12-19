@@ -5,4 +5,6 @@ type Director interface {
 	GetState(name string) string
 	Reset(name string) bool
 	ResetAll()
+	SetPaused(newstate bool)
+	GetPaused() bool
 }

@@ -73,6 +73,9 @@ func (di *Dispatcher) Start() {
 	e.GET("/api/request/matched", di.requestMatchedHandler)
 	e.GET("/api/request/unmatched", di.requestUnMatchedHandler)
 	e.GET("/api/scenarios/reset_all", di.scenariosResetHandler)
+	e.PUT("/api/scenarios/set/:scenario/:state", di.scenariosSetHandler)
+	e.PUT("/api/scenarios/pause", di.scenariosPauseHandler)
+	e.PUT("/api/scenarios/unpause", di.scenariosUnpauseHandler)
 
 	//mapping
 	e.GET("/api/mapping", di.mappingListHandler)
@@ -246,6 +249,30 @@ func (di *Dispatcher) scenariosResetHandler(c echo.Context) error {
 	di.Scenario.ResetAll()
 	ar := &ActionResponse{
 		Result: "reset",
+	}
+	return c.JSON(http.StatusOK, ar)
+}
+
+func (di *Dispatcher) scenariosSetHandler(c echo.Context) error {
+	di.Scenario.SetState(c.Param("scenario"), c.Param("state"))
+	ar := &ActionResponse{
+		Result: "updated",
+	}
+	return c.JSON(http.StatusOK, ar)
+}
+
+func (di *Dispatcher) scenariosPauseHandler(c echo.Context) error {
+	di.Scenario.SetPaused(true)
+	ar := &ActionResponse{
+		Result: "updated",
+	}
+	return c.JSON(http.StatusOK, ar)
+}
+
+func (di *Dispatcher) scenariosUnpauseHandler(c echo.Context) error {
+	di.Scenario.SetPaused(false)
+	ar := &ActionResponse{
+		Result: "updated",
 	}
 	return c.JSON(http.StatusOK, ar)
 }

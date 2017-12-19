@@ -22,6 +22,13 @@ func (dsm DummyScenarioManager) GetState(name string) string {
 	return ""
 }
 
+func (dsm DummyScenarioManager) GetPaused() bool {
+	return false
+}
+
+func (dsm DummyScenarioManager) SetPaused(_ bool) {
+}
+
 func TestFindMatches(t *testing.T) {
 	spy := NewSpy(NewTester(DummyScenarioManager{}), NewMemoryStore())
 
