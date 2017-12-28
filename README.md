@@ -1,4 +1,4 @@
-Mmock
+![Mmock](/docs/logo.png "Mmock logo")
 =========
 [![Build Status](https://travis-ci.org/jmartin82/mmock.svg?branch=master)](https://travis-ci.org/jmartin82/mmock)
 
@@ -484,7 +484,8 @@ Request data:
 ### Contributors
 - Amazing request body parsing form [@hmoragrega](https://github.com/hmoragrega)
 - Awesome use statistics from [@alfonsfoubert](https://github.com/alfonsfoubert)
-- More request variables available thanks to [@Bartek-CMP ](https://github.com/Bartek-CMP)
+- More request variables available thanks to [@Bartek-CMP](https://github.com/Bartek-CMP)
+- Scenario pause feature thanks to [@Nekroze](https://github.com/Nekroze)
 - Added the possibility of access to an array index in dynamic responses [@jaimelopez](https://github.com/jaimelopez)
 - Is this not enough? [@vtrifonov](https://github.com/vtrifonov) is working in a fork with a really advanced features. [HTTP API Mock](https://github.com/vtrifonov/http-api-mock)
 
