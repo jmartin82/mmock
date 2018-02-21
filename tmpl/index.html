@@ -24,7 +24,8 @@
         $( document ).ready(function() { 
             
             var requestLogger = new RequestLogger(); 
-            var ws = new WebSocket("ws://" + location.host + "/echo");
+            var wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+            var ws = new WebSocket(wsProtocol + location.host + "/echo");
             ws.onmessage = function(event) { 
                 var message = JSON.parse(event.data);
                 requestLogger.logEntry(message);
