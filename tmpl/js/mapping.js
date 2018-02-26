@@ -6,7 +6,7 @@ function Mapping(domain) {
     var mapping_template = Handlebars.compile(mapping_source);
 
     var fillList = function() {
-        $.getJSON("http://" + domain + "/api/mapping", function(data) {
+        $.getJSON(window.location.protocol + "//" + domain + "/api/mapping", function(data) {
             var items = [];
             $("#mapping-table tbody").empty();
             $.each(data, function(key, mapping) {
@@ -23,7 +23,7 @@ function Mapping(domain) {
 
     $('#mapping-data').on('click', '.btn-view-mapping', function() {
         var uri = $(this).data("uri");
-        $.getJSON("http://" + domain + "/api/mapping/" + uri, function(data) {
+        $.getJSON(window.location.protocol + "//" + domain + "/api/mapping/" + uri, function(data) {
             var content = JSON.stringify(data, null, "\t")
             BootstrapDialog.show({
                 title: 'Mapping definition',
@@ -35,7 +35,7 @@ function Mapping(domain) {
 
     $('#mapping-data').on('click', '.btn-edit-mapping', function() {
         var uri = $(this).data("uri");
-        var endpoint = "http://" + domain + "/api/mapping/" + uri;
+        var endpoint = window.location.protocol + "//" + domain + "/api/mapping/" + uri;
         $.getJSON(endpoint, function(data) {
             var content = JSON.stringify(data, null,"\t")
             var $text = $('<textarea id="text-update-mapping" style="min-width:570px;min-height:300px"></textarea>');
@@ -68,9 +68,4 @@ function Mapping(domain) {
             });
         });
     });
-
-
-
-
-
 }
