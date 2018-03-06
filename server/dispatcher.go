@@ -60,7 +60,7 @@ func (di Dispatcher) callWebHook(url string, match *definition.Match) {
 		log.Printf("Impossible send payload to: %s\n", url)
 		return
 	}
-	log.Print("WebHook response: %s\n", resp.StatusCode)
+	log.Printf("WebHook response: %d\n", resp.StatusCode)
 }
 
 //ServerHTTP is the mock http server request handler.
@@ -117,11 +117,11 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 
 			di.Processor.Eval(request, mock)
 			if mock.Control.Crazy {
-				log.Printf("Running crazy mode")
+				log.Println("Running crazy mode")
 				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)
 			}
 			if mock.Control.Delay > 0 {
-				log.Printf("Adding a delay")
+				log.Println("Adding a delay")
 				time.Sleep(time.Duration(mock.Control.Delay) * time.Second)
 			}
 

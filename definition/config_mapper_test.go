@@ -35,31 +35,31 @@ func TestReadMockDefinition(t *testing.T) {
 	content := []byte(MockContent)
 	dir, err := ioutil.TempDir("", "mmock")
 	if err != nil {
-		t.Errorf("Error creating temporary folder")
+		t.Error("Error creating temporary folder")
 	}
 
 	tmpfn := filepath.Join(dir, "tmpfile_1")
 	if err := ioutil.WriteFile(tmpfn, content, 0666); err != nil {
-		t.Errorf("Error creating temporary file")
+		t.Error("Error creating temporary file")
 	}
 
 	defer os.RemoveAll(dir) // clean up
 
 	mapper := NewConfigMapper()
 	if _, err := mapper.Read(tmpfn); err == nil {
-		t.Errorf("Expected read error")
+		t.Error("Expected read error")
 	}
 
 	mapper = NewConfigMapper()
 	mapper.AddConfigParser(&mockParser{canParse: false, readOk: false})
 	if _, err := mapper.Read(tmpfn); err == nil {
-		t.Errorf("Expected read error")
+		t.Error("Expected read error")
 	}
 
 	mapper = NewConfigMapper()
 	mapper.AddConfigParser(&mockParser{canParse: true, readOk: false})
 	if _, err := mapper.Read(tmpfn); err == nil {
-		t.Errorf("Expected read error")
+		t.Error("Expected read error")
 	}
 	mapper = NewConfigMapper()
 	mapper.AddConfigParser(&mockParser{canParse: true, readOk: true})
@@ -81,12 +81,12 @@ func TestWriteMockDefinition(t *testing.T) {
 	mapper := NewConfigMapper()
 	err = mapper.Write(tmpfn, mock)
 	if err != nil {
-		t.Errorf("Unexpected error writing the config", err)
+		t.Error("Unexpected error writing the config", err)
 	}
 
 	bytes, erf := ioutil.ReadFile(tmpfn)
 	if erf != nil || len(bytes) == 0 {
-		t.Errorf("Unexpected error reading the config ", erf)
+		t.Error("Unexpected error reading the config ", erf)
 	}
 
 }
