@@ -486,6 +486,7 @@ Request data:
 - Awesome use statistics from [@alfonsfoubert](https://github.com/alfonsfoubert)
 - More request variables available thanks to [@Bartek-CMP](https://github.com/Bartek-CMP)
 - Scenario pause feature thanks to [@Nekroze](https://github.com/Nekroze)
+- Improved docker image thanks to [@daroot](https://github.com/daroot)
 - Added the possibility of access to an array index in dynamic responses [@jaimelopez](https://github.com/jaimelopez)
 - Is this not enough? [@vtrifonov](https://github.com/vtrifonov) is working in a fork with a really advanced features. [HTTP API Mock](https://github.com/vtrifonov/http-api-mock)
 
@@ -499,6 +500,6 @@ If you make any changes, run ```go fmt ./...``` before submitting a pull request
 
 ### Licence
 
-Copyright ©‎ 2016 - 2018, Jordi Martín (http://jordi.io)
+Copyright © 2016 - 2018, Jordi Martín (http://jordi.io)
 
 Released under MIT license, see [LICENSE](LICENSE.md) for details.
