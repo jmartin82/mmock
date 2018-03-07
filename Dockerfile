@@ -1,4 +1,4 @@
-FROM golang:1.9-alpine
+FROM golang:1.9-alpine as builder
 
 # Install ca-certificates, required for the "release message" feature:
 RUN apk --no-cache add \
@@ -12,6 +12,13 @@ RUN apk --no-cache add --virtual build-dependencies \
   && mv /root/gocode/bin/mmock /usr/local/bin \
   && rm -rf /root/gocode \
   && apk del --purge build-dependencies
+
+FROM alpine:3.6
+
+RUN apk --no-cache add \
+    ca-certificates
+
+COPY --from=builder /usr/local/bin/mmock /usr/local/bin/mmock
 
 RUN mkdir /config
 RUN mkdir /tls

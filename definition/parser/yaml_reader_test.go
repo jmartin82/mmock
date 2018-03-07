@@ -65,89 +65,89 @@ control:
 	yaml := YAMLReader{}
 	m, err := yaml.Parse(invalidDefinition)
 	if err == nil {
-		t.Errorf("Expected error in definition")
+		t.Error("Expected error in definition")
 	}
 
 	m, err = yaml.Parse(validDefinition)
 	if err != nil {
-		t.Errorf("Unexpected error in definition", err)
+		t.Error("Unexpected error in definition", err)
 	}
 
 	if m.URI != "name" {
-		t.Errorf("Missing name")
+		t.Error("Missing name")
 	}
 
 	if m.Description != "description" {
-		t.Errorf("Missing description")
+		t.Error("Missing description")
 	}
 
 	//request
 	if m.Request.Method != "GET" {
-		t.Errorf("Missing description")
+		t.Error("Missing description")
 	}
 
 	if m.Request.Path != "/your/path/:variable" {
-		t.Errorf("Missing description")
+		t.Error("Missing description")
 	}
 
 	if m, f := m.Request.QueryStringParameters["name"]; f == false || m[0] != "value" {
-		t.Errorf("Missing QueryStringParameters")
+		t.Error("Missing QueryStringParameters")
 	}
 
 	if m, f := m.Request.Headers["name"]; f == false || m[0] != "value" {
-		t.Errorf("Missing Headers")
+		t.Error("Missing Headers")
 	}
 
 	if m, f := m.Request.Cookies["name"]; f == false || m != "value" {
-		t.Errorf("Missing Cookies")
+		t.Error("Missing Cookies")
 	}
 
 	if m.Request.Body != "Expected Body" {
-		t.Errorf("Missing Body")
+		t.Error("Missing Body")
 	}
 
 	//response
 	if m.Response.StatusCode != 200 {
-		t.Errorf("statusCode")
+		t.Error("statusCode")
 	}
 	if m, f := m.Response.Headers["name"]; f == false || m[0] != "value" {
-		t.Errorf("Missing Headers")
+		t.Error("Missing Headers")
 	}
 	if m, f := m.Response.Cookies["name"]; f == false || m != "value" {
-		t.Errorf("Missing Cookies")
+		t.Error("Missing Cookies")
 	}
 	if m.Response.Body != "Responsebody" {
-		t.Errorf("Missing Body")
+		t.Error("Missing Body")
 	}
 
 	//control
 
 	if m.Control.ProxyBaseURL != "http://www.jordi.io" {
-		t.Errorf("Missing ProxyBaseURL")
+		t.Error("Missing ProxyBaseURL")
 	}
 
 	if m.Control.Delay != 5 {
-		t.Errorf("Missing delay")
+		t.Error("Missing delay")
 	}
 
 	if m.Control.Crazy != true {
-		t.Errorf("Missing crazy")
+		t.Error("Missing crazy")
 	}
 
 	if m.Control.Priority != 1 {
-		t.Errorf("Missing Priority")
+		t.Error("Missing Priority")
 	}
 
 	if m.Control.Scenario.Name != "string (scenario name)" {
-		t.Errorf("Missing scenario name")
+		t.Error("Missing scenario name")
 	}
 
 	if m.Control.Scenario.RequiredState[1] != "another_state_name" {
-		t.Errorf("Missing scenario RequiredState")
+		t.Error("Missing scenario RequiredState")
 	}
 
 	if m.Control.Scenario.NewState != "new_stat_neme" {
-		t.Errorf("Missing scenario NewState")
+		t.Error("Missing scenario NewState")
 	}
 
 }
