@@ -39,7 +39,7 @@ func TestIntMinMax(t *testing.T) {
 			t.Error("The result should be an integer in string format", result)
 		}
 		if randomInt < min || randomInt > max {
-			errorMsg := fmt.Sprintf("The random number should be between %s and %s", min, max)
+			errorMsg := fmt.Sprintf("The random number should be between %d and %d", min, max)
 			t.Error(errorMsg, randomInt)
 		}
 	}

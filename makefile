@@ -1,6 +1,6 @@
 .PHONY: build doc fmt lint dev test vet godep install bench bindata
 
-PKG_NAME=$(shell basename `pwd`)
+PKG_NAME=mmock
 NS = jordimartin
 VERSION ?= latest
 
@@ -37,7 +37,7 @@ vet:
 	go vet -v
 
 get-deps:
-	glide install
+	curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 release:
 	docker build --no-cache=true  -t $(NS)/$(PKG_NAME):$(VERSION) .

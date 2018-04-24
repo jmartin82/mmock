@@ -55,7 +55,8 @@ func (di *Dispatcher) logFanOut() {
 //Start initiates the http console.
 func (di *Dispatcher) Start() {
 	e := echo.New()
-	//e.HideBanner = true
+	e.HideBanner = true
+	e.HidePort = true
 
 	//WS
 	di.clients = []*websocket.Conn{}

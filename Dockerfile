@@ -5,10 +5,12 @@ RUN apk --no-cache add \
     ca-certificates
 
 RUN apk --no-cache add --virtual build-dependencies \
-    git \
+    git curl\
+  && curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh \
   && mkdir -p /root/gocode \
   && export GOPATH=/root/gocode \
   && go get github.com/jmartin82/mmock \
+  && dep ensure \
   && mv /root/gocode/bin/mmock /usr/local/bin \
   && rm -rf /root/gocode \
   && apk del --purge build-dependencies

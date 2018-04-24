@@ -1,0 +1,34 @@
+# .goreleaser.yml
+# Build customization
+builds:
+  - main: mmock.go
+    binary: mmock
+    goos:
+      - windows
+      - darwin
+      - linux
+    goarch:
+      - amd64
+archive:
+  format: tar.gz
+  replacements:
+    amd64: 64-bit
+    darwin: macOS
+  files:
+    - README.md
+dockers:
+  - image: jordimartin/mmock
+  - skip_push: true
+release:
+  github:
+    owner: jmartin82
+    name: mmock
+  draft: true
+changelog:
+  filters:
+    exclude:
+      - '^docs:'
+      - typo
+      - rollback
+env_files:
+  github_token: .github

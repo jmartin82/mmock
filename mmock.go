@@ -22,6 +22,9 @@ import (
 	"github.com/jmartin82/mmock/vars/fakedata"
 )
 
+//VERSION of the application
+const VERSION string = "2.1.0"
+
 //ErrNotFoundPath error from missing or configuration path
 var ErrNotFoundPath = errors.New("Configuration path not found")
 
@@ -32,7 +35,7 @@ var ErrNotFoundDefaultPath = errors.New("We can't determinate the current path")
 var ErrNotFoundAnyMock = errors.New("No valid mock definition found")
 
 func banner() {
-	fmt.Println("MMock v 2.0.2")
+	fmt.Printf("MMock v %s", VERSION)
 	fmt.Println("")
 
 	fmt.Print(
