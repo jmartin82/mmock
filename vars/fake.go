@@ -39,20 +39,28 @@ func (fv Fake) call(data reflect.Value, name string) (string, error) {
 	return res, nil
 }
 
-func (fv Fake) callWithIntParameter(data reflect.Value, name string, parameter int) string {
+func (fv Fake) callWithIntParameters(data reflect.Value, name string, parameters []int) string {
 	// get a reflect.Value for the method
 	methodVal := data.MethodByName(name)
 	// turn that into an interface{}
 	methodIface := methodVal.Interface()
-	// turn that into a function that has the expected signature
-	method := methodIface.(func(int) string)
+
 	// call the method directly
-	res := method(parameter)
-	return res
+	if 1 == len(parameters) {
+		// only one parameter
+		// turn that into a function that has the expected signature
+		method := methodIface.(func(int) string)
+		return method(parameters[0])
+	}
+
+	// more than one parameter
+	// turn that into a function that has the expected signature
+	method := methodIface.(func(...int) string)
+	return method(parameters...)
 }
 
 func (fv Fake) callMethod(name string) (string, bool) {
-	method, parameter, hasParameter := fv.getMethodAndParameter(name)
+	method, parameters, hasParameter := fv.getMethodAndParameters(name)
 	if hasParameter {
 		name = method
 	}
@@ -68,7 +76,7 @@ func (fv Fake) callMethod(name string) (string, bool) {
 				// does receiver type match? (pointerness might be off)
 				if typ == method.Type.In(0) {
 					if hasParameter {
-						return fv.callWithIntParameter(data, method.Name, parameter), found
+						return fv.callWithIntParameters(data, method.Name, parameters), found
 					}
 
 					result, err := fv.call(data, method.Name)
@@ -83,8 +91,8 @@ func (fv Fake) callMethod(name string) (string, bool) {
 	return "", found
 }
 
-func (fv Fake) getMethodAndParameter(input string) (method string, parameter int, success bool) {
-	r := regexp.MustCompile(`(?P<method>\w+)\((?P<parameter>.*?)\)`)
+func (fv Fake) getMethodAndParameters(input string) (method string, parameters []int, success bool) {
+	r := regexp.MustCompile(`(?P<method>\w+)\((?P<parameters>.*?)\)`)
 
 	match := r.FindStringSubmatch(input)
 	result := make(map[string]string)
@@ -102,11 +110,17 @@ func (fv Fake) getMethodAndParameter(input string) (method string, parameter int
 		return
 	}
 
-	parameterString, success := result["parameter"]
+	parametersString, success := result["parameters"]
+	parametersString = strings.Replace(parametersString, " ", "", -1)
+	parametersList := strings.Split(parametersString, ",")
 
-	parameter, err := strconv.Atoi(parameterString)
-	if err != nil {
-		success = false
+	success = true
+	for index := range parametersList {
+		value, err := strconv.Atoi(parametersList[index])
+		parameters = append(parameters, value)
+		if err != nil {
+			success = false
+		}
 	}
 
 	return

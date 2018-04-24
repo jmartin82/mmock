@@ -476,6 +476,7 @@ Request data:
  - fake.WordsN(n)
  - fake.Zip
  - fake.Int(n) - random positive integer less than or equal to n
+ - fake.IntMinMax(min, max) - random positive number greater or equal to min and less than max
  - fake.Float(n) - random positive floating point number less than n
  - fake.UUID - generates a unique id  
 
