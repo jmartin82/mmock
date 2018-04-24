@@ -1,9 +1,12 @@
 package fakedata
 
 import (
+	"fmt"
+	"math/rand"
 	"regexp"
 	"strconv"
 	"testing"
+	"time"
 )
 
 func TestInt(t *testing.T) {
@@ -17,6 +20,27 @@ func TestInt(t *testing.T) {
 		}
 		if randomInt < 0 || randomInt > 1000 {
 			t.Error("The random number should be between 0 and 1000", randomInt)
+		}
+	}
+}
+
+func TestIntMinMax(t *testing.T) {
+	faker := FakeAdapter{}
+	rand.Seed(time.Now().Unix())
+
+	min := 0
+	max := 10000
+	for i := min; i < max; i++ {
+		params := []int{min, max}
+		result := faker.IntMinMax(params...)
+
+		randomInt, err := strconv.Atoi(result)
+		if err != nil {
+			t.Error("The result should be an integer in string format", result)
+		}
+		if randomInt < min || randomInt > max {
+			errorMsg := fmt.Sprintf("The random number should be between %s and %s", min, max)
+			t.Error(errorMsg, randomInt)
 		}
 	}
 }

@@ -162,6 +162,9 @@ func (ddf DummyDataFaker) Zip() string {
 func (ddf DummyDataFaker) Int(n int) string {
 	return ddf.Dummy + strconv.Itoa(n)
 }
+func (ddf DummyDataFaker) IntMinMax(values ...int) string {
+	return ddf.Dummy + strconv.Itoa(values[0]+1)
+}
 func (ddf DummyDataFaker) Float(n int) string {
 	return ddf.Dummy + strconv.Itoa(n)
 }

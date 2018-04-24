@@ -247,9 +247,14 @@ func (fa FakeAdapter) Zip() string {
 	return fake.Zip()
 }
 
-//Number returns a random positive number less than or equal to n
+//Int returns a random positive number less than or equal to n
 func (fa FakeAdapter) Int(n int) string {
 	return strconv.Itoa(rand.Intn(n + 1))
+}
+
+//IntMinMax returns a random positive number greater than min and lower than max
+func (fa FakeAdapter) IntMinMax(values ...int) string {
+	return strconv.Itoa(rand.Intn(values[1]-values[0]) + values[0])
 }
 
 //Float returns a random positive floating point number less than n

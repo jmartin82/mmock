@@ -49,6 +49,7 @@ type DataFaker interface {
 	Words() string
 	Zip() string
 	Int(n int) string
+	IntMinMax(values ...int) string
 	Float(n int) string
 	UUID() string
 }
