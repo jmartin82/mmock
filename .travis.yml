@@ -4,6 +4,7 @@ go:
 
 install:
   - make get-deps
+  - dep ensure
 
 script:
   - make test

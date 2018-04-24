@@ -19,6 +19,10 @@ archive:
 dockers:
   - image: jordimartin/mmock
   - skip_push: true
+    tag_templates:
+    - "{{ .Tag }}"
+    - "v{{ .Major }}"
+    - latest
 release:
   github:
     owner: jmartin82
