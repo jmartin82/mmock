@@ -16,6 +16,8 @@ archive:
     darwin: macOS
   files:
     - README.md
+    - config/*
+    - tls/*
 dockers:
   - image: jordimartin/mmock
   - skip_push: true
