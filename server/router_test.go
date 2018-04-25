@@ -51,9 +51,9 @@ func TestValidRoute(t *testing.T) {
 	r := NewRouter(dummyMapper, dummyMatcher)
 	req := definition.Request{Path: "/test"}
 
-	m, errs := r.Resolve(&req)
+	m, result := r.Resolve(&req)
 
-	if len(errs) > 0 || m.Response.StatusCode != 200 {
+	if len(result.Errors) > 0 || m.Response.StatusCode != 200 {
 		t.Fatalf("Not route resolved")
 	}
 
@@ -76,9 +76,9 @@ func TestInvalidRoute(t *testing.T) {
 
 	req := definition.Request{Path: "/test"}
 
-	_, errs := r.Resolve(&req)
+	_, result := r.Resolve(&req)
 
-	if len(errs) == 0 || errs["XX"] != "Random Error" {
+	if len(result.Errors) == 0 || result.Errors[0].URI != "XX" || result.Errors[0].Reason != "Random Error" {
 		t.Fatalf("Invalid route resolved")
 	}
 

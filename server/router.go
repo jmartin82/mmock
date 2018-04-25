@@ -11,7 +11,7 @@ import (
 
 //Resolver contains the functions to check the http request and return the matching mock.
 type Resolver interface {
-	Resolve(req *definition.Request) (*definition.Mock, definition.MatchErrors)
+	Resolve(req *definition.Request) (*definition.Mock, *definition.MatchResult)
 }
 
 //NewRouter returns a pointer to new Router
@@ -44,9 +44,10 @@ func (rr *Router) copy(src, dst *definition.Mock) {
 }
 
 //Route checks the request with all available mock definitions and return the matching mock for it.
-func (rr *Router) Resolve(req *definition.Request) (*definition.Mock, definition.MatchErrors) {
-	errors := make(definition.MatchErrors)
+func (rr *Router) Resolve(req *definition.Request) (*definition.Mock, *definition.MatchResult) {
 	mocks := rr.Mapping.List()
+	mLog := &definition.MatchResult{Found: false}
+	mLog.Errors = make([]definition.MatchError,0,len(mocks))
 
 	for _, mock := range mocks {
 		m, err := rr.Checker.Check(req, &mock, true)
@@ -54,14 +55,16 @@ func (rr *Router) Resolve(req *definition.Request) (*definition.Mock, definition
 			//we return a copy of it, not the definition itself because we will working on it.
 			md := definition.Mock{}
 			rr.copy(&mock, &md)
-			return &md, nil
+			mLog.Found = true
+			mLog.URI = mock.URI
+			return &md, mLog
 		}
-		errors[mock.URI] = err.Error()
+		mLog.Errors = append(mLog.Errors, definition.MatchError{URI:mock.URI,Reason:err.Error()})
 		if err != match.ErrPathNotMatch {
 			log.Printf("Discarding mock: %s Reason: %s\n", mock.URI, err.Error())
 		}
 	}
-	return getNotFoundResult(), errors
+	return getNotFoundResult(), mLog
 }
 
 func getNotFoundResult() *definition.Mock {

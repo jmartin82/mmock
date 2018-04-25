@@ -179,5 +179,5 @@ func (fm *ConfigMapping) fsIsBind() bool {
 }
 
 func (fm *ConfigMapping) sanitizeURI(URI string) string {
-	return strings.Trim(strings.TrimPrefix(URI, "/"), " ")
+	return strings.Trim(strings.TrimPrefix(URI, string(os.PathSeparator)), " ")
 }

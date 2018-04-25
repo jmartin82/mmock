@@ -56,11 +56,11 @@ func TestFindMatches(t *testing.T) {
 func TestMatchByResult(t *testing.T) {
 	spy := NewSpy(NewTester(DummyScenarioManager{}), NewMemoryStore())
 
-	m1 := definition.Match{Result: definition.Result{Found: true}}
+	m1 := definition.Match{Result: &definition.MatchResult{Found: true}}
 	spy.Save(m1)
-	m2 := definition.Match{Result: definition.Result{Found: false}}
+	m2 := definition.Match{Result: &definition.MatchResult{Found: false}}
 	spy.Save(m2)
-	m3 := definition.Match{Result: definition.Result{Found: true}}
+	m3 := definition.Match{Result: &definition.MatchResult{Found: true}}
 	spy.Save(m3)
 
 	matches := spy.GetAll()

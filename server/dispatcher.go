@@ -97,18 +97,11 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definition.Mock, *definition.Match) {
 	response := &definition.Response{}
-	result := definition.Result{}
-	mock, errs := di.Resolver.Resolve(request)
-	if errs == nil {
-		result.Found = true
-	} else {
-		result.Found = false
-		result.Errors = errs
-	}
+	mock, matchLog := di.Resolver.Resolve(request)
 
-	log.Printf("Mock match found: %s. Name : %s\n", strconv.FormatBool(result.Found), mock.URI)
+	log.Printf("Mock match found: %s. Name : %s\n", strconv.FormatBool(matchLog.Found), mock.URI)
 
-	if result.Found {
+	if matchLog.Found {
 		if len(mock.Control.ProxyBaseURL) > 0 {
 			statistics.TrackProxyFeature()
 			pr := proxy.Proxy{URL: mock.Control.ProxyBaseURL}
@@ -133,7 +126,7 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 		response = &mock.Response
 	}
 
-	match := &definition.Match{Time: time.Now().Unix(), Request: request, Response: response, Result: result}
+	match := &definition.Match{Time: time.Now().Unix(), Request: request, Response: response, Result: matchLog}
 
 	return mock, match
 
