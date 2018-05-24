@@ -3,8 +3,10 @@ package server
 import (
 	"bytes"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -171,6 +173,24 @@ func (di Dispatcher) listenAndServeTLS(addrTLS string) error {
 	for _, crt := range files {
 		extension := filepath.Ext(crt)
 		name := crt[0 : len(crt)-len(extension)]
+
+		if filepath.Base(crt) == "ca.crt" {
+			log.Println("Found ca cert", crt)
+			ca, err := ioutil.ReadFile(crt)
+			if err != nil {
+				return fmt.Errorf("could not load CA Certificate '%s'", crt)
+			}
+
+			certPool := x509.NewCertPool()
+			if ok := certPool.AppendCertsFromPEM(ca); !ok {
+				return fmt.Errorf("could not append ca cert '%s' to CertPool", crt)
+			}
+
+			log.Println("Added ca certificate to server ", crt)
+			tlsConfig.RootCAs = certPool
+			continue
+		}
+
 		key := fmt.Sprint(name, ".key")
 		log.Printf("Loading X509KeyPair (%s/%s)\n", filepath.Base(crt), filepath.Base(key))
 		certificate, err := tls.LoadX509KeyPair(crt, key)
