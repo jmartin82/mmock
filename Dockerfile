@@ -25,8 +25,8 @@ RUN mkdir /tls
 
 VOLUME /config
 
-ADD ./tls/server.crt /tls 
-ADD ./tls/server.key /tls 
+ADD ./tls/server.crt /tls
+ADD ./tls/server.key /tls
 
 EXPOSE 8082 8083 8084
 
