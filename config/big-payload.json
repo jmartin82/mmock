@@ -1,0 +1,11 @@
+{
+	"description": "Returns a big payload from a file",
+	"request": {
+		"method": "GET",
+		"path": "/body/big_payload"
+	},
+	"response": {
+		"statusCode": 200,
+		"body": "{{file.contents(config/bigfile.txt)}}"
+	}
+}

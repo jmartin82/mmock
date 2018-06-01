@@ -16,10 +16,12 @@ type Processor struct {
 func (fp Processor) Eval(req *definition.Request, m *definition.Mock) {
 	requestFiller := fp.FillerFactory.CreateRequestFiller(req, m)
 	fakeFiller := fp.FillerFactory.CreateFakeFiller()
+	streamFiller := fp.FillerFactory.CreateStreamFiller()
 	holders := fp.walkAndGet(m.Response)
 
 	vars := requestFiller.Fill(holders)
 	fp.mergeVars(vars, fakeFiller.Fill(holders))
+	fp.mergeVars(vars, streamFiller.Fill(holders))
 	fp.walkAndFill(m, vars)
 }
 

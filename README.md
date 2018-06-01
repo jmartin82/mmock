@@ -117,7 +117,7 @@ To configure Mmock, use command line flags described in help.
       -server-tls-port int
           Mock HTTPS server Port (default 8084)
       -tls-path
-          TLS config folder (It will load any crt/key combination, for example server.crt/server.key)
+          TLS config folder (It will load any crt/key combination, for example server.crt/server.key and also will load an ca.crt if exists )
 ```
 
 ### Mock
@@ -219,6 +219,84 @@ Query strings and headers support also global matches (*) in the header/paramete
 * *priority*: Set the priority to avoid match in less restrictive mocks. Higher, more priority.
 * *webHookURL*: After any match if this option is defined it will notify the match to the desired endpoint.
 
+### Variable tags
+
+You can use variable data in response. The variables will be defined as tags like this {{nameVar}}
+
+**Request data:** Use them if you want to add request data in your response.
+
+ - request.scheme
+ - request.hostname
+ - request.port
+ - request.path (full path)
+ - request.path."*key*"
+ - request.query."*key*"
+ - request.cookie."*key*"
+ - request.fragment
+ - request.url (full url with scheme, hostname, port, path and query parameters)
+ - request.autority (return scheme, hostname and port (optional))
+ - request.body
+ - request.body."*key*" (both `application/json` and `application/x-www-form-urlencoded requests)
+ - request.body."*deep*"."*key*" (only for `application/json` requests)
+
+**External streams:** Perfect for embedding big payloads or getting data from another service.
+
+ - file.contents(FILE_PATH)
+ - http.contents(URL)
+
+**[Fake](https://godoc.org/github.com/icrowley/fake) data:** Useful to provide a more rich and random response.
+
+ - fake.Brand
+ - fake.Character
+ - fake.Characters
+ - fake.CharactersN(n)
+ - fake.City
+ - fake.Color
+ - fake.Company
+ - fake.Continent
+ - fake.Country
+ - fake.CreditCardVisa
+ - fake.CreditCardMasterCard
+ - fake.CreditCardAmericanExpress
+ - fake.Currency
+ - fake.CurrencyCode
+ - fake.Day
+ - fake.Digits
+ - fake.DigitsN(n)
+ - fake.EmailAddress
+ - fake.FirstName
+ - fake.FullName
+ - fake.LastName
+ - fake.Gender
+ - fake.IPv4
+ - fake.Language
+ - fake.Model
+ - fake.Month
+ - fake.Year
+ - fake.Paragraph
+ - fake.Paragraphs
+ - fake.ParagraphsN(n)
+ - fake.Phone
+ - fake.Product
+ - fake.Sentence
+ - fake.Sentences
+ - fake.SentencesN(n)
+ - fake.SimplePassword
+ - fake.State
+ - fake.StateAbbrev
+ - fake.Street
+ - fake.StreetAddress
+ - fake.UserName
+ - fake.WeekDay
+ - fake.Word
+ - fake.Words
+ - fake.WordsN(n)
+ - fake.Zip
+ - fake.Int(n) - random positive integer less than or equal to n
+ - fake.IntMinMax(min, max) - random positive number greater or equal to min and less than max
+ - fake.Float(n) - random positive floating point number less than n
+ - fake.UUID - generates a unique id  
+
 ### Scenarios
 
 With the scenarios you can simulate a stateful service. It's useful to create test doubles.
@@ -275,7 +353,7 @@ This makes it possible to verify that a request matching a specific pattern was 
 **Response Codes**: Success (200 OK)<br>
 
 **Title** : Clean all recorded request.<br>
-**URL** : /request/reset<br>
+**URL** : /api/request/reset<br>
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
@@ -288,6 +366,7 @@ This makes it possible to verify that a request matching a specific pattern was 
 **URL** : /api/request/verify<br>
 **Method** : POST<br>
 **Data Params**:  <br>
+
 Like stubbing this call also uses the same DSL to filter and query requests.
 
 ```json
@@ -405,80 +484,6 @@ All enpoints have the same output format:
   }
 ]
 ```
-
-
-### Variable tags
-
-You can use variable data (random data or request data) in response. The variables will be defined as tags like this {{nameVar}}
-
-Request data:
-
- - request.scheme
- - request.hostname
- - request.port
- - request.path (full path)
- - request.path."*key*"
- - request.query."*key*"
- - request.cookie."*key*"
- - request.fragment
- - request.url (full url with scheme, hostname, port, path and query parameters)
- - request.autority (return scheme, hostname and port (optional))
- - request.body
- - request.body."*key*" (both `application/json` and `application/x-www-form-urlencoded requests)
- - request.body."*deep*"."*key*" (only for `application/json` requests)
-
-[Fake](https://godoc.org/github.com/icrowley/fake) data:
-
- - fake.Brand
- - fake.Character
- - fake.Characters
- - fake.CharactersN(n)
- - fake.City
- - fake.Color
- - fake.Company
- - fake.Continent
- - fake.Country
- - fake.CreditCardVisa
- - fake.CreditCardMasterCard
- - fake.CreditCardAmericanExpress
- - fake.Currency
- - fake.CurrencyCode
- - fake.Day
- - fake.Digits
- - fake.DigitsN(n)
- - fake.EmailAddress
- - fake.FirstName
- - fake.FullName
- - fake.LastName
- - fake.Gender
- - fake.IPv4
- - fake.Language
- - fake.Model
- - fake.Month
- - fake.Year
- - fake.Paragraph
- - fake.Paragraphs
- - fake.ParagraphsN(n)
- - fake.Phone
- - fake.Product
- - fake.Sentence
- - fake.Sentences
- - fake.SentencesN(n)
- - fake.SimplePassword
- - fake.State
- - fake.StateAbbrev
- - fake.Street
- - fake.StreetAddress
- - fake.UserName
- - fake.WeekDay
- - fake.Word
- - fake.Words
- - fake.WordsN(n)
- - fake.Zip
- - fake.Int(n) - random positive integer less than or equal to n
- - fake.IntMinMax(min, max) - random positive number greater or equal to min and less than max
- - fake.Float(n) - random positive floating point number less than n
- - fake.UUID - generates a unique id  
 
 
 

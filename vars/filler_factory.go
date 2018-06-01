@@ -8,6 +8,7 @@ import (
 type FillerFactory interface {
 	CreateRequestFiller(req *definition.Request, mock *definition.Mock) Filler
 	CreateFakeFiller() Filler
+	CreateStreamFiller() Filler
 }
 
 type MockFillerFactory struct {
@@ -21,4 +22,8 @@ func (mff MockFillerFactory) CreateRequestFiller(req *definition.Request, mock *
 func (mff MockFillerFactory) CreateFakeFiller() Filler {
 
 	return Fake{Fake: mff.FakeAdapter}
+}
+
+func (mff MockFillerFactory) CreateStreamFiller() Filler {
+	return Stream{}
 }

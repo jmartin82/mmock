@@ -1,0 +1,37 @@
+{
+    "description":"Checks for a given header with * in name in the request to match any value",
+    "request":{
+       "scheme":"",
+       "host":"",
+       "port":"",
+       "method":"GET",
+       "path":"/headers",
+       "queryStringParameters":null,
+       "fragment":"",
+       "headers":{
+          "Custom-Header-*":[
+             "m*etek"
+          ]
+       },
+       "cookies":null,
+       "body":""
+    },
+    "response":{
+       "statusCode":200,
+       "headers":null,
+       "cookies":null,
+       "body":"Hello AGAIN! my friend! Did you find the header you were looking for?"
+    },
+    "control":{
+       "priority":1,
+       "delay":0,
+       "crazy":false,
+       "scenario":{
+          "name":"",
+          "requiredState":null,
+          "newState":""
+       },
+       "proxyBaseURL":"",
+       "webHookURL":""
+    }
+ }
