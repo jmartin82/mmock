@@ -1,0 +1,12 @@
+description: "Example for proxy usage and post with parameters (param 2 can have any value)"
+
+request:
+  method: POST
+  path: /proxy_post
+  body: param1=1&param2=*
+  headers:
+    Content-Type:
+      - "application/x-www-form-urlencoded"
+
+control:
+  proxyBaseURL: "http://www.mocky.io/v2/57e1b4d1110000b90556f51c"
