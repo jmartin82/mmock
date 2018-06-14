@@ -97,6 +97,15 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	go di.recordMatchData(*match)
 }
 
+func getProxyResponse(request *definition.Request, mock *definition.Mock) *definition.Response {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+	pr := proxy.Proxy{URL: mock.Control.ProxyBaseURL, Client: client}
+	return pr.MakeRequest(request)
+}
+
 func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definition.Mock, *definition.Match) {
 	response := &definition.Response{}
 	mock, matchLog := di.Resolver.Resolve(request)
@@ -106,13 +115,7 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 	if matchLog.Found {
 		if len(mock.Control.ProxyBaseURL) > 0 {
 			statistics.TrackProxyFeature()
-			pr := proxy.Proxy{URL: mock.Control.ProxyBaseURL}
-
-			mockRequest := mock.Request
-			mockRequest.QueryStringParameters = request.QueryStringParameters
-			mockRequest.Body = request.Body
-			
-			response = pr.MakeRequest(mockRequest)
+			response = getProxyResponse(request, mock)
 		} else {
 
 			di.Processor.Eval(request, mock)

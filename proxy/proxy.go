@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"bytes"
-	"crypto/tls"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -10,13 +9,18 @@ import (
 	"github.com/jmartin82/mmock/definition"
 )
 
+type HttpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 // Proxy calls to real service
 type Proxy struct {
-	URL string
+	URL    string
+	Client HttpClient
 }
 
 // MakeRequest creates a real request to the desired service using data from the original request
-func (pr *Proxy) MakeRequest(request definition.Request) *definition.Response {
+func (pr *Proxy) MakeRequest(request *definition.Request) *definition.Response {
 
 	r := &definition.Response{}
 	log.Println("Proxy to URL:>", pr.URL)
@@ -38,15 +42,10 @@ func (pr *Proxy) MakeRequest(request definition.Request) *definition.Response {
 	log.Println("Query string parameters: ", req.URL.RawQuery)
 	log.Println("Request body: ", req.Body)
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
-	client := &http.Client{Transport: tr}
-	resp, err := client.Do(req)
+	resp, err := pr.Client.Do(req)
 	if err != nil {
 		log.Println("Impossible create a proxy request: ", err)
-		r.StatusCode = 500
+		r.StatusCode = http.StatusInternalServerError
 		return r
 	}
 	defer resp.Body.Close()
