@@ -27,6 +27,17 @@ func (pr *Proxy) MakeRequest(request definition.Request) *definition.Response {
 		}
 	}
 
+	q := req.URL.Query()
+	for h, values := range request.QueryStringParameters {
+		for _, value := range values {
+			q.Add(h, value)
+		}
+	}
+	req.URL.RawQuery = q.Encode()
+
+	log.Println("Query string parameters: ", req.URL.RawQuery)
+	log.Println("Request body: ", req.Body)
+
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}

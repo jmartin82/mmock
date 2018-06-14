@@ -107,7 +107,12 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 		if len(mock.Control.ProxyBaseURL) > 0 {
 			statistics.TrackProxyFeature()
 			pr := proxy.Proxy{URL: mock.Control.ProxyBaseURL}
-			response = pr.MakeRequest(mock.Request)
+
+			mockRequest := mock.Request
+			mockRequest.QueryStringParameters = request.QueryStringParameters
+			mockRequest.Body = request.Body
+			
+			response = pr.MakeRequest(mockRequest)
 		} else {
 
 			di.Processor.Eval(request, mock)
