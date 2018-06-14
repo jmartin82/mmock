@@ -16,12 +16,11 @@ import (
 
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
+	"github.com/jmartin82/mmock/proxy"
 	"github.com/jmartin82/mmock/scenario"
 	"github.com/jmartin82/mmock/statistics"
 	"github.com/jmartin82/mmock/translate"
 	"github.com/jmartin82/mmock/vars"
-	"github.com/jmartin82/mmock/proxy"
-	"strings"
 )
 
 //Dispatcher is the mock http server
@@ -107,19 +106,8 @@ func (di *Dispatcher) getMatchingResult(request *definition.Request) (*definitio
 	if matchLog.Found {
 		if len(mock.Control.ProxyBaseURL) > 0 {
 			statistics.TrackProxyFeature()
-
-			url := mock.Control.ProxyBaseURL
-
-			if strings.Contains(mock.Control.ProxyBaseURL, mock.Request.Path) {
-				url = strings.Replace(url, mock.Request.Path, request.Path, -1)
-			}
-
-			pr := proxy.Proxy{URL: url}
-			mockRequest := mock.Request
-			mockRequest.QueryStringParameters = request.QueryStringParameters
-			mockRequest.Body = request.Body
-
-			response = pr.MakeRequest(mockRequest)
+			pr := proxy.Proxy{URL: mock.Control.ProxyBaseURL}
+			response = pr.MakeRequest(mock.Request)
 		} else {
 
 			di.Processor.Eval(request, mock)
