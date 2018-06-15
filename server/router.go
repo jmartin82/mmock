@@ -7,6 +7,8 @@ import (
 
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/match"
+	"strings"
+	"sort"
 )
 
 //Resolver contains the functions to check the http request and return the matching mock.
@@ -47,9 +49,9 @@ func (rr *Router) copy(src, dst *definition.Mock) {
 func (rr *Router) Resolve(req *definition.Request) (*definition.Mock, *definition.MatchResult) {
 	mocks := rr.Mapping.List()
 	mLog := &definition.MatchResult{Found: false}
-	mLog.Errors = make([]definition.MatchError,0,len(mocks))
+	mLog.Errors = make([]definition.MatchError, 0, len(mocks))
 
-	for _, mock := range mocks {
+	for _, mock := range OrderMocksByNumberOfWildcardParams(mocks) {
 		m, err := rr.Checker.Check(req, &mock, true)
 		if m {
 			//we return a copy of it, not the definition itself because we will working on it.
@@ -59,14 +61,47 @@ func (rr *Router) Resolve(req *definition.Request) (*definition.Mock, *definitio
 			mLog.URI = mock.URI
 			return &md, mLog
 		}
-		mLog.Errors = append(mLog.Errors, definition.MatchError{URI:mock.URI,Reason:err.Error()})
+		mLog.Errors = append(mLog.Errors, definition.MatchError{URI: mock.URI, Reason: err.Error()})
 		if err != match.ErrPathNotMatch {
 			log.Printf("Discarding mock: %s Reason: %s\n", mock.URI, err.Error())
 		}
 	}
+
 	return getNotFoundResult(), mLog
 }
 
 func getNotFoundResult() *definition.Mock {
 	return &definition.Mock{Response: definition.Response{StatusCode: 404}}
+}
+
+//Orders the mocks by number of wildcard params (*) in order to give more priority to the more restrictive ones
+func OrderMocksByNumberOfWildcardParams(mocks []definition.Mock) []definition.Mock {
+
+	var mocksOrderedByWildcardParametersNum []definition.Mock
+
+	for key, _ := range mocks {
+		mocksOrderedByWildcardParametersNum = append(mocksOrderedByWildcardParametersNum, mocks[key])
+	}
+
+	sort.Slice(mocksOrderedByWildcardParametersNum, func(i, j int) bool {
+		currMock := mocksOrderedByWildcardParametersNum[i]
+		prevMock := mocksOrderedByWildcardParametersNum[j]
+
+		return GetMockWildcardParametersNumber(currMock) <= GetMockWildcardParametersNumber(prevMock)
+	})
+
+	return mocksOrderedByWildcardParametersNum
+}
+
+func GetMockWildcardParametersNumber(mock definition.Mock) int {
+	currMockWildcardsNum := strings.Count(mock.Request.Body, "*")
+	for _, queryStringParam := range mock.Request.QueryStringParameters {
+		for _, q := range queryStringParam {
+			if strings.Count(q, "*") > 0 {
+				currMockWildcardsNum += 1
+			}
+		}
+	}
+
+	return currMockWildcardsNum
 }
