@@ -23,6 +23,7 @@ import (
 	"github.com/jmartin82/mmock/vars"
 	"strings"
 	"net/url"
+	"regexp"
 )
 
 //Dispatcher is the mock http server
@@ -106,10 +107,18 @@ func getProxyResponse(request *definition.Request, mock *definition.Mock) *defin
 
 	client := &http.Client{Transport: tr}
 	mockProxyBaseURL := mock.Control.ProxyBaseURL
+	parsedMockProxyBaseURL, err := url.Parse(mockProxyBaseURL)
 
-	if strings.Contains(mock.Request.Path, "*") {
-		parsedMockProxyBaseURL, _ := url.Parse(mockProxyBaseURL)
-		mockProxyBaseURL = parsedMockProxyBaseURL.Scheme + "://" + parsedMockProxyBaseURL.Host + request.Path
+	if err != nil {
+		return &definition.Response{StatusCode: http.StatusInternalServerError}
+	}
+
+	authRegexp := regexp.MustCompile(mock.Request.Path)
+	matches := authRegexp.FindStringSubmatch(parsedMockProxyBaseURL.Path)
+
+	if len(matches) > 0 {
+		mockProxyBaseURL = strings.Replace(mockProxyBaseURL, matches[0], "", -1)
+		mockProxyBaseURL += request.Path
 	}
 
 	pr := proxy.Proxy{URL: mockProxyBaseURL, Client: client}
