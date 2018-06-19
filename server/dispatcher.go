@@ -21,6 +21,9 @@ import (
 	"github.com/jmartin82/mmock/statistics"
 	"github.com/jmartin82/mmock/translate"
 	"github.com/jmartin82/mmock/vars"
+	"strings"
+	"net/url"
+	"regexp"
 )
 
 //Dispatcher is the mock http server
@@ -101,8 +104,25 @@ func getProxyResponse(request *definition.Request, mock *definition.Mock) *defin
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
+
 	client := &http.Client{Transport: tr}
-	pr := proxy.Proxy{URL: mock.Control.ProxyBaseURL, Client: client}
+	mockProxyBaseURL := mock.Control.ProxyBaseURL
+	parsedMockProxyBaseURL, err := url.Parse(mockProxyBaseURL)
+
+	if err != nil {
+		return &definition.Response{StatusCode: http.StatusInternalServerError}
+	}
+
+	authRegexp := regexp.MustCompile(mock.Request.Path)
+	matches := authRegexp.FindStringSubmatch(parsedMockProxyBaseURL.Path)
+
+	if len(matches) > 0 {
+		mockProxyBaseURL = strings.Replace(mockProxyBaseURL, matches[0], "", -1)
+		mockProxyBaseURL += request.Path
+	}
+
+	pr := proxy.Proxy{URL: mockProxyBaseURL, Client: client}
+
 	return pr.MakeRequest(request)
 }
 
