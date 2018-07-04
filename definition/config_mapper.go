@@ -48,7 +48,7 @@ func (fd *ConfigMapper) AddConfigParser(reader Parser) {
 
 func (fd *ConfigMapper) Write(filename string, mock Mock) error {
 
-	content, err := json.Marshal(mock)
+	content, err := json.MarshalIndent(mock, "", "  ")
 	if err != nil {
 		return err
 	}
