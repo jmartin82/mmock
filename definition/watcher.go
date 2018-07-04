@@ -7,6 +7,7 @@ import (
 	"github.com/radovskyb/watcher"
 )
 
+//Watcher interface contains the function watching process
 type Watcher interface {
 	Bind()
 	UnBind()
@@ -28,7 +29,7 @@ func (fw *FileWatcher) UnBind() {
 	}
 }
 
-//WatchDir start the watching process to detect any change on defintions
+//Bind start the watching process to detect any change on defintions
 func (fw *FileWatcher) Bind() {
 
 	fw.watcher = watcher.New()
