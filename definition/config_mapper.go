@@ -5,6 +5,8 @@ import (
 	"errors"
 	"io/ioutil"
 	"log"
+	"reflect"
+	"strings"
 )
 
 //ErrNotValidParserFound we don't have any config reader valid for this file
@@ -70,6 +72,11 @@ func (fd *ConfigMapper) Read(filename string) (Mock, error) {
 			mock, erd := parser.Parse(buf)
 			if erd != nil {
 				log.Printf("Invalid mock format in: %s Err: %s", filename, erd)
+			}
+			if reflect.TypeOf(parser).String() == "parser.YAMLReader" {
+				if mock.Request.Body != "" {
+					mock.Request.Body = strings.TrimRight(mock.Request.Body, "\n")
+				}
 			}
 			return mock, erd
 		}
