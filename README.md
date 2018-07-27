@@ -450,7 +450,7 @@ Also there is a real time endpoint available through WebSockets that broadcast a
 
 #### Output
 
-All enpoints have the same output format:
+All endpoints have the same output format:
 
 ```json
 [
