@@ -9,6 +9,8 @@ builds:
       - linux
     goarch:
       - amd64
+    ldflags:
+     - -X main.VERSION={{.Version}}
 archive:
   format: tar.gz
   replacements:
