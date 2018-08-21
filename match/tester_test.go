@@ -483,6 +483,23 @@ func TestSceneMatchingDefinition(t *testing.T) {
 	}
 }
 
+func TestSceneMatchingIgnoreStateCase(t *testing.T) {
+	req := definition.Request{}
+	req.Body = "HelloWorld"
+	m := definition.Mock{}
+	m.Control.Scenario.Name = "uSEr"
+	m.Control.Scenario.RequiredState = []string{"CreAted"}
+	s := scenario.NewMemoryStore()
+	mm := Tester{Scenario: s}
+	if b, _ := mm.Check(&req, &m, true); b {
+		t.Error("Scenario doesn't match")
+	}
+	s.SetState("user", "created")
+	if b, _ := mm.Check(&req, &m, true); !b {
+		t.Error("Scenario match")
+	}
+}
+
 func TestSceneMatchingDefinitionDisabled(t *testing.T) {
 	req := definition.Request{}
 	req.Body = "HelloWorld"
