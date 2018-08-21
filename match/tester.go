@@ -127,7 +127,7 @@ func (mm Tester) matchScenarioState(scenario *definition.Scenario) bool {
 
 	currentState := mm.Scenario.GetState(scenario.Name)
 	for _, r := range scenario.RequiredState {
-		if r == currentState {
+		if strings.ToLower(r) == currentState {
 			return true
 		}
 	}
