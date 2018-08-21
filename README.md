@@ -494,7 +494,7 @@ All endpoints have the same output format:
 - Scenario pause feature thanks to [@Nekroze](https://github.com/Nekroze)
 - Improved docker image thanks to [@daroot](https://github.com/daroot)
 - Added the possibility of access to an array index in dynamic responses [@jaimelopez](https://github.com/jaimelopez)
-- Is this not enough? [@vtrifonov](https://github.com/vtrifonov) is working in a fork with a really advanced features. [HTTP API Mock](https://github.com/vtrifonov/http-api-mock)
+- Create mapping via console thanks to [@inabajunmr](https://github.com/inabajunmr)
 
 ### Contributing
 
