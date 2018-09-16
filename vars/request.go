@@ -149,11 +149,8 @@ func (rp Request) getCookieParam(name string) (string, bool) {
 
 func (rp Request) getHeaderParam(name string) (string, bool) {
 
-	if len(rp.Request.HttpHeaders.Headers) == 0 {
-		return "", false
-	}
 	value, f := rp.Request.HttpHeaders.Headers[name]
-	if !f {
+	if !f || len(rp.Request.HttpHeaders.Headers) == 0 {
 		return "", false
 	}
 	if len(value) == 0 {
