@@ -48,6 +48,8 @@ func (rp Request) Fill(holders []string) map[string]string {
 			s, found = rp.getPathParam(tag[13:])
 		} else if strings.HasPrefix(tag, "request.cookie.") {
 			s, found = rp.getCookieParam(tag[15:])
+		} else if strings.HasPrefix(tag, "request.header.") {
+			s, found = rp.getHeaderParam(tag[15:])
 		}
 
 		if found {
@@ -143,6 +145,19 @@ func (rp Request) getCookieParam(name string) (string, bool) {
 	}
 
 	return value, true
+}
+
+func (rp Request) getHeaderParam(name string) (string, bool) {
+
+	value, f := rp.Request.HttpHeaders.Headers[name]
+	if !f || len(rp.Request.HttpHeaders.Headers) == 0 {
+		return "", false
+	}
+	if len(value) == 0 {
+		return "", false
+	}
+
+	return value[0], true
 }
 
 func (rp Request) getBodyParam(name string) (string, bool) {

@@ -1,0 +1,14 @@
+request: 
+  method: GET
+  path: /user-agent
+response:
+  statusCode: 200
+  headers:
+    Content-Type: 
+      - "application/json"
+  body: >
+    [
+      {  
+        "user_agent":"{{request.header.User-Agent}}"
+      }
+    ]
