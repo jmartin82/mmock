@@ -3,25 +3,17 @@ package match
 import (
 	"errors"
 	"strings"
-
+    "fmt"
 	"github.com/jmartin82/mmock/scenario"
-
 	urlmatcher "github.com/azer/url-router"
 	"github.com/jmartin82/mmock/definition"
 	"github.com/ryanuber/go-glob"
 )
 
 var (
-	ErrHostNotMatch     = errors.New("Host not match")
-	ErrSchemeNotMatch   = errors.New("Scheme not match")
-	ErrFragmentNotMatch = errors.New("Fragment not match")
-	ErrMethodNotMatch   = errors.New("Method not match")
-	ErrPathNotMatch     = errors.New("Path not match")
-	ErrQueryStringMatch = errors.New("Query string not match")
-	ErrHeadersNotMatch  = errors.New("Headers not match")
 	ErrCookiesNotMatch  = errors.New("Cookies not match")
-	ErrBodyNotMatch     = errors.New("Body not match")
 	ErrScenarioNotMatch = errors.New("Scenario state not match")
+	ErrPathNotMatch     = errors.New("Path not match")
 )
 
 func NewTester(scenario scenario.Director) *Tester {
@@ -140,27 +132,27 @@ func (mm Tester) Check(req *definition.Request, mock *definition.Mock, scenarioA
 	routes := urlmatcher.New(mock.Request.Path)
 
 	if !mm.matchOnEqualsOrIfEmptyOrGlob(req.Host, mock.Request.Host) {
-		return false, ErrHostNotMatch
+		return false, errors.New("Host not match. Actual: " + req.Host + ", Expected: " + mock.Request.Host)
 	}
 
 	if !mm.matchOnEqualsOrIfEmpty(req.Scheme, mock.Request.Scheme) {
-		return false, ErrSchemeNotMatch
+		return false, errors.New("Scheme not match. Actual: " + req.Scheme + ", Expected: " + mock.Request.Scheme)
 	}
 
 	if !mm.matchOnEqualsOrIfEmpty(req.Fragment, mock.Request.Fragment) {
-		return false, ErrFragmentNotMatch
+		return false, errors.New("Fragment not match. Actual: " + req.Fragment + ", Expected: " + mock.Request.Fragment)
 	}
 
 	if !glob.Glob(mock.Request.Path, req.Path) && routes.Match(req.Path) == nil {
-		return false, ErrPathNotMatch
+		return false, errors.New("Path not match. Actual: " + req.Path + ", Expected: " + mock.Request.Path)
 	}
 
 	if !mm.mockIncludesMethod(req.Method, &mock.Request) {
-		return false, ErrMethodNotMatch
+		return false, errors.New("Method not match. Actual: " + req.Method + ", Expected: " + mock.Request.Method)
 	}
 
 	if !mm.matchKeyAndValues(req.QueryStringParameters, mock.Request.QueryStringParameters) {
-		return false, ErrQueryStringMatch
+	    return false, errors.New("Query string not match. Actual: " + mm.ValuesToString(req.QueryStringParameters) + ". Expected: "+ mm.ValuesToString(mock.Request.QueryStringParameters))
 	}
 
 	if !mm.matchKeyAndValue(req.Cookies, mock.Request.Cookies) {
@@ -168,11 +160,11 @@ func (mm Tester) Check(req *definition.Request, mock *definition.Mock, scenarioA
 	}
 
 	if !mm.matchKeyAndValues(req.Headers, mock.Request.Headers) {
-		return false, ErrHeadersNotMatch
+		return false, errors.New("Headers not match. Actual: " + mm.ValuesToString(req.Headers) + ". Expected: "+ mm.ValuesToString(mock.Request.Headers))
 	}
 
 	if len(mock.Request.Body) > 0 && !glob.Glob(mock.Request.Body, req.Body) {
-		return false, ErrBodyNotMatch
+		return false, errors.New("Body not match. Actual: " + req.Body + ", Expected: " + mock.Request.Body)
 	}
 
 	if scenarioAware && !mm.matchScenarioState(&mock.Control.Scenario) {
@@ -180,4 +172,18 @@ func (mm Tester) Check(req *definition.Request, mock *definition.Mock, scenarioA
 	}
 
 	return true, nil
+}
+
+
+func (mm Tester) ValuesToString(values definition.Values) (string) {
+    var valuesStr [] string
+
+    for name, value := range values {
+       name = strings.ToLower(name)
+       for _, h := range value {
+         valuesStr = append(valuesStr, fmt.Sprintf("%v: %v", name, h))
+       }
+    }
+
+    return strings.Join(valuesStr, ", ");
 }
