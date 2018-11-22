@@ -8,4 +8,5 @@ type Store interface {
 	Save(definition.Match)
 	Reset()
 	GetAll() []definition.Match
+	Get(limit uint, offset uint) []definition.Match
 }

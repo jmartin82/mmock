@@ -35,6 +35,26 @@ func (mrs *MemoryStore) GetAll() []definition.Match {
 	return r
 }
 
+//Get return an subset of current matches (positive and negative) in memory
+func (mrs *MemoryStore) Get(limit uint, offset uint) []definition.Match {
+	mrs.Lock()
+	defer mrs.Unlock()
+
+	max := offset + limit
+	if max > uint(len(mrs.matches)) {
+		max = uint(len(mrs.matches))
+	}
+
+	if offset >= max {
+		return []definition.Match{}
+	}
+
+	r := make([]definition.Match, max-offset)
+	copy(r, mrs.matches[offset:max])
+
+	return r
+}
+
 //NewMemoryStore is the MemoryStore contructor
 func NewMemoryStore() *MemoryStore {
 	reqs := make([]definition.Match, 0, 100)

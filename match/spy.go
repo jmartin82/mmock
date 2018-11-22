@@ -34,6 +34,10 @@ func (mc Spy) GetAll() []definition.Match {
 	return mc.store.GetAll()
 }
 
+func (mc Spy) Get(limit uint, offset uint) []definition.Match {
+	return mc.store.Get(limit, offset)
+}
+
 func (mc Spy) GetMatched() []definition.Match {
 	return mc.getMatchByResult(true)
 }
