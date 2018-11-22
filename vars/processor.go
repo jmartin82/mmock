@@ -42,7 +42,7 @@ func (fp Processor) walkAndGet(res definition.Response) []string {
 	return vars
 }
 
-func (fp Processor) walkAndFill(m *definition.Mock, vars map[string]string) {
+func (fp Processor) walkAndFill(m *definition.Mock, vars map[string][]string) {
 	res := &m.Response
 	for header, values := range res.Headers {
 		for i, value := range values {
@@ -57,11 +57,13 @@ func (fp Processor) walkAndFill(m *definition.Mock, vars map[string]string) {
 	res.Body = fp.replaceVars(res.Body, vars)
 }
 
-func (fp Processor) replaceVars(input string, vars map[string]string) string {
+func (fp Processor) replaceVars(input string, vars map[string][]string) string {
 	return varsRegex.ReplaceAllStringFunc(input, func(value string) string {
 		varName := strings.Trim(value, "{} ")
 		// replace the strings
-		if r, found := vars[varName]; found {
+		if v, found := vars[varName]; found {
+			r := v[0]
+			vars[varName] = v[1:]
 			return r
 		}
 		// replace regexes
@@ -78,7 +80,7 @@ func (fp Processor) extractVars(input string, vars *[]string) {
 	}
 }
 
-func (fp Processor) mergeVars(org map[string]string, vals map[string]string) {
+func (fp Processor) mergeVars(org map[string][]string, vals map[string][]string) {
 	for k, v := range vals {
 		org[k] = v
 	}

@@ -14,14 +14,14 @@ var re = regexp.MustCompile(`(?m)\((.*)\)`)
 type Stream struct {
 }
 
-func (st Stream) Fill(holders []string) map[string]string {
+func (st Stream) Fill(holders []string) map[string][]string {
 
-	vars := make(map[string]string)
+	vars := make(map[string][]string)
 	for _, tag := range holders {
 		if strings.HasPrefix(tag, "file.contents(") {
-			vars[tag] = st.getOutput(st.getFileContents(tag))
+			vars[tag] = append(vars[tag], st.getOutput(st.getFileContents(tag)))
 		} else if strings.HasPrefix(tag, "http.contents(") {
-			vars[tag] = st.getOutput(st.getHttpContents(tag))
+			vars[tag] = append(vars[tag], st.getOutput(st.getHttpContents(tag)))
 		}
 	}
 	return vars

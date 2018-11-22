@@ -17,9 +17,9 @@ type Request struct {
 	Request *definition.Request
 }
 
-func (rp Request) Fill(holders []string) map[string]string {
+func (rp Request) Fill(holders []string) map[string][]string {
 
-	vars := make(map[string]string)
+	vars := make(map[string][]string)
 	for _, tag := range holders {
 		found := false
 		s := ""
@@ -53,7 +53,7 @@ func (rp Request) Fill(holders []string) map[string]string {
 		}
 
 		if found {
-			vars[tag] = s
+			vars[tag] = append(vars[tag], s)
 		}
 
 	}
