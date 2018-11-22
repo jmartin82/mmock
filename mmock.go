@@ -14,6 +14,7 @@ import (
 	"github.com/jmartin82/mmock/definition"
 	"github.com/jmartin82/mmock/definition/parser"
 	"github.com/jmartin82/mmock/match"
+	"github.com/jmartin82/mmock/match/payload"
 	"github.com/jmartin82/mmock/scenario"
 	"github.com/jmartin82/mmock/server"
 	"github.com/jmartin82/mmock/statistics"
@@ -172,12 +173,12 @@ func main() {
 
 	//shared structs
 	scenario := scenario.NewMemoryStore()
-	checker := match.NewTester(scenario)
+	comparator := payload.NewDefaultComparator()
+	tester := match.NewTester(comparator, scenario)
 	matchStore := match.NewMemoryStore()
-
 	mapping := getMapping(*cPath)
-	spy := getMatchSpy(checker, matchStore)
-	router := getRouter(mapping, checker)
+	spy := getMatchSpy(tester, matchStore)
+	router := getRouter(mapping, tester)
 	varsProcessor := getVarsProcessor()
 
 	if !(*sStatistics) {

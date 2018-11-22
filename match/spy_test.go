@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/match/payload"
 )
 
 type DummyScenarioManager struct {
@@ -30,7 +31,7 @@ func (dsm DummyScenarioManager) SetPaused(_ bool) {
 }
 
 func TestFindMatches(t *testing.T) {
-	spy := NewSpy(NewTester(DummyScenarioManager{}), NewMemoryStore())
+	spy := NewSpy(NewTester(payload.NewComparator(), DummyScenarioManager{}), NewMemoryStore())
 
 	m1 := definition.Match{Request: &definition.Request{Host: "TEST1"}}
 	spy.Save(m1)
@@ -54,7 +55,7 @@ func TestFindMatches(t *testing.T) {
 }
 
 func TestMatchByResult(t *testing.T) {
-	spy := NewSpy(NewTester(DummyScenarioManager{}), NewMemoryStore())
+	spy := NewSpy(NewTester(payload.NewComparator(), DummyScenarioManager{}), NewMemoryStore())
 
 	m1 := definition.Match{Result: &definition.MatchResult{Found: true}}
 	spy.Save(m1)

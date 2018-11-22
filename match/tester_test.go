@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/match/payload"
 	"github.com/jmartin82/mmock/scenario"
 )
 
@@ -456,6 +457,24 @@ func TestGlobBody(t *testing.T) {
 
 }
 
+func TestBodyComparator(t *testing.T) {
+	req := definition.Request{}
+	req.Body = "{\"name\":\"bob\",\"age\":30}"
+	hval := make(definition.Values)
+	hval["Content-Type"] = []string{"application/json; charset=utf8"}
+	req.Headers = hval
+
+	m := definition.Mock{}
+	m.Request.Body = "{\"age\":30,\n\"name\":\"bob\"}"
+
+	comparator := payload.NewDefaultComparator()
+	mm := Tester{comparator: comparator}
+	if b, err := mm.Check(&req, &m, true); !b {
+		t.Error(err)
+	}
+
+}
+
 func TestMatchIgnoreMissingBodyDefinition(t *testing.T) {
 	req := definition.Request{}
 	req.Body = "HelloWorld"
@@ -473,7 +492,7 @@ func TestSceneMatchingDefinition(t *testing.T) {
 	m.Control.Scenario.Name = "uSEr"
 	m.Control.Scenario.RequiredState = []string{"created"}
 	s := scenario.NewMemoryStore()
-	mm := Tester{Scenario: s}
+	mm := Tester{scenario: s}
 	if b, _ := mm.Check(&req, &m, true); b {
 		t.Error("Scenario doesn't match")
 	}
@@ -490,7 +509,7 @@ func TestSceneMatchingIgnoreStateCase(t *testing.T) {
 	m.Control.Scenario.Name = "uSEr"
 	m.Control.Scenario.RequiredState = []string{"CreAted"}
 	s := scenario.NewMemoryStore()
-	mm := Tester{Scenario: s}
+	mm := Tester{scenario: s}
 	if b, _ := mm.Check(&req, &m, true); b {
 		t.Error("Scenario doesn't match")
 	}
@@ -507,7 +526,7 @@ func TestSceneMatchingDefinitionDisabled(t *testing.T) {
 	m.Control.Scenario.Name = "uSEr"
 	m.Control.Scenario.RequiredState = []string{"created"}
 	s := scenario.NewMemoryStore()
-	mm := Tester{Scenario: s}
+	mm := Tester{scenario: s}
 	if b, _ := mm.Check(&req, &m, false); !b {
 		t.Error("Scenario not skiped")
 	}
