@@ -37,3 +37,18 @@ func TestComparator_Compare(t *testing.T) {
 		})
 	}
 }
+
+func TestComparatorDefaultFactory(t *testing.T) {
+
+	c := NewDefaultComparator()
+
+	if _, ok := c.comparers["application/json"]; !ok {
+		t.Errorf("application/json content type doesn't have comparator")
+	}
+	if _, ok := c.comparers["application/xml"]; !ok {
+		t.Errorf("application/json content type doesn't have comparator")
+	}
+	if _, ok := c.comparers["text/xml"]; !ok {
+		t.Errorf("application/json content type doesn't have comparator")
+	}
+}
