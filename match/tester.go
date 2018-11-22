@@ -2,11 +2,13 @@ package match
 
 import (
 	"errors"
+	"fmt"
 	"strings"
-    "fmt"
-	"github.com/jmartin82/mmock/scenario"
+
 	urlmatcher "github.com/azer/url-router"
 	"github.com/jmartin82/mmock/definition"
+	"github.com/jmartin82/mmock/match/payload"
+	"github.com/jmartin82/mmock/scenario"
 	"github.com/ryanuber/go-glob"
 )
 
@@ -16,12 +18,13 @@ var (
 	ErrPathNotMatch     = errors.New("Path not match")
 )
 
-func NewTester(scenario scenario.Director) *Tester {
-	return &Tester{Scenario: scenario}
+func NewTester(comparator *payload.Comparator, scenario scenario.Director) *Tester {
+	return &Tester{scenario: scenario, comparator: comparator}
 }
 
 type Tester struct {
-	Scenario scenario.Director
+	scenario   scenario.Director
+	comparator *payload.Comparator
 }
 
 func (mm Tester) matchKeyAndValues(reqMap definition.Values, mockMap definition.Values) bool {
@@ -117,7 +120,7 @@ func (mm Tester) matchScenarioState(scenario *definition.Scenario) bool {
 		return true
 	}
 
-	currentState := mm.Scenario.GetState(scenario.Name)
+	currentState := mm.scenario.GetState(scenario.Name)
 	for _, r := range scenario.RequiredState {
 		if strings.ToLower(r) == currentState {
 			return true
@@ -152,7 +155,7 @@ func (mm Tester) Check(req *definition.Request, mock *definition.Mock, scenarioA
 	}
 
 	if !mm.matchKeyAndValues(req.QueryStringParameters, mock.Request.QueryStringParameters) {
-	    return false, fmt.Errorf("Query string not match. Actual: %s, Expected: %s", mm.ValuesToString(req.QueryStringParameters), mm.ValuesToString(mock.Request.QueryStringParameters))
+		return false, fmt.Errorf("Query string not match. Actual: %s, Expected: %s", mm.ValuesToString(req.QueryStringParameters), mm.ValuesToString(mock.Request.QueryStringParameters))
 	}
 
 	if !mm.matchKeyAndValue(req.Cookies, mock.Request.Cookies) {
@@ -163,7 +166,7 @@ func (mm Tester) Check(req *definition.Request, mock *definition.Mock, scenarioA
 		return false, fmt.Errorf("Headers not match. Actual: %s, Expected: %s", req.Headers, mock.Request.Headers)
 	}
 
-	if len(mock.Request.Body) > 0 && !glob.Glob(mock.Request.Body, req.Body) {
+	if !mm.bodyMatch(mock.Request, req) {
 		return false, fmt.Errorf("Body not match. Actual: %s, Expected: %s", req.Body, mock.Request.Body)
 	}
 
@@ -173,17 +176,38 @@ func (mm Tester) Check(req *definition.Request, mock *definition.Mock, scenarioA
 
 	return true, nil
 }
+func (mm Tester) bodyMatch(mockReq definition.Request, req *definition.Request) bool {
 
+	if len(mockReq.Body) == 0 {
+		return true
+	}
 
-func (mm Tester) ValuesToString(values definition.Values) (string) {
-    var valuesStr [] string
+	if mockReq.Body == req.Body {
+		return true
+	}
 
-    for name, value := range values {
-       name = strings.ToLower(name)
-       for _, h := range value {
-         valuesStr = append(valuesStr, fmt.Sprintf("%v: %v", name, h))
-       }
-    }
+	if strings.Index(mockReq.Body, glob.GLOB) > -1 && glob.Glob(mockReq.Body, req.Body) {
+		return true
+	}
 
-    return strings.Join(valuesStr, ", ");
+	if value, ok := req.Headers["Content-Type"]; ok && len(value) > 0 {
+		if comparable, ok := mm.comparator.Compare(value[0], mockReq.Body, req.Body); comparable {
+			return ok
+		}
+	}
+
+	return false
+}
+
+func (mm Tester) ValuesToString(values definition.Values) string {
+	var valuesStr []string
+
+	for name, value := range values {
+		name = strings.ToLower(name)
+		for _, h := range value {
+			valuesStr = append(valuesStr, fmt.Sprintf("%v: %v", name, h))
+		}
+	}
+
+	return strings.Join(valuesStr, ", ")
 }
