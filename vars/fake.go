@@ -126,9 +126,9 @@ func (fv Fake) getMethodAndParameters(input string) (method string, parameters [
 	return
 }
 
-func (fv Fake) Fill(holders []string) map[string]string {
+func (fv Fake) Fill(holders []string) map[string][]string {
 
-	vars := make(map[string]string)
+	vars := make(map[string][]string)
 	for _, tag := range holders {
 		found := false
 		s := ""
@@ -137,7 +137,7 @@ func (fv Fake) Fill(holders []string) map[string]string {
 		}
 
 		if found {
-			vars[tag] = s
+			vars[tag] = append(vars[tag], s)
 		}
 
 	}
