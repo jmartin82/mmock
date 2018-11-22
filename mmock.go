@@ -134,14 +134,16 @@ func startServer(ip string, port, portTLS int, configTLS string, done chan bool,
 	dispatcher.Start()
 	done <- true
 }
-func startConsole(ip string, port int, spy match.Spier, scenario scenario.Director, mapping definition.Mapping, done chan bool, mLog chan definition.Match) {
+func startConsole(ip string, port int, resultsPerPage uint, spy match.Spier, scenario scenario.Director, mapping definition.Mapping, done chan bool, mLog chan definition.Match) {
 	dispatcher := console.Dispatcher{
-		IP:       ip,
-		Port:     port,
-		MatchSpy: spy,
-		Scenario: scenario,
-		Mapping:  mapping,
-		Mlog:     mLog}
+		IP:             ip,
+		Port:           port,
+		MatchSpy:       spy,
+		Scenario:       scenario,
+		Mapping:        mapping,
+		Mlog:           mLog,
+		ResultsPerPage: resultsPerPage,
+	}
 	dispatcher.Start()
 	done <- true
 }
@@ -164,6 +166,7 @@ func main() {
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
 	cPath := flag.String("config-path", path, "Mocks definition folder")
 	cTLS := flag.String("tls-path", TLS, "TLS config folder (server.crt and server.key should be inside)")
+	cResultsPerPage := flag.Uint("results-per-page", 25, "Number of results per page")
 
 	flag.Parse()
 
@@ -191,7 +194,7 @@ func main() {
 	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
 	log.Printf("HTTPS Server running at %s:%d\n", *sIP, *sPortTLS)
 	if *console {
-		go startConsole(*cIP, *cPort, spy, scenario, mapping, done, mLog)
+		go startConsole(*cIP, *cPort, *cResultsPerPage, spy, scenario, mapping, done, mLog)
 		log.Printf("Console running at %s:%d\n", *cIP, *cPort)
 	}
 

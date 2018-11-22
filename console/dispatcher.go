@@ -1,8 +1,12 @@
 package console
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"regexp"
+	"strconv"
 
 	"strings"
 
@@ -15,19 +19,25 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+var pagePattern = regexp.MustCompile(`^[1-9]([0-9]+)?$`)
+
+//ErrInvalidPage the page parameters is invalid
+var ErrInvalidPage = errors.New("Invalid page")
+
 type ActionResponse struct {
 	Result string `json:"result"`
 }
 
 //Dispatcher is the http console server.
 type Dispatcher struct {
-	IP       string
-	Port     int
-	MatchSpy match.Spier
-	Scenario scenario.Director
-	Mapping  definition.Mapping
-	Mlog     chan definition.Match
-	clients  []*websocket.Conn
+	IP             string
+	Port           int
+	ResultsPerPage uint
+	MatchSpy       match.Spier
+	Scenario       scenario.Director
+	Mapping        definition.Mapping
+	Mlog           chan definition.Match
+	clients        []*websocket.Conn
 }
 
 func (di *Dispatcher) removeClient(i int) {
@@ -73,6 +83,7 @@ func (di *Dispatcher) Start() {
 	e.GET("/api/request/reset", di.requestResetHandler)
 	e.POST("/api/request/verify", di.requestVerifyHandler)
 	e.GET("/api/request/all", di.requestAllHandler)
+	e.GET("/api/request/all/:page", di.requestAllPagedHandler)
 	e.GET("/api/request/matched", di.requestMatchedHandler)
 	e.GET("/api/request/unmatched", di.requestUnMatchedHandler)
 	e.GET("/api/scenarios/reset_all", di.scenariosResetHandler)
@@ -285,6 +296,20 @@ func (di *Dispatcher) requestAllHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, di.MatchSpy.GetAll())
 }
 
+func (di *Dispatcher) requestAllPagedHandler(c echo.Context) error {
+
+	page, err := di.pageParamToInt(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, &ActionResponse{
+			Result: err.Error(),
+		})
+	}
+
+	offset := uint(page-1) * di.ResultsPerPage
+
+	return c.JSON(http.StatusOK, di.MatchSpy.Get(di.ResultsPerPage, offset))
+}
+
 func (di *Dispatcher) requestMatchedHandler(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, di.MatchSpy.GetMatched())
@@ -293,4 +318,19 @@ func (di *Dispatcher) requestMatchedHandler(c echo.Context) error {
 func (di *Dispatcher) requestUnMatchedHandler(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, di.MatchSpy.GetUnMatched())
+}
+
+func (di *Dispatcher) pageParamToInt(c echo.Context) (int, error) {
+	pageParam := c.Param("page")
+	if !pagePattern.MatchString(pageParam) {
+		return 0, ErrInvalidPage
+	}
+
+	page, err := strconv.Atoi(pageParam)
+	if err != nil {
+		log.Println(ErrInvalidPage, err)
+		return 0, ErrInvalidPage
+	}
+
+	return page, nil
 }
