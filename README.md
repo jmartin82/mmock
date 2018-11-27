@@ -268,6 +268,7 @@ You can use variable data in response. The variables will be defined as tags lik
  - fake.FullName
  - fake.LastName
  - fake.Gender
+ - fake.Hex(n) - random hexidecimal string n characters in length
  - fake.IPv4
  - fake.Language
  - fake.Model

@@ -5,6 +5,8 @@ import (
 
 	"strconv"
 
+	"strings"
+
 	"github.com/jmartin82/mmock/definition"
 )
 
@@ -170,6 +172,9 @@ func (ddf DummyDataFaker) Float(n int) string {
 }
 func (ddf DummyDataFaker) UUID() string {
 	return "00000000-0000-0000-0000-000000000000"
+}
+func (ddf DummyDataFaker) Hex(n int) string {
+	return strings.Repeat("0", n)
 }
 
 func getProcessor() Processor {

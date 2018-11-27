@@ -21,9 +21,9 @@ import (
 	"github.com/jmartin82/mmock/statistics"
 	"github.com/jmartin82/mmock/translate"
 	"github.com/jmartin82/mmock/vars"
-	"strings"
 	"net/url"
 	"regexp"
+	"strings"
 )
 
 //Dispatcher is the mock http server

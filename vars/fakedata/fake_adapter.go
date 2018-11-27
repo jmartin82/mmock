@@ -1,8 +1,10 @@
 package fakedata
 
 import (
+	"encoding/hex"
 	"math/rand"
 	"strconv"
+	"strings"
 
 	"github.com/icrowley/fake"
 	"github.com/twinj/uuid"
@@ -115,6 +117,14 @@ func (fa FakeAdapter) LastName() string {
 //Gender returns a random Gender
 func (fa FakeAdapter) Gender() string {
 	return fake.Gender()
+}
+
+//Hex returns a random hexidecimal string of length n
+func (fa FakeAdapter) Hex(n int) string {
+	bytes := make([]byte, n)
+	rand.Read(bytes)
+
+	return strings.ToLower(hex.EncodeToString(bytes))
 }
 
 //IPv4 returns a random IPv4

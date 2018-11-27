@@ -24,6 +24,7 @@ type DataFaker interface {
 	FullName() string
 	LastName() string
 	Gender() string
+	Hex(n int) string
 	IPv4() string
 	Language() string
 	Model() string
