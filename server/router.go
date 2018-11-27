@@ -47,7 +47,7 @@ func (rr *Router) copy(src, dst *definition.Mock) {
 func (rr *Router) Resolve(req *definition.Request) (*definition.Mock, *definition.MatchResult) {
 	mocks := rr.Mapping.List()
 	mLog := &definition.MatchResult{Found: false}
-	mLog.Errors = make([]definition.MatchError,0,len(mocks))
+	mLog.Errors = make([]definition.MatchError, 0, len(mocks))
 
 	for _, mock := range mocks {
 		m, err := rr.Checker.Check(req, &mock, true)
@@ -59,7 +59,7 @@ func (rr *Router) Resolve(req *definition.Request) (*definition.Mock, *definitio
 			mLog.URI = mock.URI
 			return &md, mLog
 		}
-		mLog.Errors = append(mLog.Errors, definition.MatchError{URI:mock.URI,Reason:err.Error()})
+		mLog.Errors = append(mLog.Errors, definition.MatchError{URI: mock.URI, Reason: err.Error()})
 		if err != match.ErrPathNotMatch {
 			log.Printf("Discarding mock: %s Reason: %s\n", mock.URI, err.Error())
 		}

@@ -84,5 +84,17 @@ func TestBasicFakeVars(t *testing.T) {
 	if faker.CharactersN(5) == "" && len(faker.Character()) != 5 {
 		t.Error("CharactersN fake doesn't work")
 	}
+}
 
+func TestHex(t *testing.T) {
+	faker := FakeAdapter{}
+
+	for i := 1; i < 65; i++ {
+		r := regexp.MustCompile(fmt.Sprintf("[0-9a-f]{%d}", i))
+
+		result := faker.Hex(i)
+		if !r.MatchString(result) {
+			t.Error("The generated string is not a valid lower case hexidecimal string", result)
+		}
+	}
 }
