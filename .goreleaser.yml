@@ -22,10 +22,9 @@ archive:
     - tls/*
 dockers:
   - image: jordimartin/mmock
-  - skip_push: true
+  - skip_push: false
     tag_templates:
     - "{{ .Tag }}"
-    - "v{{ .Major }}"
     - latest
 release:
   github:

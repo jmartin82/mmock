@@ -24,7 +24,7 @@ import (
 )
 
 //VERSION of the application
-const VERSION string = "development"
+var VERSION string = "development"
 
 //ErrNotFoundPath error from missing or configuration path
 var ErrNotFoundPath = errors.New("Configuration path not found")
