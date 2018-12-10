@@ -21,11 +21,16 @@ archive:
     - config/*
     - tls/*
 dockers:
-  - image: jordimartin/mmock
-  - skip_push: false
-    tag_templates:
-    - "{{ .Tag }}"
-    - latest
+  - 
+    dockerfile: Dockerfile
+    skip_push: false
+    binary: mmock
+    image_templates:
+      - "jordimartin/mmock:{{.Tag}}"
+      - "jordimartin/mmock:latest"
+    extra_files:
+      - tls/server.crt
+      - tls/server.key
 release:
   github:
     owner: jmartin82
