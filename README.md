@@ -507,6 +507,6 @@ If you make any changes, run ```go fmt ./...``` before submitting a pull request
 
 ### Licence
 
-Copyright © 2016 - 2018, Jordi Martín (http://jordi.io)
+Copyright © 2016 - 2019, Jordi Martín (http://jordi.io)
 
 Released under MIT license, see [LICENSE](LICENSE.md) for details.
