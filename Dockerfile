@@ -8,8 +8,8 @@ RUN mkdir /tls
 
 VOLUME /config
 
-COPY server.crt /tls/server.crt
-COPY server.key /tls/server.key
+COPY tls/server.crt /tls/server.crt
+COPY tls/server.key /tls/server.key
 COPY mmock /usr/local/bin/mmock
 
 EXPOSE 8082 8083 8084
