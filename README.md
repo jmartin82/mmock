@@ -83,11 +83,9 @@ Either:
 Run it from Docker using the provided ```Dockerfile``` or [from Docker Hub](https://hub.docker.com/r/jordimartin/mmock/)
 
 ```
-go get github.com/jmartin82/mmock
-docker build -t mmock/mmock .
-docker run -v YOUR_ABS_PATH:/config -p 8082:8082 -p 8083:8083  mmock/mmock
+docker image pull jordimartin/mmock
+docker run -v YOUR_ABS_PATH:/config -p 8082:8082 -p 8083:8083 jordimartin/mmock
 ```
-
 
 Or run mmock locally from the command line. (Requires Go 1.8 at least)
 
@@ -102,22 +100,26 @@ To configure Mmock, use command line flags described in help.
 
 ```
     Usage of ./mmock:
-      -cconsole-port int
-          Console server Port (default 8082)
-      -config-path string
-          Mocks definition folder (default "execution_path/config")
-      -console
-          Console enabled  (true/false) (default true)
-      -console-ip string
-          Console Server IP (default "public_ip")
-      -server-ip string
-          Mock server IP (default "public_ip")
-      -server-port int
-          Mock server Port (default 8083)
-      -server-tls-port int
-          Mock HTTPS server Port (default 8084)
-      -tls-path
-          TLS config folder (It will load any crt/key combination, for example server.crt/server.key and also will load an ca.crt if exists )
+	  -config-path string
+		Mocks definition folder (default "execution_pathconfig")
+	  -console
+		Console enabled  (true/false) (default true)
+	  -console-ip string
+		Console server IP (default "public_ip")
+	  -console-port int
+		Console server Port (default 8082)
+	  -results-per-page uint
+		Number of results per page (default 25)
+	  -server-ip string
+		Mock server IP (default "public_ip")
+	  -server-port int
+		Mock server Port (default 8083)
+	  -server-statistics
+		Mock server sends anonymous statistics (default true)
+	  -server-tls-port int
+		Mock server TLS Port (default 8084)
+	  -tls-path string
+		TLS config folder (server.crt and server.key should be inside) (default "execution_path/tls")
 ```
 
 ### Mock
