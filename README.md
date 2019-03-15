@@ -488,6 +488,19 @@ All endpoints have the same output format:
 ]
 ```
 
+### Statistics
+
+Mmock is collecting anonymous statistics about the usage of the following actions:
+
+Source code: [/statistics/statistics.go](https://github.com/jmartin82/mmock/blob/master/statistics/statistics.go#L30)
+
+- `requests.mock`: Mocks served (number) 
+- `requests.console`: Web console usage (number)
+- `requests.verify`: Verify requests (number)
+- `feature.scenario`: Mocks with scenario feature served (number)
+- `feature.proxy`: Mocks with proxy feature served (number)
+
+You can always disable this behavior adding the following flag `-server-statistics=false`
 
 
 ### Contributors

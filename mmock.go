@@ -184,10 +184,15 @@ func main() {
 	router := getRouter(mapping, tester)
 	varsProcessor := getVarsProcessor()
 
-	if !(*sStatistics) {
+	if *sStatistics {
+		fmt.Printf("\n************************************************************************************\n")
+		fmt.Printf("* Mmock is collecting anonymous statistics about the usage of the features.        *\n")
+		fmt.Printf("* You can disable this behavior adding the following flag -server-statistics=false *\n")
+		fmt.Printf("************************************************************************************\n\n")
+	} else {
 		statistics.SetMonitor(statistics.NewNullableMonitor())
-		log.Printf("Not sending statistics\n")
 	}
+
 	defer statistics.Stop()
 
 	go startServer(*sIP, *sPort, *sPortTLS, *cTLS, done, router, mLog, scenario, varsProcessor, spy)
