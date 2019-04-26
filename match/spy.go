@@ -23,6 +23,7 @@ func (mc Spy) Find(r definition.Request) []definition.Match {
 
 }
 
+// ResetMatch ...
 func (mc Spy) ResetMatch(r definition.Request) {
 	mc.store.ResetMatch(r)
 }
