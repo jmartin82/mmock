@@ -10,6 +10,7 @@ import (
 type MemoryStore struct {
 	matches []definition.Match
 	sync.Mutex
+	checker Checker
 }
 
 //Save store a match information
@@ -23,6 +24,21 @@ func (mrs *MemoryStore) Save(req definition.Match) {
 func (mrs *MemoryStore) Reset() {
 	mrs.Lock()
 	mrs.matches = make([]definition.Match, 0, 100)
+	mrs.Unlock()
+}
+
+//Reset clean the request stored in memory that matches a particular criteria
+func (mrs *MemoryStore) ResetMatch(req definition.Request) {
+	matches := mrs.GetAll()
+	mrs.Lock()
+	var r = []definition.Match{}
+	for _, e := range matches {
+		if c, _ := mrs.checker.Check(e.Request, &definition.Mock{Request: req}, false); c == false {
+			r = append(r, e)
+		}
+	}
+
+	mrs.matches = r
 	mrs.Unlock()
 }
 
@@ -55,9 +71,9 @@ func (mrs *MemoryStore) Get(limit uint, offset uint) []definition.Match {
 	return r
 }
 
-//NewMemoryStore is the MemoryStore contructor
-func NewMemoryStore() *MemoryStore {
+//NewMemoryStore is the MemoryStore constructor
+func NewMemoryStore(checker Checker) *MemoryStore {
 	reqs := make([]definition.Match, 0, 100)
-	return &MemoryStore{matches: reqs}
+	return &MemoryStore{matches: reqs, checker: checker}
 
 }

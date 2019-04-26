@@ -1,15 +1,29 @@
 package match
 
 import (
+	"errors"
+	"github.com/jmartin82/mmock/match/payload"
+	"github.com/jmartin82/mmock/scenario"
 	"reflect"
 	"testing"
 
 	"github.com/jmartin82/mmock/definition"
 )
 
+type DummyMatcher struct {
+	OK bool
+}
+
+func (dm DummyMatcher) Check(req *definition.Request, mock *definition.Mock, scenarioAware bool) (bool, error) {
+	if dm.OK {
+		return true, nil
+	}
+	return false, errors.New("Random Error")
+}
+
 func TestStoreRequest(t *testing.T) {
 
-	msr := NewMemoryStore()
+	msr := NewMemoryStore(DummyMatcher{})
 	m1 := definition.Match{Request: &definition.Request{Host: "TEST1"}}
 	msr.Save(m1)
 	m2 := definition.Match{Request: &definition.Request{Host: "TEST2"}}
@@ -31,7 +45,7 @@ func TestStoreRequest(t *testing.T) {
 
 func TestGetAll(t *testing.T) {
 
-	msr := NewMemoryStore()
+	msr := NewMemoryStore(DummyMatcher{})
 	m1 := definition.Match{Request: &definition.Request{Host: "TEST1"}}
 	msr.Save(m1)
 	m2 := definition.Match{Request: &definition.Request{Host: "TEST2"}}
@@ -52,7 +66,7 @@ func TestGetAll(t *testing.T) {
 
 func TestGet(t *testing.T) {
 
-	msr := NewMemoryStore()
+	msr := NewMemoryStore(DummyMatcher{})
 
 	matches := []definition.Match{
 		{Time: 1},
@@ -95,7 +109,7 @@ func TestGet(t *testing.T) {
 
 func TestGetOnEmptyStore(t *testing.T) {
 
-	msr := NewMemoryStore()
+	msr := NewMemoryStore(DummyMatcher{})
 
 	tests := []struct {
 		msg      string
@@ -122,7 +136,7 @@ func TestGetOnEmptyStore(t *testing.T) {
 
 func TestReset(t *testing.T) {
 
-	msr := NewMemoryStore()
+	msr := NewMemoryStore(DummyMatcher{})
 	m1 := definition.Match{Request: &definition.Request{Host: "TEST1"}}
 	msr.Save(m1)
 	m2 := definition.Match{Request: &definition.Request{Host: "TEST2"}}
@@ -143,6 +157,40 @@ func TestReset(t *testing.T) {
 	}
 
 	if cap(msr.matches) != 100 {
+		t.Fatalf("Invalid store cap: %v", cap(msr.matches))
+	}
+
+}
+
+func TestResetMatch(t *testing.T) {
+
+	scenario := scenario.NewMemoryStore()
+	comparator := payload.NewDefaultComparator()
+	tester := NewTester(comparator, scenario)
+
+	msr := NewMemoryStore(tester)
+	m1 := definition.Match{Request: &definition.Request{Host: "TEST1"}}
+	msr.Save(m1)
+	m2 := definition.Match{Request: &definition.Request{Host: "TEST2"}}
+	msr.Save(m2)
+
+	if len(msr.matches) != 2 {
+		t.Fatalf("Invalid store len: %v", len(msr.matches))
+	}
+
+	if cap(msr.matches) != 100 {
+		t.Fatalf("Invalid store cap: %v", cap(msr.matches))
+	}
+
+	msr.ResetMatch(definition.Request{
+		Host: "TEST1",
+	})
+
+	if len(msr.matches) != 1 {
+		t.Fatalf("Invalid store len: %v", len(msr.matches))
+	}
+
+	if cap(msr.matches) != 1 {
 		t.Fatalf("Invalid store cap: %v", cap(msr.matches))
 	}
 

@@ -82,6 +82,7 @@ func (di *Dispatcher) Start() {
 	//verification
 	e.GET("/api/request/reset", di.requestResetHandler)
 	e.POST("/api/request/verify", di.requestVerifyHandler)
+	e.POST("/api/request/reset_match", di.resetMatchHandler)
 	e.GET("/api/request/all", di.requestAllHandler)
 	e.GET("/api/request/all/:page", di.requestAllPagedHandler)
 	e.GET("/api/request/matched", di.requestMatchedHandler)
@@ -249,6 +250,21 @@ func (di *Dispatcher) requestVerifyHandler(c echo.Context) error {
 	}
 	result := di.MatchSpy.Find(dReq)
 	return c.JSON(http.StatusOK, result)
+}
+
+func (di *Dispatcher) resetMatchHandler(c echo.Context) error {
+	statistics.TrackVerifyRequest()
+	dReq := definition.Request{}
+	if err := c.Bind(&dReq); err != nil {
+		return err
+	}
+
+	ar := &ActionResponse{
+		Result: "reset match",
+	}
+
+	di.MatchSpy.ResetMatch(dReq)
+	return c.JSON(http.StatusOK, ar)
 }
 
 func (di *Dispatcher) requestResetHandler(c echo.Context) error {

@@ -178,7 +178,7 @@ func main() {
 	scenario := scenario.NewMemoryStore()
 	comparator := payload.NewDefaultComparator()
 	tester := match.NewTester(comparator, scenario)
-	matchStore := match.NewMemoryStore()
+	matchStore := match.NewMemoryStore(tester)
 	mapping := getMapping(*cPath)
 	spy := getMatchSpy(tester, matchStore)
 	router := getRouter(mapping, tester)
