@@ -27,7 +27,7 @@ func (mrs *MemoryStore) Reset() {
 	mrs.Unlock()
 }
 
-//Reset clean the request stored in memory that matches a particular criteria
+//ResetMatch clean the request stored in memory that matches a particular criteria
 func (mrs *MemoryStore) ResetMatch(req definition.Request) {
 	matches := mrs.GetAll()
 	mrs.Lock()
