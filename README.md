@@ -360,6 +360,33 @@ This makes it possible to verify that a request matching a specific pattern was 
 **Method** : GET<br>
 **Response Codes**: Success (200 OK)<br>
 
+**Title** : Reset all requests that match with an specific pattern.<br>
+**URL** : /api/request/reset_match<br>
+**Method** : POST<br>
+**Data Params**:  <br>
+
+Like stubbing this call also uses the same DSL to filter and query requests.
+
+```json
+{
+	"host": "example.com",
+	"method": "GET|POST|PUT|PATCH|... (Mandatory)", 
+	"path": "/your/path/:variable (Mandatory)",
+	"queryStringParameters": {
+		"name": ["value"],
+		"name": ["value", "value"]
+	},
+	"headers": {
+		"name": ["value"]
+	},
+	"cookies": {
+		"name": "value"
+	},
+	"body": "Expected Body"
+}
+```
+**Response Codes**: Success (200 OK)<br>
+
 **Title** : Get all non matched requests.<br>
 **URL** : /api/request/unmatched<br>
 **Method** : GET<br>

@@ -98,6 +98,27 @@
         }
       }
     },
+    "/request/reset_match": {
+      "get": {
+        "summary": "Reset stored requests that matches specific criteria",
+        "tags": [
+          "request"
+        ],
+        "operationId": "Reset stored requests with criteria",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ActionResponse"
+            }
+          }
+        }
+      }
+    },
     "/request/unmatched": {
       "get": {
         "summary": "Get all unmatched requests",
