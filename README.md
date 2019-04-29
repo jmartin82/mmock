@@ -535,6 +535,7 @@ You can always disable this behavior adding the following flag `-server-statisti
 - Awesome use statistics from [@alfonsfoubert](https://github.com/alfonsfoubert)
 - More request variables available thanks to [@Bartek-CMP](https://github.com/Bartek-CMP)
 - Scenario pause feature thanks to [@Nekroze](https://github.com/Nekroze)
+- Storage reset feature thanks to [@rubencougil](https://github.com/rubencougil)
 - Improved docker image thanks to [@daroot](https://github.com/daroot)
 - Added the possibility of access to an array index in dynamic responses [@jaimelopez](https://github.com/jaimelopez)
 - Create mapping via console thanks to [@inabajunmr](https://github.com/inabajunmr)
