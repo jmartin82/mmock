@@ -92,7 +92,7 @@ func existsConfigPath(path string) bool {
 func getMapping(path string) config.Mapping {
 	path, _ = filepath.Abs(path)
 	if !existsConfigPath(path) {
-		log.Fatalf(ErrNotFoundPath.Error())
+		log.Fatalln(ErrNotFoundPath.Error())
 	}
 
 	fsMapper := config.NewFileSystemMapper()

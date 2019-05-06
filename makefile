@@ -1,19 +1,19 @@
-.PHONY: build doc fmt lint dev test vet godep install bench bindata
+.PHONY: build doc fmt lint dev test vet bindata
 
 PKG_NAME=mmock
 NS = jordimartin
 VERSION ?= latest
 
-install:
-	go get -t -v ./...
+export GO111MODULE=on
+
 
 build: bindata \
 	vet \
 	test
-	go build -v -o ./bin/$(PKG_NAME)
+	go build  -v -o ./bin/$(PKG_NAME) cmd/mmock/main.go
 
 bindata:
-	go-bindata -pkg console -o console/bindata.go tmpl/*
+	go-bindata -pkg console -o internal/console/bindata.go tmpl/*
 
 doc:
 	godoc -http=:6060
@@ -34,7 +34,7 @@ coverage:
 
 # https://godoc.org/golang.org/x/tools/cmd/vet
 vet:
-	go vet -v
+	go vet -v  ./...
 
 release:
 	goreleaser --rm-dist

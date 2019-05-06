@@ -81,7 +81,7 @@ func (fv Fake) callMethod(name string) (string, bool) {
 
 					result, err := fv.call(data, method.Name)
 					if err != nil {
-						log.Printf(err.Error())
+						log.Println(err.Error())
 					}
 					return result, err == nil
 				}

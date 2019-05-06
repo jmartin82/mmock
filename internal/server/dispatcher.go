@@ -183,7 +183,7 @@ func (di Dispatcher) Start() {
 	err := <-errCh
 
 	if err != nil {
-		log.Fatalf("ListenAndServe: " + err.Error())
+		log.Fatalf("ListenAndServe: %s" , err.Error())
 	}
 
 }
