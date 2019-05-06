@@ -3,7 +3,7 @@ go:
   - 1.11
 
 script:
-  - env GO111MODULE=on go build
+  - env GO111MODULE=on go build cmd/mmock/main.go
   - make test
   - make coverage
 
