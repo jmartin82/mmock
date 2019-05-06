@@ -1,7 +1,7 @@
 # .goreleaser.yml
 # Build customization
 builds:
-  - main: mmock.go
+  - main: cmd/mmock/main.go
     binary: mmock
     goos:
       - windows
