@@ -544,7 +544,7 @@ You can always disable this behavior adding the following flag `-server-statisti
 
 Clone this repository to ```$GOPATH/src/github.com/jmartin82/mmock``` and type ```go get .```.
 
-Requires Go 1.8+ to build.
+Requires Go 1.11+ to build.
 
 If you make any changes, run ```go fmt ./...``` before submitting a pull request.
 

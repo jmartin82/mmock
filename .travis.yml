@@ -1,10 +1,6 @@
 language: go
 go: 
-  - 1.9
-
-install:
-  - make get-deps
-  - dep ensure
+  - 1.11
 
 script:
   - make test

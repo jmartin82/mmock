@@ -36,9 +36,6 @@ coverage:
 vet:
 	go vet -v
 
-get-deps:
-	curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-
 release:
 	goreleaser --rm-dist
 
