@@ -90,7 +90,7 @@ docker run -v YOUR_ABS_PATH:/config -p 8082:8082 -p 8083:8083 jordimartin/mmock
 Or run mmock locally from the command line. (Requires Go 1.8 at least)
 
 ```
-go get github.com/jmartin82/mmock
+go get github.com/jmartin82/mmock/...
 mmock -h
 
 ```
