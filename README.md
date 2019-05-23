@@ -519,7 +519,7 @@ All endpoints have the same output format:
 
 Mmock is collecting anonymous statistics about the usage of the following actions:
 
-Source code: [/statistics/statistics.go] (https://github.com/jmartin82/mmock/blob/master/internal/statistics/statistics.go#L30)
+Source code: [/statistics/statistics.go](https://github.com/jmartin82/mmock/blob/master/internal/statistics/statistics.go#L30)
 
 - `requests.mock`: Mocks served (number) 
 - `requests.console`: Web console usage (number)
