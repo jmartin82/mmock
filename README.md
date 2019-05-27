@@ -539,6 +539,7 @@ You can always disable this behavior adding the following flag `-server-statisti
 - Improved docker image thanks to [@daroot](https://github.com/daroot)
 - Added the possibility of access to an array index in dynamic responses [@jaimelopez](https://github.com/jaimelopez)
 - Create mapping via console thanks to [@inabajunmr](https://github.com/inabajunmr)
+- Thanks to [@joel-44] for bug fixing (https://github.com/joel-44)
 
 ### Contributing
 
