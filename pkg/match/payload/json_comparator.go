@@ -12,7 +12,7 @@ func isArray(s1 string) bool {
 	return len(s1) > 0 && s1[0] == '['
 }
 
-func (jc *JSONComparator) CompareArray(s1, s2 string) bool {
+func (jc *JSONComparator) compareArray(s1, s2 string) bool {
 
 	var o1 []interface{}
 	var o2 []interface{}
@@ -33,7 +33,7 @@ func (jc *JSONComparator) CompareArray(s1, s2 string) bool {
 func (jc *JSONComparator) Compare(s1, s2 string) bool {
 
 	if isArray(s1) || isArray(s2) {
-		return jc.CompareArray(s1, s2)
+		return jc.compareArray(s1, s2)
 	}
 
 	var o1 interface{}
