@@ -14,6 +14,9 @@ func TestJSONComparator_Compare(t *testing.T) {
 	}{
 		{"Test same value order and format", args{"{\"name\":\"bob\",\"age\":30}", "{\"name\":\"bob\",\"age\":30}"}, true},
 		{"Test different order", args{"{\"name\":\"bob\",\"age\":30}", "{\"age\":30,\"name\":\"bob\"}"}, true},
+		{"Test equal arrays", args{"[{\"name\":\"bob\",\"age\":30}]", "[{\"age\":30,\"name\":\"bob\"}]"}, true},
+		{"Test object and array difference", args{"{\"name\":\"bob\",\"age\":30}", "[{\"age\":30,\"name\":\"bob\"}]"}, false},
+		{"Test different arrays", args{"[{\"name\":\"john\",\"age\":30}]", "[{\"age\":30,\"name\":\"bob\"}]"}, false},
 		{"Test different format", args{"{\"name\":\"bob\",\"age\":30}", "{\"name\" : \"bob\"\n,\"age\" : 30}"}, true},
 		{"Test different values", args{"{\"name\":\"bobs\",\"age\":30}", "{\"name\":\"bob\",\"age\":30}"}, false},
 	}
