@@ -491,7 +491,7 @@ func TestSceneMatchingDefinition(t *testing.T) {
 	m := mock.Definition{}
 	m.Control.Scenario.Name = "uSEr"
 	m.Control.Scenario.RequiredState = []string{"created"}
-	s := NewScenarioStore()
+	s := NewInMemoryScenarioStore()
 	mm := Request{scenario: s}
 	if b, _ := mm.Match(&req, &m, true); b {
 		t.Error("Scenario doesn't match")
@@ -508,7 +508,7 @@ func TestSceneMatchingIgnoreStateCase(t *testing.T) {
 	m := mock.Definition{}
 	m.Control.Scenario.Name = "uSEr"
 	m.Control.Scenario.RequiredState = []string{"CreAted"}
-	s := NewScenarioStore()
+	s := NewInMemoryScenarioStore()
 	mm := Request{scenario: s}
 	if b, _ := mm.Match(&req, &m, true); b {
 		t.Error("Scenario doesn't match")
@@ -525,7 +525,7 @@ func TestSceneMatchingDefinitionDisabled(t *testing.T) {
 	m := mock.Definition{}
 	m.Control.Scenario.Name = "uSEr"
 	m.Control.Scenario.RequiredState = []string{"created"}
-	s := NewScenarioStore()
+	s := NewInMemoryScenarioStore()
 	mm := Request{scenario: s}
 	if b, _ := mm.Match(&req, &m, false); !b {
 		t.Error("Scenario not skiped")

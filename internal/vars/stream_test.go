@@ -44,7 +44,7 @@ func TestReadFile(t *testing.T) {
 func TestHTTPContent(t *testing.T) {
 	st := Stream{}
 
-	k := "http.contents(http://example.com/)"
+	k := "http.contents(http://jordi.io/)"
 	holders := []string{k}
 
 	result := st.Fill(holders)
@@ -53,7 +53,7 @@ func TestHTTPContent(t *testing.T) {
 		t.Errorf("Stream key not found")
 	}
 
-	if !strings.Contains(v[0], "Example Domain") {
+	if !strings.Contains(v[0], "Software Engineer") {
 		t.Errorf("Couldn't get the content. Value: %s", v)
 	}
 }

@@ -33,7 +33,7 @@ type Dispatcher struct {
 	IP             string
 	Port           int
 	ResultsPerPage uint
-	MatchSpy       match.Spier
+	MatchSpy       match.TransactionSpier
 	Scenario       match.ScenearioStorer
 	Mapping        config.Mapping
 	Mlog           chan match.Log

@@ -6,7 +6,7 @@ import (
 	"github.com/jmartin82/mmock/pkg/mock"
 )
 
-type Storer interface {
+type TransactionStorer interface {
 	Save(Log)
 	Reset()
 	ResetMatch(mock.Request)
@@ -15,29 +15,29 @@ type Storer interface {
 }
 
 
-//Store stores all received request and their matches in memory until the last reset
-type Store struct {
+//InMemoryTransactionStore stores all received request and their matches in memory until the last reset
+type InMemoryTransactionStore struct {
 	matches []Log
 	sync.Mutex
 	checker Matcher
 }
 
 //Save store a match information
-func (mrs *Store) Save(req Log) {
+func (mrs *InMemoryTransactionStore) Save(req Log) {
 	mrs.Lock()
 	mrs.matches = append(mrs.matches, req)
 	mrs.Unlock()
 }
 
 //Reset clean the request stored in memory
-func (mrs *Store) Reset() {
+func (mrs *InMemoryTransactionStore) Reset() {
 	mrs.Lock()
 	mrs.matches = make([]Log, 0, 100)
 	mrs.Unlock()
 }
 
 //ResetMatch clean the request stored in memory that matches a particular criteria
-func (mrs *Store) ResetMatch(req mock.Request) {
+func (mrs *InMemoryTransactionStore) ResetMatch(req mock.Request) {
 	matches := mrs.GetAll()
 	mrs.Lock()
 	var r = []Log{}
@@ -52,7 +52,7 @@ func (mrs *Store) ResetMatch(req mock.Request) {
 }
 
 //GetAll return current matches (positive and negative) in memory
-func (mrs *Store) GetAll() []Log {
+func (mrs *InMemoryTransactionStore) GetAll() []Log {
 	mrs.Lock()
 	r := make([]Log, len(mrs.matches))
 	copy(r, mrs.matches)
@@ -61,7 +61,7 @@ func (mrs *Store) GetAll() []Log {
 }
 
 //Get return an subset of current matches (positive and negative) in memory
-func (mrs *Store) Get(limit uint, offset uint) []Log {
+func (mrs *InMemoryTransactionStore) Get(limit uint, offset uint) []Log {
 	mrs.Lock()
 	defer mrs.Unlock()
 
@@ -80,9 +80,9 @@ func (mrs *Store) Get(limit uint, offset uint) []Log {
 	return r
 }
 
-//NewScenarioStore is the Store constructor
-func NewStore(checker Matcher) *Store {
+//NewInMemoryScenarioStore is the InMemoryTransactionStore constructor
+func NewInMemoryTransactionStore(checker Matcher) *InMemoryTransactionStore {
 	reqs := make([]Log, 0, 100)
-	return &Store{matches: reqs, checker: checker}
+	return &InMemoryTransactionStore{matches: reqs, checker: checker}
 
 }

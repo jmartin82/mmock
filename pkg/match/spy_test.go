@@ -32,7 +32,7 @@ func (dsm DummyScenarioManager) SetPaused(_ bool) {
 }
 
 func TestFindMatches(t *testing.T) {
-	spy := NewSpy(NewTester(payload.NewComparator(), DummyScenarioManager{}), NewStore(DummyMatcher{}))
+	spy := NewSpy(NewTester(payload.NewComparator(), DummyScenarioManager{}), NewInMemoryTransactionStore(DummyMatcher{}))
 
 	m1 := Log{Request: &mock.Request{Host: "TEST1"}}
 	spy.Save(m1)
@@ -56,7 +56,7 @@ func TestFindMatches(t *testing.T) {
 }
 
 func TestMatchByResult(t *testing.T) {
-	spy := NewSpy(NewTester(payload.NewComparator(), DummyScenarioManager{}), NewStore(DummyMatcher{}))
+	spy := NewSpy(NewTester(payload.NewComparator(), DummyScenarioManager{}), NewInMemoryTransactionStore(DummyMatcher{}))
 
 	m1 := Log{Result: &Result{Found: true}}
 	spy.Save(m1)

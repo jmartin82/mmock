@@ -15,17 +15,17 @@ type ScenearioStorer interface {
 }
 
 
-func NewScenarioStore() *ScenarioStore {
+func NewInMemoryScenarioStore() *InMemoryScenarioStore {
 	status := make(map[string]string)
-	return &ScenarioStore{status: status}
+	return &InMemoryScenarioStore{status: status}
 }
 
-type ScenarioStore struct {
+type InMemoryScenarioStore struct {
 	status map[string]string
 	paused bool
 }
 
-func (sm *ScenarioStore) Reset(name string) bool {
+func (sm *InMemoryScenarioStore) Reset(name string) bool {
 	if _, f := sm.status[strings.ToLower(name)]; f {
 		sm.status[strings.ToLower(name)] = "not_started"
 		return true
@@ -33,29 +33,29 @@ func (sm *ScenarioStore) Reset(name string) bool {
 	return false
 }
 
-func (sm *ScenarioStore) ResetAll() {
+func (sm *InMemoryScenarioStore) ResetAll() {
 	sm.status = make(map[string]string)
 	sm.paused = false
 }
 
-func (sm *ScenarioStore) SetState(name, status string) {
+func (sm *InMemoryScenarioStore) SetState(name, status string) {
 	if sm.paused {
 		return
 	}
 	sm.status[strings.ToLower(name)] = strings.ToLower(status)
 }
 
-func (sm *ScenarioStore) GetState(name string) string {
+func (sm *InMemoryScenarioStore) GetState(name string) string {
 	if v, f := sm.status[strings.ToLower(name)]; f {
 		return v
 	}
 	return "not_started"
 }
 
-func (sm *ScenarioStore) GetPaused() bool {
+func (sm *InMemoryScenarioStore) GetPaused() bool {
 	return sm.paused
 }
 
-func (sm *ScenarioStore) SetPaused(newstate bool) {
+func (sm *InMemoryScenarioStore) SetPaused(newstate bool) {
 	sm.paused = newstate
 }

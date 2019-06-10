@@ -1,14 +1,13 @@
 package vars
 
 import (
-	"github.com/jmartin82/mmock/pkg/mock"
 	"testing"
+
+	"github.com/jmartin82/mmock/pkg/mock"
 
 	"strconv"
 
 	"strings"
-
-
 )
 
 //DummyDataFaker is used in tests
@@ -178,8 +177,10 @@ func (ddf DummyDataFaker) Hex(n int) string {
 	return strings.Repeat("0", n)
 }
 
-func getProcessor() Evaluator {
-	return Evaluator{FillerFactory: MockFillerFactory{FakeAdapter: NewDummyDataFaker("AleixMG")}}
+func getProcessor() ResponseMessageEvaluator {
+	dfp := NewDummyDataFaker("AleixMG")
+	ff := NewFillerFactory(dfp)
+	return ResponseMessageEvaluator{FillerFactory: ff}
 }
 
 func TestReplaceTags(t *testing.T) {
