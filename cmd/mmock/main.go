@@ -74,7 +74,7 @@ func getOutboundIP() string {
 	return localAddr[0:idx]
 }
 
-func getMatchSpier(checker match.Matcher, matchStore match.TransactionStorer) match.TransactionSpier {
+func getTransactionSpy(checker match.Matcher, matchStore match.TransactionStorer) *match.Spy {
 	return match.NewSpy(checker, matchStore)
 }
 
@@ -181,7 +181,7 @@ func main() {
 	tester := match.NewTester(comparator, scenario)
 	matchStore := match.NewInMemoryTransactionStore(tester)
 	mapping := getMapping(*cPath)
-	spy := getMatchSpier(tester, matchStore)
+	spy := getTransactionSpy(tester, matchStore)
 	router := getRouter(mapping, tester)
 	varsProcessor := getVarsProcessor()
 
