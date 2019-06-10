@@ -14,15 +14,16 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jmartin82/mmock/pkg/match"
 	"github.com/jmartin82/mmock/internal/proxy"
+	"github.com/jmartin82/mmock/pkg/match"
 
-	"github.com/jmartin82/mmock/internal/statistics"
-	"github.com/jmartin82/mmock/pkg/mock"
-	"github.com/jmartin82/mmock/internal/vars"
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/jmartin82/mmock/internal/statistics"
+	"github.com/jmartin82/mmock/internal/vars"
+	"github.com/jmartin82/mmock/pkg/mock"
 )
 
 //Dispatcher is the mock http server
@@ -31,11 +32,11 @@ type Dispatcher struct {
 	Port       int
 	PortTLS    int
 	ConfigTLS  string
-	Resolver   Resolver
+	Resolver   RequestResolver
 	Translator mock.MessageTranslator
-	Processor  vars.Evaluator
+	Evaluator  vars.Evaluator
 	Scenario   match.ScenearioStorer
-	Spier      match.Spier
+	Spier      match.TransactionSpier
 	Mlog       chan match.Log
 }
 
@@ -137,7 +138,7 @@ func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition
 			response = getProxyResponse(request, mock)
 		} else {
 
-			di.Processor.Eval(request, mock)
+			di.Evaluator.Eval(request, mock)
 			if mock.Control.Crazy {
 				log.Println("Running crazy mode")
 				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)
@@ -183,7 +184,7 @@ func (di Dispatcher) Start() {
 	err := <-errCh
 
 	if err != nil {
-		log.Fatalf("ListenAndServe: %s" , err.Error())
+		log.Fatalf("ListenAndServe: %s", err.Error())
 	}
 
 }

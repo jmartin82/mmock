@@ -1,4 +1,4 @@
-package fakedata
+package fake
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 )
 
 func TestInt(t *testing.T) {
-	faker := FakeAdapter{}
+	faker := Provider{}
 
 	for i := 0; i < 10000; i++ {
 		result := faker.Int(1000)
@@ -25,7 +25,7 @@ func TestInt(t *testing.T) {
 }
 
 func TestIntMinMax(t *testing.T) {
-	faker := FakeAdapter{}
+	faker := Provider{}
 	rand.Seed(time.Now().Unix())
 
 	min := 0
@@ -46,7 +46,7 @@ func TestIntMinMax(t *testing.T) {
 }
 
 func TestFloat(t *testing.T) {
-	faker := FakeAdapter{}
+	faker := Provider{}
 
 	for i := 0; i < 10000; i++ {
 		result := faker.Float(1000)
@@ -61,7 +61,7 @@ func TestFloat(t *testing.T) {
 }
 
 func TestUUID(t *testing.T) {
-	faker := FakeAdapter{}
+	faker := Provider{}
 	r := regexp.MustCompile(`[0-9A-Fa-f]{32}|[0-9A-Fa-f\\-]{36}`)
 
 	for i := 0; i < 10000; i++ {
@@ -73,7 +73,7 @@ func TestUUID(t *testing.T) {
 }
 
 func TestBasicFakeVars(t *testing.T) {
-	faker := FakeAdapter{}
+	faker := Provider{}
 	if faker.Brand() == "" {
 		t.Error("Brand fake doesn't work")
 	}
@@ -87,7 +87,7 @@ func TestBasicFakeVars(t *testing.T) {
 }
 
 func TestHex(t *testing.T) {
-	faker := FakeAdapter{}
+	faker := Provider{}
 
 	for i := 1; i < 65; i++ {
 		r := regexp.MustCompile(fmt.Sprintf("[0-9a-f]{%d}", i))

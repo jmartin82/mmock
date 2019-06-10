@@ -10,8 +10,8 @@ import (
 	"github.com/jmartin82/mmock/pkg/match"
 )
 
-//Resolver contains the functions to check the http request and return the matching mock.
-type Resolver interface {
+//RequestResolver contains the functions to check the http request and return the matching mock.
+type RequestResolver interface {
 	Resolve(req *mock.Request) (*mock.Definition, *match.Result)
 }
 

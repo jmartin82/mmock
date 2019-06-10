@@ -1,20 +1,27 @@
 package vars
 
 import (
-	"github.com/jmartin82/mmock/pkg/mock"
 	"regexp"
 	"strings"
 
-
+	"github.com/jmartin82/mmock/pkg/mock"
 )
 
 var varsRegex = regexp.MustCompile(`\{\{\s*(.+?)\s*\}\}`)
 
-type Evaluator struct {
+type Evaluator interface {
+	Eval(req *mock.Request, m *mock.Definition)
+}
+
+type ResponseMessageEvaluator struct {
 	FillerFactory FillerFactory
 }
 
-func (fp Evaluator) Eval(req *mock.Request, m *mock.Definition) {
+func NewResponseMessageEvaluator(fp FillerFactory) *ResponseMessageEvaluator {
+	return &ResponseMessageEvaluator{FillerFactory: fp}
+}
+
+func (fp ResponseMessageEvaluator) Eval(req *mock.Request, m *mock.Definition) {
 	requestFiller := fp.FillerFactory.CreateRequestFiller(req, m)
 	fakeFiller := fp.FillerFactory.CreateFakeFiller()
 	streamFiller := fp.FillerFactory.CreateStreamFiller()
@@ -26,7 +33,7 @@ func (fp Evaluator) Eval(req *mock.Request, m *mock.Definition) {
 	fp.walkAndFill(m, vars)
 }
 
-func (fp Evaluator) walkAndGet(res mock.Response) []string {
+func (fp ResponseMessageEvaluator) walkAndGet(res mock.Response) []string {
 
 	vars := []string{}
 	for _, header := range res.Headers {
@@ -43,7 +50,7 @@ func (fp Evaluator) walkAndGet(res mock.Response) []string {
 	return vars
 }
 
-func (fp Evaluator) walkAndFill(m *mock.Definition, vars map[string][]string) {
+func (fp ResponseMessageEvaluator) walkAndFill(m *mock.Definition, vars map[string][]string) {
 	res := &m.Response
 	for header, values := range res.Headers {
 		for i, value := range values {
@@ -58,7 +65,7 @@ func (fp Evaluator) walkAndFill(m *mock.Definition, vars map[string][]string) {
 	res.Body = fp.replaceVars(res.Body, vars)
 }
 
-func (fp Evaluator) replaceVars(input string, vars map[string][]string) string {
+func (fp ResponseMessageEvaluator) replaceVars(input string, vars map[string][]string) string {
 	return varsRegex.ReplaceAllStringFunc(input, func(value string) string {
 		varName := strings.Trim(value, "{} ")
 		// replace the strings
@@ -72,7 +79,7 @@ func (fp Evaluator) replaceVars(input string, vars map[string][]string) string {
 	})
 }
 
-func (fp Evaluator) extractVars(input string, vars *[]string) {
+func (fp ResponseMessageEvaluator) extractVars(input string, vars *[]string) {
 	if m := varsRegex.FindAllString(input, -1); m != nil {
 		for _, v := range m {
 			varName := strings.Trim(v, "{} ")
@@ -81,7 +88,7 @@ func (fp Evaluator) extractVars(input string, vars *[]string) {
 	}
 }
 
-func (fp Evaluator) mergeVars(org map[string][]string, vals map[string][]string) {
+func (fp ResponseMessageEvaluator) mergeVars(org map[string][]string, vals map[string][]string) {
 	for k, v := range vals {
 		org[k] = v
 	}

@@ -27,20 +27,20 @@ type Log struct {
 }
 
 
-type Spier interface {
+type TransactionSpier interface {
 	Find(mock.Request) []Log
 	GetMatched() []Log
 	GetUnMatched() []Log
-	Storer
+	TransactionStorer
 }
 
 type Spy struct {
-	store   Storer
+	store   TransactionStorer
 	checker Matcher
 }
 
-func NewSpy(checker Matcher, matchStore Storer) *Spy {
-	return &Spy{store: matchStore, checker: checker}
+func NewSpy(checker Matcher, transactionStore TransactionStorer) *Spy {
+	return &Spy{store: transactionStore, checker: checker}
 }
 
 func (mc Spy) Find(r mock.Request) []Log {

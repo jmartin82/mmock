@@ -3,7 +3,7 @@ package match
 import "testing"
 
 func TestBasicScenarioManage(t *testing.T) {
-	ms := NewScenarioStore()
+	ms := NewInMemoryScenarioStore()
 
 	state := ms.GetState("scene1")
 	if state != "not_started" {
@@ -36,7 +36,7 @@ func TestBasicScenarioManage(t *testing.T) {
 }
 
 func TestScenarioManagePause(t *testing.T) {
-	ms := NewScenarioStore()
+	ms := NewInMemoryScenarioStore()
 	ms.SetPaused(true)
 
 	ms.SetState("Scene1", "some_state")

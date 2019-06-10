@@ -10,16 +10,16 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jmartin82/mmock/internal/console"
 	"github.com/jmartin82/mmock/internal/config"
 	"github.com/jmartin82/mmock/internal/config/parser"
-	"github.com/jmartin82/mmock/pkg/match"
-	"github.com/jmartin82/mmock/pkg/match/payload"
+	"github.com/jmartin82/mmock/internal/console"
 	"github.com/jmartin82/mmock/internal/server"
 	"github.com/jmartin82/mmock/internal/statistics"
-	"github.com/jmartin82/mmock/pkg/mock"
 	"github.com/jmartin82/mmock/internal/vars"
-	"github.com/jmartin82/mmock/internal/vars/fakedata"
+	"github.com/jmartin82/mmock/internal/vars/fake"
+	"github.com/jmartin82/mmock/pkg/match"
+	"github.com/jmartin82/mmock/pkg/match/payload"
+	"github.com/jmartin82/mmock/pkg/mock"
 )
 
 //VERSION of the application
@@ -74,7 +74,7 @@ func getOutboundIP() string {
 	return localAddr[0:idx]
 }
 
-func getMatchSpier(checker match.Matcher, matchStore match.Storer) match.Spier {
+func getMatchSpier(checker match.Matcher, matchStore match.TransactionStorer) match.TransactionSpier {
 	return match.NewSpy(checker, matchStore)
 }
 
@@ -112,12 +112,14 @@ func getRouter(mapping config.Mapping, checker match.Matcher) *server.Router {
 	return router
 }
 
-func getVarsProcessor() vars.Evaluator {
-
-	return vars.Evaluator{FillerFactory: vars.MockFillerFactory{FakeAdapter: fakedata.FakeAdapter{}}}
+func getVarsProcessor() *vars.ResponseMessageEvaluator {
+	ccg := fake.NewCreditCardGenerator()
+	fp := fake.NewFakeDataProvider(ccg)
+	ff := vars.NewFillerFactory(fp)
+	return vars.NewResponseMessageEvaluator(ff)
 }
 
-func startServer(ip string, port, portTLS int, configTLS string, done chan bool, router server.Resolver, mLog chan match.Log, scenario match.ScenearioStorer, varsProcessor vars.Evaluator, spier match.Spier) {
+func startServer(ip string, port, portTLS int, configTLS string, done chan struct{}, router server.RequestResolver, mLog chan match.Log, scenario match.ScenearioStorer, varsProcessor vars.Evaluator, spier match.TransactionSpier) {
 	dispatcher := server.Dispatcher{
 		IP:         ip,
 		Port:       port,
@@ -125,15 +127,15 @@ func startServer(ip string, port, portTLS int, configTLS string, done chan bool,
 		ConfigTLS:  configTLS,
 		Resolver:   router,
 		Translator: mock.HTTP{},
-		Processor:  varsProcessor,
+		Evaluator:  varsProcessor,
 		Scenario:   scenario,
 		Spier:      spier,
 		Mlog:       mLog,
 	}
 	dispatcher.Start()
-	done <- true
+	done <- struct{}{}
 }
-func startConsole(ip string, port int, resultsPerPage uint, spy match.Spier, scenario match.ScenearioStorer, mapping config.Mapping, done chan bool, mLog chan match.Log) {
+func startConsole(ip string, port int, resultsPerPage uint, spy match.TransactionSpier, scenario match.ScenearioStorer, mapping config.Mapping, done chan struct{}, mLog chan match.Log) {
 	dispatcher := console.Dispatcher{
 		IP:             ip,
 		Port:           port,
@@ -144,7 +146,7 @@ func startConsole(ip string, port int, resultsPerPage uint, spy match.Spier, sce
 		ResultsPerPage: resultsPerPage,
 	}
 	dispatcher.Start()
-	done <- true
+	done <- struct{}{}
 }
 
 func main() {
@@ -171,13 +173,13 @@ func main() {
 
 	//chanels
 	mLog := make(chan match.Log)
-	done := make(chan bool)
+	done := make(chan struct{})
 
 	//shared structs
-	scenario := match.NewScenarioStore()
+	scenario := match.NewInMemoryScenarioStore()
 	comparator := payload.NewDefaultComparator()
 	tester := match.NewTester(comparator, scenario)
-	matchStore := match.NewStore(tester)
+	matchStore := match.NewInMemoryTransactionStore(tester)
 	mapping := getMapping(*cPath)
 	spy := getMatchSpier(tester, matchStore)
 	router := getRouter(mapping, tester)

@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/jmartin82/mmock/pkg/mock"
 	"io"
 	"net/http"
 	"testing"
+
+	"github.com/jmartin82/mmock/pkg/mock"
 )
 
 type MockClient struct {
@@ -47,7 +48,7 @@ func TestMakeValidRequest(t *testing.T) {
 	request.Host = "http://mock_host.com"
 	request.Method = "GET"
 	request.Path = "/home"
-	url := "http://example.com"
+	url := "http://jordi.io"
 	proxy := Proxy{URL: url, Client: client}
 	response := proxy.MakeRequest(request)
 
@@ -81,8 +82,8 @@ func TestMakeInvalidRequest(t *testing.T) {
 	request := &mock.Request{}
 	request.Host = "http://mock_host.com"
 	request.Method = "GET"
-	request.Path = "/home"
-	url := "http://example.com"
+	request.Path = "/home/OriolMG"
+	url := "http://jordi.io"
 	proxy := Proxy{URL: url, Client: client}
 	response := proxy.MakeRequest(request)
 	if response.StatusCode != http.StatusInternalServerError {

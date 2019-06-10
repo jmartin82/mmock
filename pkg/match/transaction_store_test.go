@@ -24,7 +24,7 @@ func (dm DummyMatcher) Match(req *mock.Request, mock *mock.Definition, scenarioA
 
 func TestStoreRequest(t *testing.T) {
 
-	msr := NewStore(DummyMatcher{})
+	msr := NewInMemoryTransactionStore(DummyMatcher{})
 	m1 := Log{Request: &mock.Request{Host: "TEST1"}}
 	msr.Save(m1)
 	m2 := Log{Request: &mock.Request{Host: "TEST2"}}
@@ -46,7 +46,7 @@ func TestStoreRequest(t *testing.T) {
 
 func TestGetAll(t *testing.T) {
 
-	msr := NewStore(DummyMatcher{})
+	msr := NewInMemoryTransactionStore(DummyMatcher{})
 	m1 := Log{Request: &mock.Request{Host: "TEST1"}}
 	msr.Save(m1)
 	m2 := Log{Request: &mock.Request{Host: "TEST2"}}
@@ -67,7 +67,7 @@ func TestGetAll(t *testing.T) {
 
 func TestGet(t *testing.T) {
 
-	msr := NewStore(DummyMatcher{})
+	msr := NewInMemoryTransactionStore(DummyMatcher{})
 
 	matches := []Log{
 		{Time: 1},
@@ -110,7 +110,7 @@ func TestGet(t *testing.T) {
 
 func TestGetOnEmptyStore(t *testing.T) {
 
-	msr := NewStore(DummyMatcher{})
+	msr := NewInMemoryTransactionStore(DummyMatcher{})
 
 	tests := []struct {
 		msg      string
@@ -137,7 +137,7 @@ func TestGetOnEmptyStore(t *testing.T) {
 
 func TestReset(t *testing.T) {
 
-	msr := NewStore(DummyMatcher{})
+	msr := NewInMemoryTransactionStore(DummyMatcher{})
 	m1 := Log{Request: &mock.Request{Host: "TEST1"}}
 	msr.Save(m1)
 	m2 := Log{Request: &mock.Request{Host: "TEST2"}}
@@ -165,11 +165,11 @@ func TestReset(t *testing.T) {
 
 func TestResetMatch(t *testing.T) {
 
-	scenario := NewScenarioStore()
+	scenario := NewInMemoryScenarioStore()
 	comparator := payload.NewDefaultComparator()
 	tester := NewTester(comparator, scenario)
 
-	msr := NewStore(tester)
+	msr := NewInMemoryTransactionStore(tester)
 	m1 := Log{Request: &mock.Request{Host: "TEST1"}}
 	msr.Save(m1)
 	m2 := Log{Request: &mock.Request{Host: "TEST2"}}
