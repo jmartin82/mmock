@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/jmartin82/mmock/pkg/mock"
 	"net/url"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -50,6 +51,8 @@ func (rp Request) Fill(holders []string) map[string][]string {
 			s, found = rp.getCookieParam(tag[15:])
 		} else if strings.HasPrefix(tag, "request.header.") {
 			s, found = rp.getHeaderParam(tag[15:])
+		} else if strings.HasPrefix(tag, "env.") {
+			s, found = os.LookupEnv(tag[4:])
 		}
 
 		if found {
