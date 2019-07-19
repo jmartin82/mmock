@@ -102,7 +102,7 @@ To configure Mmock, use command line flags described in help.
     Usage of ./mmock:
 	  -config-path=string
 		Mocks definition folder (default "execution_pathconfig")
-	  -console
+	  -console=boolean
 		Console enabled  (true/false) (default true)
 	  -console-ip=string
 		Console server IP (default "public_ip")
@@ -114,7 +114,7 @@ To configure Mmock, use command line flags described in help.
 		Mock server IP (default "public_ip")
 	  -server-port=int
 		Mock server Port (default 8083)
-	  -server-statistics
+	  -server-statistics=boolean
 		Mock server sends anonymous statistics (default true)
 	  -server-tls-port=int
 		Mock server TLS Port (default 8084)
