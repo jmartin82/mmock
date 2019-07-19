@@ -14,5 +14,5 @@ COPY mmock /usr/local/bin/mmock
 
 EXPOSE 8082 8083 8084
 
-ENTRYPOINT ["mmock","-config-path","/config","-tls-path","/tls"]
-CMD ["-server-ip","0.0.0.0","-console-ip","0.0.0.0"]
+ENTRYPOINT ["mmock","-config-path=/config","-tls-path=/tls"]
+CMD ["-server-ip=0.0.0.0","-console-ip=0.0.0.0"]
