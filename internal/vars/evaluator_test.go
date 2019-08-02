@@ -1,7 +1,6 @@
 package vars
 
 import (
-	"os"
 	"testing"
 
 	"github.com/jmartin82/mmock/pkg/mock"
