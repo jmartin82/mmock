@@ -22,6 +22,7 @@ require (
 	github.com/ryanuber/go-glob v1.0.0
 	github.com/stathat/go v1.0.0
 	github.com/stretchr/testify v1.3.0 // indirect
+	github.com/tidwall/gjson v1.3.2
 	github.com/twinj/uuid v1.0.0
 	github.com/valyala/fasttemplate v1.0.1 // indirect
 	golang.org/x/net v0.0.0-20190503192946-f4e77d36d62c

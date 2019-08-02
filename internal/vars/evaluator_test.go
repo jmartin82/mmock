@@ -1,6 +1,7 @@
 package vars
 
 import (
+	"os"
 	"testing"
 
 	"github.com/jmartin82/mmock/pkg/mock"
@@ -446,13 +447,19 @@ func TestReplaceJsonBodyEncodedTags(t *testing.T) {
   "email": "hilari@hilarimoragrega.com",
   "age": 34,
   "height": 5.66,
-  "weight": null,
+  "weight": ,
   "active": true,
   "level": -8,
-  "friends": ["jordi.martin@gmail.com","alfons.faubert@gmail.com"],
+  "friends": [
+    "jordi.martin@gmail.com", 
+    "alfons.faubert@gmail.com"
+  ],
   "first-friend": "jordi.martin@gmail.com",
   "last-friend": "alfons.faubert@gmail.com",
-  "attributes": {"programming":15,"trolling":27},
+  "attributes": {
+    "programming": 15,
+    "trolling": 27
+  },
   "tracking": {
     "uuid": "0bd74115-2307-458f-8288-b726724045ef",
     "deeper": {
@@ -461,7 +468,84 @@ func TestReplaceJsonBodyEncodedTags(t *testing.T) {
   }
 }
 `
+	mock := mock.Definition{Request: req, Response: res}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
 
+	if mock.Response.Body != expected {
+		t.Error("Replaced tags from body form do not match", mock.Response.Body)
+	}
+}
+
+func TestReplaceXmlBodyEncodedTags(t *testing.T) {
+	req := mock.Request{}
+	req.Headers = make(mock.Values)
+	req.Headers["Content-Type"] = []string{"application/xml"}
+	req.Body = `
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<active>true</active>
+	<age>34</age>
+	<attributes>
+		<programming>15</programming>
+		<trolling>27</trolling>
+	</attributes>
+	<email>hilari@hilarimoragrega.com</email>
+	<friends>
+		<element>jordi.martin@gmail.com</element>
+		<element>alfons.faubert@gmail.com</element>
+	</friends>
+	<height>5.66</height>
+	<level>-8</level>
+	<tracking>
+		<discarded>do not return</discarded>
+		<nesting>
+			<level>nesting is ok</level>
+		</nesting>
+		<uuid>0bd74115-2307-458f-8288-b726724045ef</uuid>
+	</tracking>
+</root>
+`
+	res := mock.Response{}
+	res.Body = `
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<active>{{request.root.body.active}}</active>
+	<age>{{request.body.root.email}}</age>
+	<email>{{request.body.root.email}}</email>
+	<friends>
+		<element>{{request.body.root.friends.element.0}}</element>
+		<element>{{request.body.root.friends.element.1}}</element>
+	</friends>
+	<level>{{request.body.root.level}}</level>
+	<tracking>
+		<nesting>
+			<level>{{request.body.root.tracking.nesting.level}}</level>
+		</nesting>
+		<uuid>{{request.body.root.tracking.uuid}}</uuid>
+	</tracking>
+</root>
+`
+
+	expected := `
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<active>{{request.root.body.active}}</active>
+	<age>hilari@hilarimoragrega.com</age>
+	<email>hilari@hilarimoragrega.com</email>
+	<friends>
+		<element>jordi.martin@gmail.com</element>
+		<element>alfons.faubert@gmail.com</element>
+	</friends>
+	<level>-8</level>
+	<tracking>
+		<nesting>
+			<level>nesting is ok</level>
+		</nesting>
+		<uuid>0bd74115-2307-458f-8288-b726724045ef</uuid>
+	</tracking>
+</root>
+`
 	mock := mock.Definition{Request: req, Response: res}
 	varsProcessor := getProcessor()
 	varsProcessor.Eval(&req, &mock)
