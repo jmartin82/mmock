@@ -1,16 +1,17 @@
 package vars
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/jmartin82/mmock/pkg/mock"
 	"net/url"
 	"os"
 	"sort"
-	"strconv"
 	"strings"
 
+	"github.com/jmartin82/mmock/pkg/mock"
+
 	urlmatcher "github.com/azer/url-router"
+	xj "github.com/basgys/goxml2json"
+	"github.com/tidwall/gjson"
 )
 
 type Request struct {
@@ -164,19 +165,47 @@ func (rp Request) getHeaderParam(name string) (string, bool) {
 }
 
 func (rp Request) getBodyParam(name string) (string, bool) {
-
 	contentType, found := rp.Request.Headers["Content-Type"]
 	if !found {
 		return "", false
 	}
-
 	if strings.HasPrefix(contentType[0], "application/x-www-form-urlencoded") {
 		return rp.getUrlEncodedFormBodyParam(name)
+	} else if strings.HasPrefix(contentType[0], "application/xml") {
+		return rp.getXmlBodyParam(name)
 	} else if strings.HasPrefix(contentType[0], "application/json") {
 		return rp.getJsonBodyParam(name)
 	}
 
 	return "", false
+}
+
+func (rp Request) getXmlBodyParam(name string) (string, bool) {
+	xml := strings.NewReader(rp.Request.Body)
+	json, err := xj.Convert(xml)
+	if err != nil {
+		return "", false
+	}
+
+	value := gjson.Get(json.String(), name)
+	if !value.Exists() {
+		return "", false
+	}
+
+	//TODO: Add support to complex types extraction like arrays or maps
+	if value.Type == gjson.JSON {
+		return "", false
+	}
+
+	return value.String(), true
+}
+
+func (rp Request) getJsonBodyParam(name string) (string, bool) {
+	value := gjson.Get(rp.Request.Body, name)
+	if !value.Exists() {
+		return "", false
+	}
+	return value.String(), true
 }
 
 func (rp Request) getUrlEncodedFormBodyParam(name string) (string, bool) {
@@ -192,56 +221,4 @@ func (rp Request) getUrlEncodedFormBodyParam(name string) (string, bool) {
 	}
 
 	return value, true
-}
-
-func (rp Request) getJsonBodyParam(name string) (string, bool) {
-
-	hierarchy := strings.Split(name, ".")
-
-	var payload interface{}
-	if err := json.Unmarshal([]byte(rp.Request.Body), &payload); err != nil {
-		return "", false
-	}
-
-	for _, value := range hierarchy {
-		if mapper, ok := payload.(map[string]interface{}); ok {
-			payload, ok = mapper[value]
-
-			if !ok {
-				return "", false
-			}
-
-			continue
-		}
-
-		if arrayMapper, ok := payload.([]interface{}); ok {
-			index, err := strconv.Atoi(value)
-
-			if err != nil || index >= len(arrayMapper) {
-				return "", false
-			}
-
-			payload = arrayMapper[index]
-			continue
-		}
-	}
-
-	return rp.getJsonValue(payload)
-}
-
-func (rp Request) getJsonValue(object interface{}) (string, bool) {
-
-	stringContent, ok := object.(string)
-
-	if ok {
-		return stringContent, true
-	}
-
-	genericContent, err := json.Marshal(object)
-
-	if err == nil {
-		return string(genericContent), true
-	}
-
-	return "", false
 }

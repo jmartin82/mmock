@@ -238,8 +238,13 @@ You can use variable data in response. The variables will be defined as tags lik
  - request.url (full url with scheme, hostname, port, path and query parameters)
  - request.autority (return scheme, hostname and port (optional))
  - request.body
- - request.body."*key*" (both `application/json` and `application/x-www-form-urlencoded requests)
- - request.body."*deep*"."*key*" (only for `application/json` requests)
+
+You can extract information from the request body too, using a dot notation path:
+ 
+ - request.body."*key*" (support for `application/json`, `application/xml` and `application/x-www-form-urlencoded` requests)
+ - request.body."*deep*"."*key*" (support for `application/json`, `application/xml` requests)
+
+Quick overview of the path syntax available to extract values form the request: [https://github.com/tidwall/gjson#path-syntax] (https://github.com/tidwall/gjson#path-syntax)
 
 **External streams:** Perfect for embedding big payloads or getting data from another service.
 
@@ -546,7 +551,7 @@ You can always disable this behavior adding the following flag `-server-statisti
 
 Clone this repository to ```$GOPATH/src/github.com/jmartin82/mmock``` and type ```go get .```.
 
-Requires Go 1.11+ to build.
+Requires Go 1.12+ to build.
 
 If you make any changes, run ```go fmt ./...``` before submitting a pull request.
 
