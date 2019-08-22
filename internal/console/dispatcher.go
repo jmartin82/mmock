@@ -3,7 +3,6 @@ package console
 import (
 	"errors"
 	"fmt"
-	"github.com/jmartin82/mmock/internal/config"
 	"log"
 	"net/http"
 	"regexp"
@@ -12,9 +11,11 @@ import (
 	"strings"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/pkg/config"
 	"github.com/jmartin82/mmock/pkg/match"
-		"github.com/jmartin82/mmock/internal/statistics"
+	"github.com/jmartin82/mmock/pkg/mock"
+
+	"github.com/jmartin82/mmock/internal/statistics"
 	"github.com/labstack/echo"
 	"golang.org/x/net/websocket"
 )

@@ -6,3 +6,5 @@ data/*
 coverage.txt
 .github
 dist
+.vscode
+.idea

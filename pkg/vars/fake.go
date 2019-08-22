@@ -2,7 +2,7 @@ package vars
 
 import (
 	"errors"
-	"github.com/jmartin82/mmock/internal/vars/fake"
+	"github.com/jmartin82/mmock/pkg/vars/fake"
 	"log"
 	"reflect"
 	"regexp"

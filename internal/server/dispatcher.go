@@ -22,7 +22,7 @@ import (
 	"strings"
 
 	"github.com/jmartin82/mmock/internal/statistics"
-	"github.com/jmartin82/mmock/internal/vars"
+	"github.com/jmartin82/mmock/pkg/vars"
 	"github.com/jmartin82/mmock/pkg/mock"
 )
 

@@ -10,16 +10,17 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jmartin82/mmock/internal/config"
-	"github.com/jmartin82/mmock/internal/config/parser"
 	"github.com/jmartin82/mmock/internal/console"
+	"github.com/jmartin82/mmock/internal/fs"
+	"github.com/jmartin82/mmock/internal/fs/parser"
 	"github.com/jmartin82/mmock/internal/server"
 	"github.com/jmartin82/mmock/internal/statistics"
-	"github.com/jmartin82/mmock/internal/vars"
-	"github.com/jmartin82/mmock/internal/vars/fake"
+	"github.com/jmartin82/mmock/pkg/config"
 	"github.com/jmartin82/mmock/pkg/match"
 	"github.com/jmartin82/mmock/pkg/match/payload"
 	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/pkg/vars"
+	"github.com/jmartin82/mmock/pkg/vars/fake"
 )
 
 //VERSION of the application
@@ -95,16 +96,16 @@ func getMapping(path string) config.Mapping {
 		log.Fatalln(ErrNotFoundPath.Error())
 	}
 
-	fsMapper := config.NewFileSystemMapper()
+	fsMapper := fs.NewFileSystemMapper()
 	fsMapper.AddParser(parser.JSONReader{})
 	fsMapper.AddParser(parser.YAMLReader{})
 
 	fsUpdate := make(chan struct{})
 
-	watcher := config.NewFileWatcher(path, fsUpdate)
+	watcher := fs.NewFileWatcher(path, fsUpdate)
 	watcher.Bind()
 
-	return config.NewConfigMapping(path, fsMapper, fsUpdate)
+	return fs.NewConfigMapping(path, fsMapper, fsUpdate)
 }
 
 func getRouter(mapping config.Mapping, checker match.Matcher) *server.Router {

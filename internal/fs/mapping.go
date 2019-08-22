@@ -1,4 +1,4 @@
-package config
+package fs
 
 import (
 	"errors"
@@ -14,13 +14,6 @@ import (
 
 var ErrFilePathIsNotUnderConfigPath = errors.New("File path is not under config path")
 var ErrMockDoesntExist = errors.New("Definition doesn't exist")
-
-type Mapping interface {
-	Set(URI string, mock mock.Definition) error
-	Delete(URI string) error
-	Get(URI string) (mock.Definition, bool)
-	List() []mock.Definition
-}
 
 //PrioritySort mock array sorted by priority
 type PrioritySort []mock.Definition

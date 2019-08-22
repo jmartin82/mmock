@@ -3,9 +3,12 @@ package server
 import (
 	"bytes"
 	"encoding/gob"
-	"github.com/jmartin82/mmock/internal/config"
-	"github.com/jmartin82/mmock/pkg/mock"
+
+	"github.com/jmartin82/mmock/pkg/config"
+
 	"log"
+
+	"github.com/jmartin82/mmock/pkg/mock"
 
 	"github.com/jmartin82/mmock/pkg/match"
 )
