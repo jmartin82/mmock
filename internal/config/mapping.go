@@ -1,8 +1,7 @@
-package fs
+package config
 
 import (
 	"errors"
-	"github.com/jmartin82/mmock/pkg/mock"
 	"log"
 	"os"
 	"path"
@@ -10,10 +9,19 @@ import (
 	"sort"
 	"strings"
 	"sync"
+
+	"github.com/jmartin82/mmock/pkg/mock"
 )
 
 var ErrFilePathIsNotUnderConfigPath = errors.New("File path is not under config path")
 var ErrMockDoesntExist = errors.New("Definition doesn't exist")
+
+type Mapping interface {
+	Set(URI string, mock mock.Definition) error
+	Delete(URI string) error
+	Get(URI string) (mock.Definition, bool)
+	List() []mock.Definition
+}
 
 //PrioritySort mock array sorted by priority
 type PrioritySort []mock.Definition

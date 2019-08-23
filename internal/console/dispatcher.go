@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
-	"github.com/jmartin82/mmock/pkg/config"
+	"github.com/jmartin82/mmock/internal/config"
 	"github.com/jmartin82/mmock/pkg/match"
 	"github.com/jmartin82/mmock/pkg/mock"
 

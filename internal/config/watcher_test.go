@@ -1,4 +1,4 @@
-package fs
+package config
 
 import (
 	"io/ioutil"

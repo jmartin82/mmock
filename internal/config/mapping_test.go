@@ -1,4 +1,4 @@
-package fs
+package config
 
 import (
 	"github.com/jmartin82/mmock/pkg/mock"
