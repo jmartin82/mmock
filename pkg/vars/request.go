@@ -171,7 +171,7 @@ func (rp Request) getBodyParam(name string) (string, bool) {
 	}
 	if strings.HasPrefix(contentType[0], "application/x-www-form-urlencoded") {
 		return rp.getUrlEncodedFormBodyParam(name)
-	} else if strings.HasPrefix(contentType[0], "application/xml") {
+	} else if strings.HasPrefix(contentType[0], "application/xml") || strings.HasPrefix(contentType[0], "text/xml") {
 		return rp.getXmlBodyParam(name)
 	} else if strings.HasPrefix(contentType[0], "application/json") {
 		return rp.getJsonBodyParam(name)
