@@ -37,7 +37,7 @@ type Dispatcher struct {
 	MatchSpy       match.TransactionSpier
 	Scenario       match.ScenearioStorer
 	Mapping        config.Mapping
-	Mlog           chan match.Log
+	Mlog           chan match.Transaction
 	clients        []*websocket.Conn
 }
 

@@ -5,32 +5,10 @@ import (
 	"github.com/jmartin82/mmock/pkg/mock"
 )
 
-//Error contains the tested uri and the match error
-type Error struct {
-	URI    string `json:"uri"`
-	Reason string `json:"reason"`
-}
-
-//Result contains the match result and the failing matches with different mocks and the reason or the fail.
-type Result struct {
-	Found  bool    `json:"match"`
-	URI    string  `json:"uri"`
-	Errors []Error `json:"errors"`
-}
-
-//Log contains the whole information about the request match. The http request, the final response received and the matching result.
-type Log struct {
-	Time     int64          `json:"time"`
-	Request  *mock.Request  `json:"request"`
-	Response *mock.Response `json:"response"`
-	Result   *Result        `json:"result"`
-}
-
-
 type TransactionSpier interface {
-	Find(mock.Request) []Log
-	GetMatched() []Log
-	GetUnMatched() []Log
+	Find(mock.Request) []Transaction
+	GetMatched() []Transaction
+	GetUnMatched() []Transaction
 	TransactionStorer
 }
 
@@ -43,9 +21,9 @@ func NewSpy(checker Matcher, transactionStore TransactionStorer) *Spy {
 	return &Spy{store: transactionStore, checker: checker}
 }
 
-func (mc Spy) Find(r mock.Request) []Log {
+func (mc Spy) Find(r mock.Request) []Transaction {
 	matches := mc.store.GetAll()
-	result := []Log{}
+	result := []Transaction{}
 	for _, match := range matches {
 		if m, _ := mc.checker.Match(match.Request, &mock.Definition{Request: r}, false); m {
 			result = append(result, match)
@@ -60,32 +38,32 @@ func (mc Spy) ResetMatch(r mock.Request) {
 	mc.store.ResetMatch(r)
 }
 
-func (mc Spy) Save(match Log) {
+func (mc Spy) Save(match Transaction) {
 	mc.store.Save(match)
 }
 func (mc Spy) Reset() {
 	mc.store.Reset()
 }
 
-func (mc Spy) GetAll() []Log {
+func (mc Spy) GetAll() []Transaction {
 	return mc.store.GetAll()
 }
 
-func (mc Spy) Get(limit uint, offset uint) []Log {
+func (mc Spy) Get(limit uint, offset uint) []Transaction {
 	return mc.store.Get(limit, offset)
 }
 
-func (mc Spy) GetMatched() []Log {
+func (mc Spy) GetMatched() []Transaction {
 	return mc.getMatchByResult(true)
 }
 
-func (mc Spy) GetUnMatched() []Log {
+func (mc Spy) GetUnMatched() []Transaction {
 	return mc.getMatchByResult(false)
 }
 
-func (mc Spy) getMatchByResult(found bool) []Log {
+func (mc Spy) getMatchByResult(found bool) []Transaction {
 	matches := mc.store.GetAll()
-	result := []Log{}
+	result := []Transaction{}
 	for _, match := range matches {
 		if match.Result.Found == found {
 			result = append(result, match)

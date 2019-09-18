@@ -119,7 +119,7 @@ func getVarsProcessor() *vars.ResponseMessageEvaluator {
 	return vars.NewResponseMessageEvaluator(ff)
 }
 
-func startServer(ip string, port, portTLS int, configTLS string, done chan struct{}, router server.RequestResolver, mLog chan match.Log, scenario match.ScenearioStorer, varsProcessor vars.Evaluator, spier match.TransactionSpier) {
+func startServer(ip string, port, portTLS int, configTLS string, done chan struct{}, router server.RequestResolver, mLog chan match.Transaction, scenario match.ScenearioStorer, varsProcessor vars.Evaluator, spier match.TransactionSpier) {
 	dispatcher := server.Dispatcher{
 		IP:         ip,
 		Port:       port,
@@ -135,7 +135,7 @@ func startServer(ip string, port, portTLS int, configTLS string, done chan struc
 	dispatcher.Start()
 	done <- struct{}{}
 }
-func startConsole(ip string, port int, resultsPerPage uint, spy match.TransactionSpier, scenario match.ScenearioStorer, mapping config.Mapping, done chan struct{}, mLog chan match.Log) {
+func startConsole(ip string, port int, resultsPerPage uint, spy match.TransactionSpier, scenario match.ScenearioStorer, mapping config.Mapping, done chan struct{}, mLog chan match.Transaction) {
 	dispatcher := console.Dispatcher{
 		IP:             ip,
 		Port:           port,
@@ -172,7 +172,7 @@ func main() {
 	flag.Parse()
 
 	//chanels
-	mLog := make(chan match.Log)
+	mLog := make(chan match.Transaction)
 	done := make(chan struct{})
 
 	//shared structs
@@ -197,11 +197,11 @@ func main() {
 	defer statistics.Stop()
 
 	go startServer(*sIP, *sPort, *sPortTLS, *cTLS, done, router, mLog, scenario, varsProcessor, spy)
-	log.Printf("HTTP Server running at %s:%d\n", *sIP, *sPort)
-	log.Printf("HTTPS Server running at %s:%d\n", *sIP, *sPortTLS)
+	log.Printf("HTTP Server running at http://%s:%d\n", *sIP, *sPort)
+	log.Printf("HTTPS Server running at https://%s:%d\n", *sIP, *sPortTLS)
 	if *console {
 		go startConsole(*cIP, *cPort, *cResultsPerPage, spy, scenario, mapping, done, mLog)
-		log.Printf("Console running at %s:%d\n", *cIP, *cPort)
+		log.Printf("Console running at http://%s:%d\n", *cIP, *cPort)
 	}
 
 	<-done

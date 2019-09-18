@@ -34,11 +34,11 @@ func (dsm DummyScenarioManager) SetPaused(_ bool) {
 func TestFindMatches(t *testing.T) {
 	spy := NewSpy(NewTester(payload.NewComparator(), DummyScenarioManager{}), NewInMemoryTransactionStore(DummyMatcher{}))
 
-	m1 := Log{Request: &mock.Request{Host: "TEST1"}}
+	m1 := Transaction{Request: &mock.Request{Host: "TEST1"}}
 	spy.Save(m1)
-	m2 := Log{Request: &mock.Request{Host: "TEST2"}}
+	m2 := Transaction{Request: &mock.Request{Host: "TEST2"}}
 	spy.Save(m2)
-	m3 := Log{Request: &mock.Request{Host: "TEST1"}}
+	m3 := Transaction{Request: &mock.Request{Host: "TEST1"}}
 	spy.Save(m3)
 
 	matches := spy.Find(mock.Request{Host: "TEST1"})
@@ -58,11 +58,11 @@ func TestFindMatches(t *testing.T) {
 func TestMatchByResult(t *testing.T) {
 	spy := NewSpy(NewTester(payload.NewComparator(), DummyScenarioManager{}), NewInMemoryTransactionStore(DummyMatcher{}))
 
-	m1 := Log{Result: &Result{Found: true}}
+	m1 := Transaction{Result: &Result{Found: true}}
 	spy.Save(m1)
-	m2 := Log{Result: &Result{Found: false}}
+	m2 := Transaction{Result: &Result{Found: false}}
 	spy.Save(m2)
-	m3 := Log{Result: &Result{Found: true}}
+	m3 := Transaction{Result: &Result{Found: true}}
 	spy.Save(m3)
 
 	matches := spy.GetAll()

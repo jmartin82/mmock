@@ -22,8 +22,8 @@ import (
 	"strings"
 
 	"github.com/jmartin82/mmock/internal/statistics"
-	"github.com/jmartin82/mmock/pkg/vars"
 	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/pkg/vars"
 )
 
 //Dispatcher is the mock http server
@@ -37,10 +37,10 @@ type Dispatcher struct {
 	Evaluator  vars.Evaluator
 	Scenario   match.ScenearioStorer
 	Spier      match.TransactionSpier
-	Mlog       chan match.Log
+	Mlog       chan match.Transaction
 }
 
-func (di Dispatcher) recordMatchData(msg match.Log) {
+func (di Dispatcher) recordMatchData(msg match.Transaction) {
 	di.Mlog <- msg
 }
 
@@ -52,7 +52,7 @@ func (di Dispatcher) randomStatusCode(currentStatus int) int {
 	return currentStatus
 }
 
-func (di Dispatcher) callWebHook(url string, match *match.Log) {
+func (di Dispatcher) callWebHook(url string, match *match.Transaction) {
 	log.Printf("Running webhook: %s\n", url)
 	content, err := json.Marshal(match)
 	if err != nil {
@@ -79,10 +79,10 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	log.Printf("New request: %s %s\n", req.Method, req.URL.String())
 
-	mock, match := di.getMatchingResult(&mRequest)
+	mock, transaction := di.getMatchingResult(&mRequest)
 
 	//save the match info
-	di.Spier.Save(*match)
+	di.Spier.Save(*transaction)
 
 	//set new scenario
 	if mock.Control.Scenario.NewState != "" {
@@ -91,13 +91,13 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if mock.Control.WebHookURL != "" {
-		go di.callWebHook(mock.Control.WebHookURL, match)
+		go di.callWebHook(mock.Control.WebHookURL, transaction)
 	}
 
 	//translate request
-	di.Translator.WriteHTTPResponseFromDefinition(match.Response, w)
+	di.Translator.WriteHTTPResponseFromDefinition(transaction.Response, w)
 
-	go di.recordMatchData(*match)
+	go di.recordMatchData(*transaction)
 }
 
 func getProxyResponse(request *mock.Request, definition *mock.Definition) *mock.Response {
@@ -126,13 +126,13 @@ func getProxyResponse(request *mock.Request, definition *mock.Definition) *mock.
 	return pr.MakeRequest(request)
 }
 
-func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition, *match.Log) {
+func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition, *match.Transaction) {
 	response := &mock.Response{}
-	mock, matchLog := di.Resolver.Resolve(request)
+	mock, result := di.Resolver.Resolve(request)
 
-	log.Printf("Definition match found: %s. Name : %s\n", strconv.FormatBool(matchLog.Found), mock.URI)
+	log.Printf("Definition match found: %s. Name : %s\n", strconv.FormatBool(result.Found), mock.URI)
 
-	if matchLog.Found {
+	if result.Found {
 		if len(mock.Control.ProxyBaseURL) > 0 {
 			statistics.TrackProxyFeature()
 			response = getProxyResponse(request, mock)
@@ -156,7 +156,7 @@ func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition
 		response = &mock.Response
 	}
 
-	match := &match.Log{Time: time.Now().Unix(), Request: request, Response: response, Result: matchLog}
+	match := match.NewTransaction(request, response, result)
 
 	return mock, match
 
