@@ -1,7 +1,6 @@
 package match
 
 import (
-
 	"github.com/jmartin82/mmock/pkg/mock"
 )
 
@@ -49,7 +48,7 @@ func (mc Spy) GetAll() []Transaction {
 	return mc.store.GetAll()
 }
 
-func (mc Spy) Get(limit uint, offset uint) []Transaction {
+func (mc Spy) Get(limit int, offset int) []Transaction {
 	return mc.store.Get(limit, offset)
 }
 

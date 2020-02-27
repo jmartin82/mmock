@@ -2,13 +2,13 @@ package match
 
 import (
 	"errors"
+
 	"github.com/jmartin82/mmock/pkg/match/payload"
 
 	"reflect"
 	"testing"
 
 	"github.com/jmartin82/mmock/pkg/mock"
-
 )
 
 type DummyMatcher struct {
@@ -24,7 +24,7 @@ func (dm DummyMatcher) Match(req *mock.Request, mock *mock.Definition, scenarioA
 
 func TestStoreRequest(t *testing.T) {
 
-	msr := NewInMemoryTransactionStore(DummyMatcher{})
+	msr := NewInMemoryTransactionStore(DummyMatcher{}, 10)
 	m1 := Transaction{Request: &mock.Request{Host: "TEST1"}}
 	msr.Save(m1)
 	m2 := Transaction{Request: &mock.Request{Host: "TEST2"}}
@@ -34,7 +34,7 @@ func TestStoreRequest(t *testing.T) {
 		t.Fatalf("Invalid store len: %v", len(msr.matches))
 	}
 
-	if cap(msr.matches) != 100 {
+	if cap(msr.matches) != 10 {
 		t.Fatalf("Invalid store cap: %v", cap(msr.matches))
 	}
 
@@ -46,7 +46,7 @@ func TestStoreRequest(t *testing.T) {
 
 func TestGetAll(t *testing.T) {
 
-	msr := NewInMemoryTransactionStore(DummyMatcher{})
+	msr := NewInMemoryTransactionStore(DummyMatcher{}, 10)
 	m1 := Transaction{Request: &mock.Request{Host: "TEST1"}}
 	msr.Save(m1)
 	m2 := Transaction{Request: &mock.Request{Host: "TEST2"}}
@@ -67,7 +67,7 @@ func TestGetAll(t *testing.T) {
 
 func TestGet(t *testing.T) {
 
-	msr := NewInMemoryTransactionStore(DummyMatcher{})
+	msr := NewInMemoryTransactionStore(DummyMatcher{}, 10)
 
 	matches := []Transaction{
 		{Time: 1},
@@ -82,8 +82,8 @@ func TestGet(t *testing.T) {
 
 	tests := []struct {
 		msg      string
-		limit    uint
-		offset   uint
+		limit    int
+		offset   int
 		expected []Transaction
 	}{
 		{"Zero limit and offset", 0, 0, []Transaction{}},
@@ -110,12 +110,12 @@ func TestGet(t *testing.T) {
 
 func TestGetOnEmptyStore(t *testing.T) {
 
-	msr := NewInMemoryTransactionStore(DummyMatcher{})
+	msr := NewInMemoryTransactionStore(DummyMatcher{}, 10)
 
 	tests := []struct {
 		msg      string
-		limit    uint
-		offset   uint
+		limit    int
+		offset   int
 		expected []Transaction
 	}{
 		{"Zero limit and offset", 0, 0, []Transaction{}},
@@ -137,7 +137,7 @@ func TestGetOnEmptyStore(t *testing.T) {
 
 func TestReset(t *testing.T) {
 
-	msr := NewInMemoryTransactionStore(DummyMatcher{})
+	msr := NewInMemoryTransactionStore(DummyMatcher{}, 10)
 	m1 := Transaction{Request: &mock.Request{Host: "TEST1"}}
 	msr.Save(m1)
 	m2 := Transaction{Request: &mock.Request{Host: "TEST2"}}
@@ -147,7 +147,7 @@ func TestReset(t *testing.T) {
 		t.Fatalf("Invalid store len: %v", len(msr.matches))
 	}
 
-	if cap(msr.matches) != 100 {
+	if cap(msr.matches) != 10 {
 		t.Fatalf("Invalid store cap: %v", cap(msr.matches))
 	}
 
@@ -157,7 +157,7 @@ func TestReset(t *testing.T) {
 		t.Fatalf("Invalid store len: %v", len(msr.matches))
 	}
 
-	if cap(msr.matches) != 100 {
+	if cap(msr.matches) != 10 {
 		t.Fatalf("Invalid store cap: %v", cap(msr.matches))
 	}
 
@@ -169,7 +169,7 @@ func TestResetMatch(t *testing.T) {
 	comparator := payload.NewDefaultComparator()
 	tester := NewTester(comparator, scenario)
 
-	msr := NewInMemoryTransactionStore(tester)
+	msr := NewInMemoryTransactionStore(tester, 10)
 	m1 := Transaction{Request: &mock.Request{Host: "TEST1"}}
 	msr.Save(m1)
 	m2 := Transaction{Request: &mock.Request{Host: "TEST2"}}
@@ -179,7 +179,7 @@ func TestResetMatch(t *testing.T) {
 		t.Fatalf("Invalid store len: %v", len(msr.matches))
 	}
 
-	if cap(msr.matches) != 100 {
+	if cap(msr.matches) != 10 {
 		t.Fatalf("Invalid store cap: %v", cap(msr.matches))
 	}
 
@@ -193,6 +193,70 @@ func TestResetMatch(t *testing.T) {
 
 	if cap(msr.matches) != 1 {
 		t.Fatalf("Invalid store cap: %v", cap(msr.matches))
+	}
+
+}
+
+func TestCapacityLimit(t *testing.T) {
+
+	msr := NewInMemoryTransactionStore(DummyMatcher{}, 2)
+	m1 := Transaction{Request: &mock.Request{Host: "TEST1"}}
+	msr.Save(m1)
+	m2 := Transaction{Request: &mock.Request{Host: "TEST2"}}
+	msr.Save(m2)
+
+	reqs := msr.GetAll()
+
+	if len(reqs) != 2 {
+		t.Fatalf("Invalid store len: %v", len(reqs))
+	}
+
+	if reqs[0].Request.Host != "TEST1" {
+		t.Fatalf("Store FIFO error")
+	}
+
+	if reqs[1].Request.Host != "TEST2" {
+		t.Fatalf("Store FIFO error")
+	}
+
+	m3 := Transaction{Request: &mock.Request{Host: "TEST3"}}
+	msr.Save(m3)
+	reqs = msr.GetAll()
+
+	if len(reqs) != 2 {
+		t.Fatalf("Invalid store len: %v", len(reqs))
+	}
+
+	if reqs[0].Request.Host != "TEST2" {
+		t.Fatalf("Store FIFO error")
+	}
+
+	if reqs[1].Request.Host != "TEST3" {
+		t.Fatalf("Store FIFO error")
+	}
+
+}
+
+func TestInfiniteCapacity(t *testing.T) {
+
+	msr := NewInMemoryTransactionStore(DummyMatcher{}, 0)
+	m1 := Transaction{Request: &mock.Request{Host: "TEST1"}}
+	msr.Save(m1)
+	m2 := Transaction{Request: &mock.Request{Host: "TEST2"}}
+	msr.Save(m2)
+
+	reqs := msr.GetAll()
+
+	if len(reqs) != 2 {
+		t.Fatalf("Invalid store len: %v", len(reqs))
+	}
+
+	if reqs[0].Request.Host != "TEST1" {
+		t.Fatalf("Store FIFO error")
+	}
+
+	if reqs[1].Request.Host != "TEST2" {
+		t.Fatalf("Store FIFO error")
 	}
 
 }

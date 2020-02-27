@@ -1,11 +1,10 @@
 package match
 
 import (
-	"github.com/jmartin82/mmock/pkg/match/payload"
-	"github.com/jmartin82/mmock/pkg/mock"
 	"testing"
 
-
+	"github.com/jmartin82/mmock/pkg/match/payload"
+	"github.com/jmartin82/mmock/pkg/mock"
 )
 
 type DummyScenarioManager struct {
@@ -32,7 +31,7 @@ func (dsm DummyScenarioManager) SetPaused(_ bool) {
 }
 
 func TestFindMatches(t *testing.T) {
-	spy := NewSpy(NewTester(payload.NewComparator(), DummyScenarioManager{}), NewInMemoryTransactionStore(DummyMatcher{}))
+	spy := NewSpy(NewTester(payload.NewComparator(), DummyScenarioManager{}), NewInMemoryTransactionStore(DummyMatcher{}, 10))
 
 	m1 := Transaction{Request: &mock.Request{Host: "TEST1"}}
 	spy.Save(m1)
@@ -56,7 +55,7 @@ func TestFindMatches(t *testing.T) {
 }
 
 func TestMatchByResult(t *testing.T) {
-	spy := NewSpy(NewTester(payload.NewComparator(), DummyScenarioManager{}), NewInMemoryTransactionStore(DummyMatcher{}))
+	spy := NewSpy(NewTester(payload.NewComparator(), DummyScenarioManager{}), NewInMemoryTransactionStore(DummyMatcher{}, 10))
 
 	m1 := Transaction{Result: &Result{Found: true}}
 	spy.Save(m1)
