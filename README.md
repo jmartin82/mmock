@@ -120,7 +120,7 @@ To configure Mmock, use command line flags described in help.
 	  -console-port int
 		Console server Port (default 8082)
  	  -request-storage-capacity int
-        Request storage capacity (0 = infinite) (default 100)
+		Request storage capacity (0 = infinite) (default 100)
 	  -results-per-page uint
 		Number of results per page (default 25)
 	  -server-ip string
@@ -360,7 +360,7 @@ You can find a comprehensive set of open tools for the OAI specification at: htt
 
 ### Verify
 
-The Mmock records the requests it receives in memory (last 100 by default). 
+The Mmock records the incoming requests in memory (last 100 by default). 
 This makes it possible to verify that a request matching a specific pattern was received, and also to fetch the requests details.
 
 **Title** : Get all requests.<br>

@@ -259,4 +259,12 @@ func TestInfiniteCapacity(t *testing.T) {
 		t.Fatalf("Store FIFO error")
 	}
 
+
+	if len(msr.matches) != 2 {
+		t.Fatalf("Invalid store len: %v", len(msr.matches))
+	}
+
+	if cap(msr.matches) != 100 {
+		t.Fatalf("Invalid store cap: %v", cap(msr.matches))
+	}
 }
