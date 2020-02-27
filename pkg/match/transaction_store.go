@@ -11,20 +11,25 @@ type TransactionStorer interface {
 	Reset()
 	ResetMatch(mock.Request)
 	GetAll() []Transaction
-	Get(limit uint, offset uint) []Transaction
+	Get(limit int, offset int) []Transaction
 }
-
 
 //InMemoryTransactionStore stores all received request and their matches in memory until the last reset
 type InMemoryTransactionStore struct {
 	matches []Transaction
 	sync.Mutex
 	checker Matcher
+	limit   int
 }
 
 //Save store a match information
 func (mrs *InMemoryTransactionStore) Save(req Transaction) {
 	mrs.Lock()
+	if mrs.limit > 0 && mrs.limit == len(mrs.matches) {
+		mrs.matches[0] = Transaction{}
+		mrs.matches = mrs.matches[1:]
+	}
+
 	mrs.matches = append(mrs.matches, req)
 	mrs.Unlock()
 }
@@ -32,7 +37,7 @@ func (mrs *InMemoryTransactionStore) Save(req Transaction) {
 //Reset clean the request stored in memory
 func (mrs *InMemoryTransactionStore) Reset() {
 	mrs.Lock()
-	mrs.matches = make([]Transaction, 0, 100)
+	mrs.matches = make([]Transaction, 0, mrs.limit)
 	mrs.Unlock()
 }
 
@@ -61,13 +66,13 @@ func (mrs *InMemoryTransactionStore) GetAll() []Transaction {
 }
 
 //Get return an subset of current matches (positive and negative) in memory
-func (mrs *InMemoryTransactionStore) Get(limit uint, offset uint) []Transaction {
+func (mrs *InMemoryTransactionStore) Get(limit int, offset int) []Transaction {
 	mrs.Lock()
 	defer mrs.Unlock()
 
 	max := offset + limit
-	if max > uint(len(mrs.matches)) {
-		max = uint(len(mrs.matches))
+	if max > len(mrs.matches) {
+		max = len(mrs.matches)
 	}
 
 	if offset >= max {
@@ -81,8 +86,13 @@ func (mrs *InMemoryTransactionStore) Get(limit uint, offset uint) []Transaction 
 }
 
 //NewInMemoryScenarioStore is the InMemoryTransactionStore constructor
-func NewInMemoryTransactionStore(checker Matcher) *InMemoryTransactionStore {
-	reqs := make([]Transaction, 0, 100)
-	return &InMemoryTransactionStore{matches: reqs, checker: checker}
+func NewInMemoryTransactionStore(checker Matcher, limit int) *InMemoryTransactionStore {
+	l := 100
+	if limit > 0 {
+		l = limit
+	}
+
+	reqs := make([]Transaction, 0, l)
+	return &InMemoryTransactionStore{matches: reqs, checker: checker, limit: limit}
 
 }

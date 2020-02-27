@@ -135,7 +135,7 @@ func startServer(ip string, port, portTLS int, configTLS string, done chan struc
 	dispatcher.Start()
 	done <- struct{}{}
 }
-func startConsole(ip string, port int, resultsPerPage uint, spy match.TransactionSpier, scenario match.ScenearioStorer, mapping config.Mapping, done chan struct{}, mLog chan match.Transaction) {
+func startConsole(ip string, port int, resultsPerPage int, spy match.TransactionSpier, scenario match.ScenearioStorer, mapping config.Mapping, done chan struct{}, mLog chan match.Transaction) {
 	dispatcher := console.Dispatcher{
 		IP:             ip,
 		Port:           port,
@@ -167,7 +167,8 @@ func main() {
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
 	cPath := flag.String("config-path", path, "Mocks config folder")
 	cTLS := flag.String("tls-path", TLS, "TLS config folder (server.crt and server.key should be inside)")
-	cResultsPerPage := flag.Uint("results-per-page", 25, "Number of results per page")
+	cStorageCapacity := flag.Int("request-storage-capacity", 100, "Request storage capacity (0 = infinite)")
+	cResultsPerPage := flag.Int("results-per-page", 25, "Number of results per page")
 
 	flag.Parse()
 
@@ -179,7 +180,7 @@ func main() {
 	scenario := match.NewInMemoryScenarioStore()
 	comparator := payload.NewDefaultComparator()
 	tester := match.NewTester(comparator, scenario)
-	matchStore := match.NewInMemoryTransactionStore(tester)
+	matchStore := match.NewInMemoryTransactionStore(tester, *cStorageCapacity)
 	mapping := getMapping(*cPath)
 	spy := getTransactionSpy(tester, matchStore)
 	router := getRouter(mapping, tester)

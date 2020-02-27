@@ -33,7 +33,7 @@ type ActionResponse struct {
 type Dispatcher struct {
 	IP             string
 	Port           int
-	ResultsPerPage uint
+	ResultsPerPage int
 	MatchSpy       match.TransactionSpier
 	Scenario       match.ScenearioStorer
 	Mapping        config.Mapping
@@ -322,7 +322,7 @@ func (di *Dispatcher) requestAllPagedHandler(c echo.Context) error {
 		})
 	}
 
-	offset := uint(page-1) * di.ResultsPerPage
+	offset := (page - 1) * di.ResultsPerPage
 
 	return c.JSON(http.StatusOK, di.MatchSpy.Get(di.ResultsPerPage, offset))
 }
