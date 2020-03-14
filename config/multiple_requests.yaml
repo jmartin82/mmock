@@ -1,0 +1,18 @@
+--- # First request
+description: Returns 'Hello world!'
+request:
+  method: GET
+  path: /hello
+response:
+  statusCode: 200
+  body: >
+    Hello world!
+--- # Second request
+description: Returns 'Boom!'
+request:
+  method: GET
+  path: /hello2
+response:
+  statusCode: 200
+  body: >
+    Boom!

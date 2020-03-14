@@ -71,15 +71,20 @@ func TestJSONRead(t *testing.T) {
 	invalidDefinition := []byte("sfsdf")
 
 	json := JSONReader{}
-	m, err := json.Parse(invalidDefinition)
+	mocks, err := json.Parse(invalidDefinition)
 	if err == nil {
 		t.Errorf("Expected error in config")
 	}
 
-	m, err = json.Parse(validDefinition)
+	mocks, err = json.Parse(validDefinition)
 	if err != nil {
 		t.Errorf("Unexpected error in config")
 	}
+
+	if len(mocks) != 1 {
+		t.Errorf("Unexpected number of the mocks")
+	}
+	m := mocks[0]
 
 	if m.URI != "name" {
 		t.Errorf("Missing name")

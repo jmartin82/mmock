@@ -2,11 +2,10 @@ package parser
 
 import (
 	"encoding/json"
-	"github.com/jmartin82/mmock/pkg/mock"
 	"path/filepath"
 	"strings"
 
-
+	"github.com/jmartin82/mmock/pkg/mock"
 )
 
 //JSONReader struct created to read json config files
@@ -19,11 +18,11 @@ func (jp JSONReader) CanParse(filename string) bool {
 }
 
 //Read Unmarshal a json file to Definition struct
-func (jp JSONReader) Parse(buf []byte) (mock.Definition, error) {
+func (jp JSONReader) Parse(buf []byte) ([]mock.Definition, error) {
 	m := mock.Definition{}
 	err := json.Unmarshal(buf, &m)
 	if err != nil {
-		return mock.Definition{}, err
+		return nil, err
 	}
-	return m, nil
+	return []mock.Definition{m}, nil
 }
