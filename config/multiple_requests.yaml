@@ -2,17 +2,17 @@
 description: Returns 'Hello world!'
 request:
   method: GET
-  path: /hello
+  path: /multi_request_1
 response:
   statusCode: 200
   body: >
-    Hello world!
+    Hello request 1!
 --- # Second request
 description: Returns 'Boom!'
 request:
   method: GET
-  path: /hello2
+  path: /multi_request_2
 response:
   statusCode: 200
   body: >
-    Boom!
+    Boom request 2!
