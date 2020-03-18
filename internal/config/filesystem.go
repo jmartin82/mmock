@@ -3,11 +3,12 @@ package config
 import (
 	"encoding/json"
 	"errors"
-	"github.com/jmartin82/mmock/pkg/mock"
 	"io/ioutil"
 	"log"
 	"reflect"
 	"strings"
+
+	"github.com/jmartin82/mmock/pkg/mock"
 )
 
 //ErrNotValidParserFound we don't have any config reader valid for this file
@@ -29,7 +30,7 @@ type Writer interface {
 //Parser interface allows recognize if there is available some config reader for an a specific file.
 type Parser interface {
 	CanParse(filename string) bool
-	Parse(content []byte) (mock.Definition, error)
+	Parse(content []byte) ([]mock.Definition, error)
 }
 
 //NewFileSystemMapper file config constructor
@@ -61,27 +62,29 @@ func (fd *FSMapper) Write(filename string, mock mock.Definition) error {
 	return nil
 }
 
-func (fd *FSMapper) Read(filename string) (mock.Definition, error) {
+func (fd *FSMapper) Read(filename string) ([]mock.Definition, error) {
 	for _, parser := range fd.parsers {
 		if parser.CanParse(filename) {
 			buf, err := ioutil.ReadFile(filename)
 			if err != nil {
 				log.Printf("Invalid mock config in: %s\n", filename)
-				return mock.Definition{}, ErrInvalidMockDefinition
+				return nil, ErrInvalidMockDefinition
 			}
 			log.Printf("Loading config file: %s\n", filename)
-			mock, erd := parser.Parse(buf)
+			mocks, erd := parser.Parse(buf)
 			if erd != nil {
 				log.Printf("Invalid mock format in: %s Err: %s", filename, erd)
 			}
-			if reflect.TypeOf(parser).String() == "parser.YAMLReader" {
-				if mock.Request.Body != "" {
-					mock.Request.Body = strings.TrimRight(mock.Request.Body, "\n")
+			for _, mock := range mocks {
+				if reflect.TypeOf(parser).String() == "parser.YAMLReader" {
+					if mock.Request.Body != "" {
+						mock.Request.Body = strings.TrimRight(mock.Request.Body, "\n")
+					}
 				}
 			}
-			return mock, erd
+			return mocks, erd
 		}
 
 	}
-	return mock.Definition{}, ErrNotValidParserFound
+	return nil, ErrNotValidParserFound
 }
