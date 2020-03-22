@@ -85,8 +85,6 @@ response:
 
 ```
 
-**Note:** Yaml format allows more than one request in the same file.
-
 You can see more complex examples [here](/config).
 
 ### Getting started
