@@ -2,12 +2,11 @@ package config
 
 import (
 	"errors"
+	"github.com/jmartin82/mmock/pkg/mock"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/jmartin82/mmock/pkg/mock"
 )
 
 var MockContent = "{\"URI\":\"test\",\"description\":\"\",\"request\":{\"host\":\"\",\"method\":\"\",\"path\":\"\",\"queryStringParameters\":null,\"headers\":null,\"cookies\":null,\"body\":\"\"},\"response\":{\"statusCode\":0,\"headers\":null,\"cookies\":null,\"body\":\"\"},\"control\":{\"priority\":0,\"delay\":0,\"crazy\":false,\"scenario\":{\"name\":\"\",\"requiredState\":null,\"newState\":\"\"},\"proxyBaseURL\":\"\"}})"
@@ -21,14 +20,14 @@ func (mr *mockParser) CanParse(filename string) bool {
 	return mr.canParse
 }
 
-func (mr *mockParser) Parse(content []byte) ([]mock.Definition, error) {
+func (mr *mockParser) Parse(content []byte) (mock.Definition, error) {
 	if mr.readOk {
 		m := mock.Definition{}
 		m.URI = "test"
-		return []mock.Definition{m}, nil
+		return m, nil
 	}
 
-	return nil, errors.New("error reading")
+	return mock.Definition{}, errors.New("error reading")
 
 }
 

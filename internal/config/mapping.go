@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"os"
 	"path"
@@ -144,15 +143,14 @@ func (fm *ConfigMapping) load(URI string) error {
 		return errf
 	}
 
-	mocks, err := fm.mapper.Read(fileName)
+	mock, err := fm.mapper.Read(fileName)
+	mock.URI = URI
 	if err != nil {
 		return err
+
 	}
 
-	for i, mock := range mocks {
-		mock.URI = fmt.Sprintf("%s[%d]", URI, i)
-		fm.mapping[mock.URI] = mock
-	}
+	fm.mapping[URI] = mock
 
 	return nil
 }

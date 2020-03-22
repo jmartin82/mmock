@@ -19,8 +19,8 @@ func (jp DummyReader) CanParse(filename string) bool {
 }
 
 //Read Unmarshal a json file to Mock struct
-func (jp DummyReader) Parse(buf []byte) ([]mock.Definition, error) {
-	return []mock.Definition{mock.Definition{URI: "test_mapping"}}, nil
+func (jp DummyReader) Parse(buf []byte) (mock.Definition, error) {
+	return mock.Definition{URI: "test_mapping"}, nil
 }
 
 var fsUpdate = make(chan struct{})
@@ -98,7 +98,7 @@ func TestPopulate(t *testing.T) {
 		t.Errorf("Error listing mapping should be 1")
 	}
 
-	if m, f := n.Get("tmpfile_populate[0]"); !f || m.URI != "tmpfile_populate[0]" {
+	if m, f := n.Get("tmpfile_populate"); !f || m.URI != "tmpfile_populate" {
 		t.Errorf("Error mapping should exist")
 	}
 

@@ -63,20 +63,15 @@ control:
 	invalidDefinition := []byte("sfsdf")
 
 	yaml := YAMLReader{}
-	mocks, err := yaml.Parse(invalidDefinition)
+	m, err := yaml.Parse(invalidDefinition)
 	if err == nil {
 		t.Error("Expected error in config")
 	}
 
-	mocks, err = yaml.Parse(validDefinition)
+	m, err = yaml.Parse(validDefinition)
 	if err != nil {
 		t.Error("Unexpected error in config", err)
 	}
-
-	if len(mocks) != 1 {
-		t.Errorf("Unexpected number of the mocks")
-	}
-	m := mocks[0]
 
 	if m.URI != "name" {
 		t.Error("Missing name")
@@ -155,44 +150,4 @@ control:
 		t.Error("Missing scenario NewState")
 	}
 
-}
-
-func TestMultiYamlRead(t *testing.T) {
-	y := `
---- # First request
-description: Returns 'Hello world!'
-request:
-  method: GET
-  path: /hello
-response:
-  statusCode: 200
-  body: >
-    Hello world!
---- # Second request
-description: Returns 'Boom!'
-request:
-  method: GET
-  path: /hello2
-response:
-  statusCode: 200
-  body: >
-    Boom!`
-
-	yaml := YAMLReader{}
-	mocks, err := yaml.Parse([]byte(y))
-	if err != nil {
-		t.Error("Unexpected error in config", err)
-	}
-
-	if len(mocks) != 2 {
-		t.Errorf("Unexpected number of the mocks")
-	}
-
-	if mocks[0].Description != "Returns 'Hello world!'" {
-		t.Error("Missing description")
-	}
-
-	if mocks[1].Description != "Returns 'Boom!'" {
-		t.Error("Missing description")
-	}
 }
