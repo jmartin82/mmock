@@ -1,5 +1,11 @@
 package mock
 
+import (
+	"encoding/json"
+	"fmt"
+	"time"
+)
+
 type Values map[string][]string
 
 type Cookies map[string]string
@@ -33,9 +39,35 @@ type Scenario struct {
 	NewState      string   `json:"newState"`
 }
 
+type Delay string
+
+func (d *Delay) UnmarshalJSON(data []byte) error {
+	var v interface{}
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+
+	if f, ok := v.(float64); ok {
+		*d = Delay(fmt.Sprintf("%ds", int(f)))
+		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+		fmt.Println("! DEPRECATION NOTICE:                                        !")
+		fmt.Println("! Please use a time unit (m,s,ms) to define the delay value. !")
+		fmt.Println("! Ex: \"delay\":\"1ms\" instead \"delay\":1                  !")
+		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+		return nil
+	}
+
+	*d = Delay(v.(string))
+	return nil
+}
+
+func (d Delay) Duration() (time.Duration, error) {
+	return time.ParseDuration(string(d))
+}
+
 type Control struct {
 	Priority     int      `json:"priority"`
-	Delay        int      `json:"delay"`
+	Delay        Delay    `json:"delay"`
 	Crazy        bool     `json:"crazy"`
 	Scenario     Scenario `json:"scenario"`
 	ProxyBaseURL string   `json:"proxyBaseURL"`

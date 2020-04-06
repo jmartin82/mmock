@@ -1,6 +1,9 @@
 package parser
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestYamlCanParse(t *testing.T) {
 	yaml := YAMLReader{}
@@ -70,7 +73,7 @@ control:
 
 	m, err = yaml.Parse(validDefinition)
 	if err != nil {
-		t.Error("Unexpected error in config", err)
+		t.Errorf("Unexpected error in config: %s", err)
 	}
 
 	if m.URI != "name" {
@@ -126,8 +129,9 @@ control:
 		t.Error("Missing ProxyBaseURL")
 	}
 
-	if m.Control.Delay != 5 {
-		t.Error("Missing delay")
+	d, _ := m.Control.Delay.Duration()
+	if d != 5*time.Second {
+		t.Errorf("Missing delay")
 	}
 
 	if m.Control.Crazy != true {

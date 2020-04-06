@@ -143,9 +143,10 @@ func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition
 				log.Println("Running crazy mode")
 				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)
 			}
-			if mock.Control.Delay > 0 {
-				log.Println("Adding a delay")
-				time.Sleep(time.Duration(mock.Control.Delay) * time.Second)
+
+			if d, err := mock.Control.Delay.Duration(); err == nil && d > 0 {
+				log.Printf("Adding a delay of: %s\n", d.String())
+				time.Sleep(d)
 			}
 
 			response = &mock.Response
