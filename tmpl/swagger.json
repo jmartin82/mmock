@@ -446,8 +446,7 @@
         },
         "delay": {
           "description": "",
-          "type": "integer",
-          "format": "int32"
+          "type": "string",
         },
         "crazy": {
           "description": "",

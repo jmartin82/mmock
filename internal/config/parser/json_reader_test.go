@@ -1,6 +1,9 @@
 package parser
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestJSONCanParse(t *testing.T) {
 	json := JSONReader{}
@@ -63,7 +66,7 @@ func TestJSONRead(t *testing.T) {
 				"newState": "new_stat_neme"
 			},
 			"proxyBaseURL": "http://www.jordi.io",
-			"delay": 5,
+			"delay": "50ms",
 			"crazy": true,
 			"priority": 1
 		}
@@ -78,7 +81,7 @@ func TestJSONRead(t *testing.T) {
 
 	m, err = json.Parse(validDefinition)
 	if err != nil {
-		t.Errorf("Unexpected error in config")
+		t.Errorf("Unexpected error in config: %s", err)
 	}
 
 	if m.URI != "name" {
@@ -134,7 +137,7 @@ func TestJSONRead(t *testing.T) {
 		t.Errorf("Missing ProxyBaseURL")
 	}
 
-	if m.Control.Delay != 5 {
+	if m.Control.Delay.Duration != 50*time.Millisecond {
 		t.Errorf("Missing delay")
 	}
 
@@ -156,6 +159,29 @@ func TestJSONRead(t *testing.T) {
 
 	if m.Control.Scenario.NewState != "new_stat_neme" {
 		t.Errorf("Missing scenario NewState")
+	}
+
+}
+
+func TestJSONCompat(t *testing.T) {
+	v1 := []byte(`{
+		"control":{
+		   "delay": 5
+		}
+	 }`)
+
+	v2 := []byte(`{
+		"control": {
+			"delay": "5s"
+		}
+	}`)
+
+	json := JSONReader{}
+	m1, _ := json.Parse(v1)
+	m2, _ := json.Parse(v2)
+
+	if m1.Control.Delay != m2.Control.Delay {
+		t.Errorf("Error with delay field compatibility")
 	}
 
 }

@@ -178,7 +178,7 @@ Mock definition:
 			"newState": "new_stat_neme"
 		},
 		"proxyBaseURL": "string (original URL endpoint)",
-		"delay": "int (response delay in seconds)",
+		"delay": "string (response delay in s,ms)",
 		"crazy": "bool (return random 5xx)",
 		"priority": "int (matching priority)",
 		"webHookURL" : "string (URL endpoint)"
@@ -229,7 +229,7 @@ Query strings and headers support also global matches (*) in the header/paramete
 
 * *scenario*; A scenario is essentially a state machine whose states can be arbitrarily assigned.
 * *proxyBaseURL*: If this parameter is present, it sends the request data to the BaseURL and resend the response to de client. Useful if you don't want mock a the whole service. NOTE: It's not necessary fill the response field in this case.
-* *delay*: Delay the response in seconds. Simulate bad connection or bad server performance.
+* *delay*: Delay the response. Simulate bad connection or bad server performance.
 * *crazy*: Return random server errors (5xx) in some request. Simulate server problems.
 * *priority*: Set the priority to avoid match in less restrictive mocks. Higher, more priority.
 * *webHookURL*: After any match if this option is defined it will notify the match to the desired endpoint.

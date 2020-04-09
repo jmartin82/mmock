@@ -1,0 +1,14 @@
+{
+	"description": "Really slow endpoint",
+	"request": {
+		"method": "GET",
+		"path": "/slow"
+	},
+	"response": {
+		"statusCode": 200,
+		"body": "My CPU is on fire!!!"
+    },
+    "control": {
+        "delay": "400ms"
+    }
+}
