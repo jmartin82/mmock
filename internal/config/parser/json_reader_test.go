@@ -137,8 +137,7 @@ func TestJSONRead(t *testing.T) {
 		t.Errorf("Missing ProxyBaseURL")
 	}
 
-	d, _ := m.Control.Delay.Duration()
-	if d != 50*time.Millisecond {
+	if m.Control.Delay.Duration != 50*time.Millisecond {
 		t.Errorf("Missing delay")
 	}
 

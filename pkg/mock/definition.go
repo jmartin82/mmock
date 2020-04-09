@@ -3,6 +3,7 @@ package mock
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"time"
 )
 
@@ -39,30 +40,35 @@ type Scenario struct {
 	NewState      string   `json:"newState"`
 }
 
-type Delay string
+type Delay struct {
+	time.Duration
+}
 
-func (d *Delay) UnmarshalJSON(data []byte) error {
-	var v interface{}
-	if err := json.Unmarshal(data, &v); err != nil {
+func (d *Delay) UnmarshalJSON(data []byte) (err error) {
+	var (
+		v interface{}
+		s string
+	)
+	if err = json.Unmarshal(data, &v); err != nil {
 		return err
 	}
 
-	if f, ok := v.(float64); ok {
-		*d = Delay(fmt.Sprintf("%ds", int(f)))
+	switch v.(type) {
+	case float64:
+		s = fmt.Sprintf("%ds", int(v.(float64)))
 		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 		fmt.Println("! DEPRECATION NOTICE:                                        !")
 		fmt.Println("! Please use a time unit (m,s,ms) to define the delay value. !")
 		fmt.Println("! Ex: \"delay\":\"1ms\" instead \"delay\":1                  !")
 		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-		return nil
+	case string:
+		s = v.(string)
+	default:
+		return fmt.Errorf("invalid value for delay, got: %v", reflect.TypeOf(v))
 	}
 
-	*d = Delay(v.(string))
-	return nil
-}
-
-func (d Delay) Duration() (time.Duration, error) {
-	return time.ParseDuration(string(d))
+	d.Duration, err = time.ParseDuration(s)
+	return err
 }
 
 type Control struct {
