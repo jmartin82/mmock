@@ -144,8 +144,8 @@ func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition
 				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)
 			}
 
-			if d, err := mock.Control.Delay.Duration(); err == nil && d > 0 {
-				log.Printf("Adding a delay of: %s\n", d.String())
+			if d := mock.Control.Delay.Duration; d > 0 {
+				log.Printf("Adding a delay of: %s\n", d)
 				time.Sleep(d)
 			}
 

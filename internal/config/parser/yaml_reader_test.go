@@ -129,8 +129,7 @@ control:
 		t.Error("Missing ProxyBaseURL")
 	}
 
-	d, _ := m.Control.Delay.Duration()
-	if d != 5*time.Second {
+	if m.Control.Delay.Duration != 5*time.Second {
 		t.Errorf("Missing delay")
 	}
 
