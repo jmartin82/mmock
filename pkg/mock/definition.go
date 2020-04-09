@@ -59,7 +59,7 @@ func (d *Delay) UnmarshalJSON(data []byte) (err error) {
 		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 		fmt.Println("! DEPRECATION NOTICE:                                        !")
 		fmt.Println("! Please use a time unit (m,s,ms) to define the delay value. !")
-		fmt.Println("! Ex: \"delay\":\"1ms\" instead \"delay\":1                  !")
+		fmt.Println("! Ex: \"delay\":\"1s\" instead \"delay\":1                   !")
 		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	case string:
 		s = v.(string)
