@@ -36,10 +36,8 @@ var ErrNotFoundAnyMock = errors.New("No valid mock config found")
 
 func banner() {
 	fmt.Printf("MMock v %s", VERSION)
-	fmt.Println("")
-
-	fmt.Print(
-		`		.---. .---.
+	fmt.Print(`
+                .---. .---.
                :     : o   :    me want request!
            _..-:   o :     :-.._    /
        .-''  '  ` + "`" + `---' ` + "`" + `---' "   ` + "`" + `` + "`" + `-.
