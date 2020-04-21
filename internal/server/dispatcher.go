@@ -68,6 +68,24 @@ func (di Dispatcher) callWebHook(url string, match *match.Transaction) {
 	log.Printf("WebHook response: %d\n", resp.StatusCode)
 }
 
+func (di *Dispatcher) handleCallback(mRequest *mock.Request, mock *mock.Definition) {
+	url := mock.Callback.Url
+	contentType := mock.Callback.ContentType
+
+	if d := mock.Callback.Delay.Duration; d > 0 {
+		log.Printf("Delaying callback by: %s\n", d)
+		time.Sleep(d)
+	}
+
+	log.Printf("Making callback to %s\n", url)
+	_, err := http.Post(url, contentType, bytes.NewBufferString(mock.Callback.Body))
+	if err != nil {
+		log.Printf("Error from callback: %s\n", err)
+	} else {
+		log.Println("Callback handled successfully")
+	}
+}
+
 //ServerHTTP is the mock http server request handler.
 //It uses the router to decide the matching mock and translator as adapter between the HTTP impelementation and the mock mock.
 func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -96,6 +114,10 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	//translate request
 	di.Translator.WriteHTTPResponseFromDefinition(transaction.Response, w)
+
+	if mock.Callback.Url != "" {
+		go di.handleCallback(&mRequest, mock)
+	}
 
 	go di.recordMatchData(*transaction)
 }

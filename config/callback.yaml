@@ -1,0 +1,14 @@
+request:
+  method: POST
+  path: "/callback"
+response:
+  statusCode: 202
+  headers:
+    Content-Type:
+    - application/json
+  body: '{}'
+callback:
+  url: https://httpbin.org/post
+  delay: 2s
+  contentType: application/json
+  body: '{"token": "{{request.header.Token}}", "success": true, "response": "{{fake.Digits}}"}'

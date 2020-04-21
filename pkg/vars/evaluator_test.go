@@ -553,3 +553,27 @@ func TestReplaceXmlBodyEncodedTags(t *testing.T) {
 		t.Error("Replaced tags from body form do not match", mock.Response.Body)
 	}
 }
+
+func TestReplaceTagsCallback(t *testing.T) {
+
+	req := mock.Request{}
+	req.Body = "hi!"
+	val := make(mock.Values)
+	val["param1"] = []string{"valParam"}
+	req.QueryStringParameters = val
+
+	cookie := make(mock.Cookies)
+	cookie["cookie1"] = "valCookie"
+	req.Cookies = cookie
+
+	cb := mock.Callback{}
+	cb.Body = "Request Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}. Random: {{fake.UserName}}"
+
+	mock := mock.Definition{Request: req, Callback: cb}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Callback.Body != "Request Body hi!. Query valParam. Cookie: valCookie. Random: AleixMG" {
+		t.Error("Replaced tags in callback body not match", cb.Body)
+	}
+}
