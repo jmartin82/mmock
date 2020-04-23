@@ -35,10 +35,11 @@ type Response struct {
 }
 
 type Callback struct {
-	Delay       Delay  `json:"delay"`
-	Url         string `json:"url"`
-	ContentType string `json:"contentType"`
-	Body        string `json:"body"`
+	Delay  Delay  `json:"delay"`
+	Method string `json:"method"`
+	Url    string `json:"url"`
+	HttpHeaders
+	Body string `json:"body"`
 }
 
 type Scenario struct {

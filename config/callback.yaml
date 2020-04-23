@@ -8,7 +8,10 @@ response:
     - application/json
   body: '{}'
 callback:
+  method: POST
   url: https://httpbin.org/post
   delay: 2s
-  contentType: application/json
+  headers:
+    Content-Type:
+    - application/json
   body: '{"token": "{{request.header.Token}}", "success": true, "response": "{{fake.Digits}}"}'

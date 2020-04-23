@@ -69,21 +69,45 @@ func (di Dispatcher) callWebHook(url string, match *match.Transaction) {
 }
 
 func (di *Dispatcher) handleCallback(mRequest *mock.Request, mock *mock.Definition) {
-	url := mock.Callback.Url
-	contentType := mock.Callback.ContentType
+	cb := mock.Callback
 
-	if d := mock.Callback.Delay.Duration; d > 0 {
+	if d := cb.Delay.Duration; d > 0 {
 		log.Printf("Delaying callback by: %s\n", d)
 		time.Sleep(d)
 	}
 
+	url := cb.Url
 	log.Printf("Making callback to %s\n", url)
-	_, err := http.Post(url, contentType, bytes.NewBufferString(mock.Callback.Body))
+	req, err := http.NewRequest(cb.Method, url, bytes.NewBufferString(cb.Body))
 	if err != nil {
-		log.Printf("Error from callback: %s\n", err)
-	} else {
-		log.Println("Callback handled successfully")
+		log.Printf("Error creating callback request: %s\n", err)
+		return
 	}
+	// add headers
+	for h, vs := range cb.Headers {
+		for _, v := range vs {
+			req.Header.Set(h, v)
+		}
+	}
+
+	client := &http.Client{Timeout: time.Second * 10}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("Error making callback: %s\n", err)
+		return
+	}
+	defer resp.Body.Close()
+	statusCode := resp.StatusCode
+	if statusCode >= 400 {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Printf("Unexpected response from callback. Status code %d", statusCode)
+		} else {
+			log.Printf("Unexpected response from callback. Status code %d, Body %s", statusCode, body)
+		}
+		return
+	}
+	log.Printf("Successfully made callback to %s", url)
 }
 
 //ServerHTTP is the mock http server request handler.
