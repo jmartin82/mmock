@@ -168,6 +168,15 @@ Mock definition:
 		},
 		"body": "Response body"
 	},
+	"callback": {
+		"method": "GET|POST|PUT|PATCH|...",
+		"url": "http://your-callback/",
+		"delay": "string (response delay in s,ms)",
+		"headers": {
+			"name": ["value"]
+		},
+		"body": "Response body"
+	},
 	"control": {
 		"scenario": {
 			"name": "string (scenario name)",
@@ -220,10 +229,21 @@ Query strings and headers support also global matches (*) in the header/paramete
 
 #### Response (Optional on proxy call)
 
-* *statusCode*: Request http method.
+* *statusCode*: Response status code
 * *headers*: Array of headers. It allows more than one value for the same key and vars.
 * *cookies*: Array of cookies. It allows vars.
 * *body*: Body string. It allows vars.
+
+#### Callback (Optional)
+
+This is used to have mmock make an API request after receiving the mocked request.
+
+* *delay*: Delay before making the callback
+* *url*: URL to make a request to
+* *method*: Request http method
+* *headers*: Array of headers. It allows more than one value for the same key.
+* *body*: Body string. It allows vars.
+* *timeout*: Duration to allow the callback to respond (default 10s)
 
 #### Control (Optional)
 
