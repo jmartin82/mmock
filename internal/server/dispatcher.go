@@ -97,6 +97,17 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	//translate request
 	di.Translator.WriteHTTPResponseFromDefinition(transaction.Response, w)
 
+	if mock.Callback.Url != "" {
+		go func() {
+			_, err := HandleCallback(mock.Callback)
+			if err != nil {
+				log.Printf("Error from HandleCallback: %s", err)
+			} else {
+				log.Println("Callback made successfully")
+			}
+		}()
+	}
+
 	go di.recordMatchData(*transaction)
 }
 

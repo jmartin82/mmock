@@ -26,6 +26,7 @@ func (fp ResponseMessageEvaluator) Eval(req *mock.Request, m *mock.Definition) {
 	fakeFiller := fp.FillerFactory.CreateFakeFiller()
 	streamFiller := fp.FillerFactory.CreateStreamFiller()
 	holders := fp.walkAndGet(m.Response)
+	fp.extractVars(m.Callback.Body, &holders)
 
 	vars := requestFiller.Fill(holders)
 	fp.mergeVars(vars, fakeFiller.Fill(holders))
@@ -63,6 +64,7 @@ func (fp ResponseMessageEvaluator) walkAndFill(m *mock.Definition, vars map[stri
 	}
 
 	res.Body = fp.replaceVars(res.Body, vars)
+	m.Callback.Body = fp.replaceVars(m.Callback.Body, vars)
 }
 
 func (fp ResponseMessageEvaluator) replaceVars(input string, vars map[string][]string) string {
