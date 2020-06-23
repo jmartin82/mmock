@@ -1,7 +1,7 @@
 package vars
 
 import (
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"os"
 	"strings"
 	"testing"
@@ -96,7 +96,7 @@ func TestGetEnvironmentVariableNotFound(t *testing.T) {
 	}
 
 	rp := Request{}
-	
+
 	os.Setenv("TEST_VARIABLE", value)
 	vars := rp.Fill(holders)
 	os.Unsetenv("TEST_VARIABLE")

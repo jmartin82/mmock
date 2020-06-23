@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"io/ioutil"
 	"os"
 	"path/filepath"

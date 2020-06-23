@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 // HandleCallback makes a callback required after a request

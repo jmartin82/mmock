@@ -14,16 +14,16 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jmartin82/mmock/internal/proxy"
-	"github.com/jmartin82/mmock/pkg/match"
+	"github.com/jmartin82/mmock/v3/internal/proxy"
+	"github.com/jmartin82/mmock/v3/pkg/match"
 
 	"net/url"
 	"regexp"
 	"strings"
 
-	"github.com/jmartin82/mmock/internal/statistics"
-	"github.com/jmartin82/mmock/pkg/mock"
-	"github.com/jmartin82/mmock/pkg/vars"
+	"github.com/jmartin82/mmock/v3/internal/statistics"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/vars"
 )
 
 //Dispatcher is the mock http server

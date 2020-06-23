@@ -3,7 +3,7 @@ package config
 import (
 	"encoding/json"
 	"errors"
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"io/ioutil"
 	"log"
 	"reflect"

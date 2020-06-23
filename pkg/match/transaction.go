@@ -3,7 +3,7 @@ package match
 import (
 	"time"
 
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 //Error contains the tested uri and the match error

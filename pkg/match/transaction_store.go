@@ -3,7 +3,7 @@ package match
 import (
 	"sync"
 
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 type TransactionStorer interface {

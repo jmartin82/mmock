@@ -6,10 +6,10 @@ import (
 
 	"log"
 
-	"github.com/jmartin82/mmock/pkg/mock"
-	"github.com/jmartin82/mmock/internal/config"
+	"github.com/jmartin82/mmock/v3/internal/config"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 
-	"github.com/jmartin82/mmock/pkg/match"
+	"github.com/jmartin82/mmock/v3/pkg/match"
 )
 
 //RequestResolver contains the functions to check the http request and return the matching mock.

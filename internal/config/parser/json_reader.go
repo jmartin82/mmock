@@ -2,11 +2,9 @@ package parser
 
 import (
 	"encoding/json"
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"path/filepath"
 	"strings"
-
-
 )
 
 //JSONReader struct created to read json config files

@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 
 	urlmatcher "github.com/azer/url-router"
 	xj "github.com/basgys/goxml2json"

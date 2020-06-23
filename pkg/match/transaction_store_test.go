@@ -3,12 +3,12 @@ package match
 import (
 	"errors"
 
-	"github.com/jmartin82/mmock/pkg/match/payload"
+	"github.com/jmartin82/mmock/v3/pkg/match/payload"
 
 	"reflect"
 	"testing"
 
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 type DummyMatcher struct {
@@ -258,7 +258,6 @@ func TestInfiniteCapacity(t *testing.T) {
 	if reqs[1].Request.Host != "TEST2" {
 		t.Fatalf("Store FIFO error")
 	}
-
 
 	if len(msr.matches) != 2 {
 		t.Fatalf("Invalid store len: %v", len(msr.matches))

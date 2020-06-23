@@ -11,11 +11,11 @@ import (
 	"strings"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
-	"github.com/jmartin82/mmock/internal/config"
-	"github.com/jmartin82/mmock/pkg/match"
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/internal/config"
+	"github.com/jmartin82/mmock/v3/pkg/match"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 
-	"github.com/jmartin82/mmock/internal/statistics"
+	"github.com/jmartin82/mmock/v3/internal/statistics"
 	"github.com/labstack/echo"
 	"golang.org/x/net/websocket"
 )

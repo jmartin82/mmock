@@ -2,10 +2,8 @@ package server
 
 import (
 	"errors"
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"testing"
-
-
 )
 
 type DummyMatcher struct {

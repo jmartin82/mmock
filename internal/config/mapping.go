@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 var ErrFilePathIsNotUnderConfigPath = errors.New("File path is not under config path")

@@ -2,19 +2,15 @@ package vars
 
 import (
 	"errors"
-	"github.com/jmartin82/mmock/pkg/vars/fake"
+	"github.com/jmartin82/mmock/v3/pkg/vars/fake"
 	"log"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
-
 )
 
-
 var errMissingParameterValue = errors.New("The requested method needs input parameters which are not supplied!")
-
-
 
 //Fake parses the data looking for fake data tags or request data tags
 type Fake struct {

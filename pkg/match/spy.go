@@ -1,7 +1,7 @@
 package match
 
 import (
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 type TransactionSpier interface {

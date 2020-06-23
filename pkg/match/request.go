@@ -3,8 +3,8 @@ package match
 import (
 	"errors"
 	"fmt"
-	"github.com/jmartin82/mmock/pkg/match/payload"
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/match/payload"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"strings"
 
 	urlmatcher "github.com/azer/url-router"
@@ -17,8 +17,6 @@ var (
 	ErrScenarioNotMatch = errors.New("Scenario state not match")
 	ErrPathNotMatch     = errors.New("Path not match")
 )
-
-
 
 func NewTester(comparator *payload.Comparator, scenario ScenearioStorer) *Request {
 	return &Request{scenario: scenario, comparator: comparator}
@@ -136,7 +134,6 @@ func (mm Request) matchScenarioState(scenario *mock.Scenario) bool {
 type Matcher interface {
 	Match(req *mock.Request, mock *mock.Definition, scenarioAware bool) (bool, error)
 }
-
 
 func (mm Request) Match(req *mock.Request, mock *mock.Definition, scenarioAware bool) (bool, error) {
 

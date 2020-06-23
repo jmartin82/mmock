@@ -3,8 +3,8 @@ package match
 import (
 	"testing"
 
-	"github.com/jmartin82/mmock/pkg/match/payload"
-	"github.com/jmartin82/mmock/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/match/payload"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 type DummyScenarioManager struct {

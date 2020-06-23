@@ -582,11 +582,13 @@ You can always disable this behavior adding the following flag `-server-statisti
 
 ### Contributing
 
-Clone this repository to ```$GOPATH/src/github.com/jmartin82/mmock``` and type ```go get .```.
+As of version 3.0.0, Mmock is available as a Go module. Therefore a Go version capable of understanding /vN suffixed imports is required:
 
-Requires Go 1.12+ to build.
+1.9.7+
+1.10.3+
+1.11+
 
-If you make any changes, run ```go fmt ./...``` before submitting a pull request.
+If you make any changes, please run ```go fmt ./...``` before submitting a pull request.
 
 ### Licence
 

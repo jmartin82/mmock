@@ -10,16 +10,16 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jmartin82/mmock/internal/config"
-	"github.com/jmartin82/mmock/internal/config/parser"
-	"github.com/jmartin82/mmock/internal/console"
-	"github.com/jmartin82/mmock/internal/server"
-	"github.com/jmartin82/mmock/internal/statistics"
-	"github.com/jmartin82/mmock/pkg/match"
-	"github.com/jmartin82/mmock/pkg/match/payload"
-	"github.com/jmartin82/mmock/pkg/mock"
-	"github.com/jmartin82/mmock/pkg/vars"
-	"github.com/jmartin82/mmock/pkg/vars/fake"
+	"github.com/jmartin82/mmock/v3/internal/config"
+	"github.com/jmartin82/mmock/v3/internal/config/parser"
+	"github.com/jmartin82/mmock/v3/internal/console"
+	"github.com/jmartin82/mmock/v3/internal/server"
+	"github.com/jmartin82/mmock/v3/internal/statistics"
+	"github.com/jmartin82/mmock/v3/pkg/match"
+	"github.com/jmartin82/mmock/v3/pkg/match/payload"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/vars"
+	"github.com/jmartin82/mmock/v3/pkg/vars/fake"
 )
 
 //VERSION of the application
