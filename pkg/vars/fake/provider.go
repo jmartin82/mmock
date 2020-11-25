@@ -242,6 +242,11 @@ func (p Provider) MonthShort() string {
 	return fake.MonthShort()
 }
 
+//MonthNum returns a random month (Numeric Version)
+func (p Provider) MonthNum() string {
+	return strconv.Itoa(fake.MonthNum())
+}
+
 //WeekDay returns a random day of week
 func (p Provider) WeekDay() string {
 	return fake.WeekDay()

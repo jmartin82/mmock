@@ -98,3 +98,20 @@ func TestHex(t *testing.T) {
 		}
 	}
 }
+
+func TestMonthNum(t *testing.T) {
+	faker := Provider{}
+
+	for i := 1; i < 10000; i++ {
+		result := faker.MonthNum()
+		month, err := strconv.ParseInt(result, 10, 64)
+
+		if err != nil {
+			t.Error("The result should be a valid month number", result)
+		}
+
+		if month < 0 || month > 12 {
+			t.Error("The random number should be between 0 and 12", month)
+		}
+	}
+}

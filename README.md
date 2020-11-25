@@ -313,6 +313,8 @@ Quick overview of the path syntax available to extract values form the request: 
  - fake.Language
  - fake.Model
  - fake.Month
+ - fake.MonthShort
+ - fake.MonthNum
  - fake.Year
  - fake.Paragraph
  - fake.Paragraphs
