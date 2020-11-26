@@ -31,6 +31,7 @@ type Generator interface {
 	Month() string
 	Year() string
 	MonthShort() string
+	MonthNum() string
 	Paragraph() string
 	Paragraphs() string
 	ParagraphsN(n int) string
