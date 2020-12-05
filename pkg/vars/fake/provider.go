@@ -244,7 +244,14 @@ func (p Provider) MonthShort() string {
 
 //MonthNum returns a random month (Numeric Version)
 func (p Provider) MonthNum() string {
-	return strconv.Itoa(fake.MonthNum())
+	month := fake.MonthNum()
+	retval := strconv.Itoa(month)
+
+	if month < 10 {
+		retval = "0" + retval
+	}
+
+	return retval
 }
 
 //WeekDay returns a random day of week
