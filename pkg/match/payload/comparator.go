@@ -22,6 +22,8 @@ func NewDefaultComparator() *Comparator {
 	json := &JSONComparator{}
 	xml := &XMLComparator{}
 	comparator.AddComparer("application/json", json)
+	comparator.AddComparer("application/ld+json", json)
+	comparator.AddComparer("application/merge-patch+json", json)
 	comparator.AddComparer("application/xml", xml)
 	comparator.AddComparer("text/xml", xml)
 	return comparator
