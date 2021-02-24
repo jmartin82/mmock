@@ -4,7 +4,6 @@ import (
 	"strings"
 )
 
-
 type ScenearioStorer interface {
 	SetState(name, status string)
 	GetState(name string) string
@@ -13,7 +12,6 @@ type ScenearioStorer interface {
 	SetPaused(newstate bool)
 	GetPaused() bool
 }
-
 
 func NewInMemoryScenarioStore() *InMemoryScenarioStore {
 	status := make(map[string]string)
