@@ -3,9 +3,10 @@ package match
 import (
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/jmartin82/mmock/v3/pkg/match/payload"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
-	"strings"
 
 	urlmatcher "github.com/azer/url-router"
 
@@ -68,7 +69,7 @@ func (mm Request) findByPartialKey(reqMap mock.Values, partialMatch string) ([]s
 		return []string{}, false
 	}
 
-	for key, _ := range reqMap {
+	for key := range reqMap {
 		if glob.Glob(partialMatch, key) {
 			return reqMap[key], true
 		}
@@ -93,7 +94,7 @@ func (mm Request) matchOnEqualsOrIfEmpty(reqVal string, mockVal string) bool {
 	if len(mockVal) == 0 {
 		return true
 	}
-	return strings.ToLower(mockVal) == strings.ToLower(reqVal)
+	return strings.EqualFold(mockVal, reqVal)
 }
 
 func (mm Request) matchOnEqualsOrIfEmptyOrGlob(reqVal string, mockVal string) bool {
@@ -108,10 +109,11 @@ func (mm Request) matchOnEqualsOrIfEmptyOrGlob(reqVal string, mockVal string) bo
 
 func (mm Request) mockIncludesMethod(method string, mock *mock.Request) bool {
 	for _, item := range strings.Split(mock.Method, "|") {
-		if strings.ToLower(item) == strings.ToLower(method) {
+		if strings.EqualFold(item, method) {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -191,7 +193,7 @@ func (mm Request) bodyMatch(mockReq mock.Request, req *mock.Request) bool {
 		return true
 	}
 
-	if strings.Index(mockReq.Body, glob.GLOB) > -1 && glob.Glob(mockReq.Body, req.Body) {
+	if strings.Contains(mockReq.Body, glob.GLOB) && glob.Glob(mockReq.Body, req.Body) {
 		return true
 	}
 

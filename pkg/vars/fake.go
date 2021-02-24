@@ -2,12 +2,13 @@ package vars
 
 import (
 	"errors"
-	"github.com/jmartin82/mmock/v3/pkg/vars/fake"
 	"log"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/jmartin82/mmock/v3/pkg/vars/fake"
 )
 
 var errMissingParameterValue = errors.New("The requested method needs input parameters which are not supplied!")
@@ -70,7 +71,7 @@ func (fv Fake) callMethod(name string) (string, bool) {
 	if nMethod := data.Type().NumMethod(); nMethod > 0 {
 		for i := 0; i < nMethod; i++ {
 			method := typ.Method(i)
-			if strings.ToLower(method.Name) == strings.ToLower(name) {
+			if strings.EqualFold(method.Name, name) {
 				found = true // we found the name regardless
 				// does receiver type match? (pointerness might be off)
 				if typ == method.Type.In(0) {
@@ -109,11 +110,12 @@ func (fv Fake) getMethodAndParameters(input string) (method string, parameters [
 		return
 	}
 
-	parametersString, success := result["parameters"]
+	parametersString := result["parameters"]
 	parametersString = strings.Replace(parametersString, " ", "", -1)
 	parametersList := strings.Split(parametersString, ",")
 
 	success = true
+
 	for index := range parametersList {
 		value, err := strconv.Atoi(parametersList[index])
 		parameters = append(parameters, value)
