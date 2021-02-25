@@ -1,5 +1,6 @@
 # .goreleaser.yml
 # Build customization
+project_name: mmock
 builds:
   - main: cmd/mmock/main.go
     binary: mmock
@@ -11,15 +12,17 @@ builds:
       - amd64
     ldflags:
      - -X main.VERSION={{.Version}}
-archive:
-  format: tar.gz
-  replacements:
-    amd64: 64-bit
-    darwin: macOS
-  files:
-    - README.md
-    - config/*
-    - tls/*
+archives:
+  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    replacements:
+      darwin: macOS
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    format_overrides:
+    - goos: windows
+      format: zip
 dockers:
   - 
     dockerfile: Dockerfile
