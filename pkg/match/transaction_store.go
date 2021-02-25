@@ -47,7 +47,7 @@ func (mrs *InMemoryTransactionStore) ResetMatch(req mock.Request) {
 	mrs.Lock()
 	var r = []Transaction{}
 	for _, e := range matches {
-		if c, _ := mrs.checker.Match(e.Request, &mock.Definition{Request: req}, false); c == false {
+		if c, _ := mrs.checker.Match(e.Request, &mock.Definition{Request: req}, false); !c {
 			r = append(r, e)
 		}
 	}

@@ -104,6 +104,9 @@ func (ddf DummyDataFaker) Year() string {
 func (ddf DummyDataFaker) MonthShort() string {
 	return ddf.Dummy
 }
+func (ddf DummyDataFaker) MonthNum() string {
+	return ddf.Dummy
+}
 func (ddf DummyDataFaker) Paragraph() string {
 	return ddf.Dummy
 }

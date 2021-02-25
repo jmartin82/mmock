@@ -54,7 +54,7 @@ func TestJSONParseDelay(t *testing.T) {
 		}, {
 			name: "valid",
 			in:   `"1m40s"`,
-			exp:  time.Minute + time.Second * 40,
+			exp:  time.Minute + time.Second*40,
 		},
 	}
 
