@@ -1,6 +1,7 @@
 package match
 
 import (
+	"encoding/json"
 	"strings"
 )
 
@@ -11,6 +12,7 @@ type ScenearioStorer interface {
 	ResetAll()
 	SetPaused(newstate bool)
 	GetPaused() bool
+	List() string
 }
 
 func NewInMemoryScenarioStore() *InMemoryScenarioStore {
@@ -21,6 +23,11 @@ func NewInMemoryScenarioStore() *InMemoryScenarioStore {
 type InMemoryScenarioStore struct {
 	status map[string]string
 	paused bool
+}
+
+func (sm *InMemoryScenarioStore) List() string {
+	json, _ := json.MarshalIndent(sm.status, "", "  ")
+	return string(json)
 }
 
 func (sm *InMemoryScenarioStore) Reset(name string) bool {
