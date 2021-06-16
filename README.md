@@ -461,6 +461,11 @@ Like stubbing this call also uses the same DSL to filter and query requests.
 
 ### Scenario
 
+**Title** : Get all active scenarios.<br>
+**URL** : /api/scenarios<br>
+**Method** : GET<br>
+**Response Codes**: Success (200 OK)<br>
+
 **Title** : Clean all scenarios status and pause state.<br>
 **URL** : /api/scenarios/reset_all<br>
 **Method** : GET<br>
