@@ -3,16 +3,6 @@
 [![Build Status](https://travis-ci.org/jmartin82/mmock.svg?branch=master)](https://travis-ci.org/jmartin82/mmock)
 
 
----------------------------------------
-:wave: Are you looking for a hosted API simulation without installing anything?
-
-Try [MonsterMock.com](https://monstermock.com/), codeless with a nice and comprehensive UI, test easy and frequently without dependencies, |collaborate with your team and accelerate your development speed at the same time you increase your product trustability.
-
-
-[MonsterMock.com](https://monstermock.com/) is using MMock as engine with 100% compatible API.
-
----------------------------------------
-
 Mmock is a testing and fast prototyping tool for developers:
 
 Easy and fast HTTP mock server.
