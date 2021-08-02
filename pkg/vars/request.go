@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -172,40 +173,36 @@ func (rp Request) getBodyParam(name string) (string, bool) {
 	if strings.HasPrefix(contentType[0], "application/x-www-form-urlencoded") {
 		return rp.getUrlEncodedFormBodyParam(name)
 	} else if strings.HasPrefix(contentType[0], "application/xml") || strings.HasPrefix(contentType[0], "text/xml") {
-		return rp.getXmlBodyParam(name)
+		return rp.getXmlBodyParam(rp.Request.Body, name)
 	} else if strings.HasPrefix(contentType[0], "application/") && strings.HasSuffix(contentType[0], "json") {
-		return rp.getJsonBodyParam(name)
+		return rp.getJsonBodyParam(rp.Request.Body, name)
 	}
 
 	return "", false
 }
 
-func (rp Request) getXmlBodyParam(name string) (string, bool) {
-	xml := strings.NewReader(rp.Request.Body)
+func (rp Request) getXmlBodyParam(body string, name string) (string, bool) {
+	xml := strings.NewReader(body)
 	json, err := xj.Convert(xml)
+	//log.Printf("XML to JSON: %v", json)
+
 	if err != nil {
 		return "", false
 	}
 
-	value := gjson.Get(json.String(), name)
-	if !value.Exists() {
-		return "", false
-	}
+	value, ret := rp.getBodyParamValue(json.String(), name)
 
 	//TODO: Add support to complex types extraction like arrays or maps
 	if value.Type == gjson.JSON {
 		return "", false
 	}
 
-	return value.String(), true
+	return value.String(), ret
 }
 
-func (rp Request) getJsonBodyParam(name string) (string, bool) {
-	value := gjson.Get(rp.Request.Body, name)
-	if !value.Exists() {
-		return "", false
-	}
-	return value.String(), true
+func (rp Request) getJsonBodyParam(body string, name string) (string, bool) {
+	value, ret := rp.getBodyParamValue(body, name)
+	return value.String(), ret
 }
 
 func (rp Request) getUrlEncodedFormBodyParam(name string) (string, bool) {
@@ -218,6 +215,93 @@ func (rp Request) getUrlEncodedFormBodyParam(name string) (string, bool) {
 	value := values.Get(name)
 	if value == "" {
 		return "", false
+	}
+
+	return value, true
+}
+
+func (rp Request) haveRegex(query string) bool {
+	match, _ := regexp.MatchString("(.regex\\(.*\\))", query)
+	return match
+}
+
+func (rp Request) haveConcat(query string) bool {
+	match, _ := regexp.MatchString("(.concat\\(.*\\))", query)
+	return match
+}
+
+func (rp Request) getBodyParamValue(body string, query string) (value gjson.Result, found bool) {
+
+	if rp.haveRegex(query) {
+		value, found = rp.getParamWithRegex(body, query)
+	} else if rp.haveConcat(query) {
+		value, found = rp.concatValue(body, query)
+	} else {
+		value, found = rp.getParamWithGJson(body, query)
+	}
+
+	return
+}
+
+func (rp Request) getParamWithRegex(body string, query string) (value gjson.Result, found bool) {
+
+	queries := strings.Split(query, ".regex")
+
+	if len(queries) > 1 {
+
+		value, found = rp.getParamWithGJson(body, queries[0])
+
+		regex := queries[1]
+		concatValue := ""
+
+		if rp.haveConcat(regex) {
+			queriesConcat := strings.Split(regex, ".concat")
+			regex = queriesConcat[0]
+			concatValue = queriesConcat[1]
+			concatValue = concatValue[1 : len(concatValue)-1]
+		}
+
+		regexValue, err := regexp.Compile(regex[1 : len(regex)-1])
+		if err != nil {
+			value.Str = ""
+			return value, false
+		}
+
+		value.Str = regexValue.FindString(value.String())
+
+		if value.Str != "" {
+			value.Str += concatValue
+		}
+
+	}
+
+	return
+}
+
+func (rp Request) concatValue(body string, query string) (value gjson.Result, found bool) {
+
+	queries := strings.Split(query, ".concat")
+
+	if len(queries) > 1 {
+
+		value, found = rp.getParamWithGJson(body, queries[0])
+
+		concatValue := queries[1]
+
+		if value.Str != "" {
+			value.Str += concatValue[1 : len(concatValue)-1]
+		}
+	}
+
+	return
+}
+
+func (rp Request) getParamWithGJson(body string, query string) (value gjson.Result, found bool) {
+
+	value = gjson.Get(body, query)
+	if !value.Exists() {
+		value.Str = ""
+		return value, false
 	}
 
 	return value, true

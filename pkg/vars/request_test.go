@@ -1,10 +1,11 @@
 package vars
 
 import (
-	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 func TestGetHeaderParam(t *testing.T) {
@@ -103,5 +104,44 @@ func TestGetEnvironmentVariableNotFound(t *testing.T) {
 
 	if len(vars) > 0 {
 		t.Errorf("Unexpectedly found variable")
+	}
+}
+
+func TestGetBodyParam(t *testing.T) {
+	req := mock.Request{}
+	req.Headers = make(mock.Values)
+	req.Headers["Content-Type"] = []string{"application/json"}
+	req.Body = `
+{
+  "email": "hilari@sapo.pt",
+  "age": 4,
+  "uuid":"0bd74115-2307-458f-8288-b726724045ef",
+  "discarded": "do not return"
+}
+`
+	res := mock.Response{}
+	res.Body = `
+{
+  "email": "{{request.body.email.regex((\@gmail.com))}}",
+  "age": {{request.body.age}},
+  "uuid": "{{request.body.uuid.regex(\b([0-9a-zA-Z]{4})\b).concat(-878787)}}",
+  "discarded": "{{request.body.discarded.concat(, Please!)}}"
+}
+`
+
+	expected := `
+{
+  "email": "",
+  "age": 4,
+  "uuid": "2307-878787",
+  "discarded": "do not return, Please!"
+}
+`
+	mock := mock.Definition{Request: req, Response: res}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != expected {
+		t.Error("Replaced tags from body form do not match", mock.Response.Body)
 	}
 }

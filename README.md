@@ -269,6 +269,40 @@ You can extract information from the request body too, using a dot notation path
 
 Quick overview of the path syntax available to extract values form the request: [https://github.com/tidwall/gjson#path-syntax](https://github.com/tidwall/gjson#path-syntax)
 
+You can also use "regex" and "concat" commands to complement GJson query:
+
+- request.body."*deep*"."*key*".regex() (support for `application/json`, `application/xml` requests)
+- request.body."*deep*"."*key*".concat() (support for `application/json`, `application/xml` requests)
+- request.body."*deep*"."*key*".regex().concat() (support for `application/json`, `application/xml` requests)
+
+**Example request data:**
+```json
+{
+  "email": "hilari@sapo.pt",
+  "age": 4,
+  "uuid":"0bd74115-2307-458f-8288-b726724045ef",
+  "discarded": "do not return"
+}
+```
+**Example config mock data:**
+```json
+{
+  "email": "{{request.body.email.regex((\@gmail.com))}}",
+  "age": {{request.body.age}},
+  "uuid": "{{request.body.uuid.regex(\b([0-9a-zA-Z]{4})\b).concat(-878787)}}",
+  "discarded": "{{request.body.discarded.concat(, Please!)}}"
+}
+```
+**Example response data:**
+```json
+{
+  "email": "",
+  "age": 4,
+  "uuid": "2307-878787",
+  "discarded": "do not return, Please!"
+}
+```
+
 **External streams:** Perfect for embedding big payloads or getting data from another service.
 
  - file.contents(FILE_PATH)
