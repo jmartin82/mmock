@@ -19,7 +19,7 @@ require (
 	github.com/radovskyb/watcher v1.0.7
 	github.com/ryanuber/go-glob v1.0.0
 	github.com/stathat/go v1.0.0
-	github.com/tidwall/gjson v1.6.0
+	github.com/tidwall/gjson v1.6.5
 	github.com/twinj/uuid v1.0.0
 	golang.org/x/net v0.0.0-20200602114024-627f9648deb9
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect

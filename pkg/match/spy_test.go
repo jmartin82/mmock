@@ -30,6 +30,10 @@ func (dsm DummyScenarioManager) GetPaused() bool {
 func (dsm DummyScenarioManager) SetPaused(_ bool) {
 }
 
+func (dsm DummyScenarioManager) List() string {
+	return ""
+}
+
 func TestFindMatches(t *testing.T) {
 	spy := NewSpy(NewTester(payload.NewComparator(), DummyScenarioManager{}), NewInMemoryTransactionStore(DummyMatcher{}, 10))
 
