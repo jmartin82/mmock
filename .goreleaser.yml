@@ -27,8 +27,6 @@ dockers:
   - 
     dockerfile: Dockerfile
     skip_push: false
-    binaries: 
-      - mmock
     image_templates:
       - "jordimartin/mmock:{{.Tag}}"
       - "jordimartin/mmock:latest"
