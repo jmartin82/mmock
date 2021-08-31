@@ -1,6 +1,6 @@
 ![Mmock](/docs/logo.png "Mmock logo")
 =========
-[![Build Status](https://travis-ci.org/jmartin82/mmock.svg?branch=master)](https://travis-ci.org/jmartin82/mmock)
+[![Build Status](https://app.travis-ci.com/jmartin82/mmock.svg?branch=master)](https://app.travis-ci.com/jmartin82/mmock)
 
 
 Mmock is a testing and fast prototyping tool for developers:
