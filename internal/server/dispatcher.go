@@ -207,7 +207,7 @@ func (di Dispatcher) listenAndServeTLS(addrTLS string) error {
 	files, err := filepath.Glob(pattern)
 	if err != nil || len(files) == 0 {
 		log.Println("TLS certificates not found, impossible to start the TLS server.")
-		return nil
+		return err
 	}
 
 	for _, crt := range files {
