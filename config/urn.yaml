@@ -1,0 +1,10 @@
+---
+request:
+  method: GET
+  path: /api/v1/notes/urn:organization:notebook:eu:note:123
+response:
+  statusCode: 200
+  headers:
+    Content-Type:
+      - "application/json"
+  body: "It works"

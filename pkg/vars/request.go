@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/jmartin82/mmock/v3/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/route"
 
-	urlmatcher "github.com/azer/url-router"
 	xj "github.com/basgys/goxml2json"
 	"github.com/tidwall/gjson"
 )
@@ -115,8 +115,8 @@ func (rp Request) getUrl() (string, bool) {
 
 func (rp Request) getPathParam(name string) (string, bool) {
 
-	routes := urlmatcher.New(rp.Mock.Request.Path)
-	mparm := routes.Match(rp.Request.Path)
+	route := route.NewRoute(rp.Mock.Request.Path)
+	mparm := route.Match(rp.Request.Path)
 
 	value, f := mparm.Params[name]
 	if !f {

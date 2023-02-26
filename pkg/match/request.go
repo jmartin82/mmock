@@ -7,8 +7,7 @@ import (
 
 	"github.com/jmartin82/mmock/v3/pkg/match/payload"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
-
-	urlmatcher "github.com/azer/url-router"
+	"github.com/jmartin82/mmock/v3/pkg/route"
 
 	"github.com/ryanuber/go-glob"
 )
@@ -132,14 +131,14 @@ func (mm Request) matchScenarioState(scenario *mock.Scenario) bool {
 	return false
 }
 
-//Matcher checks if the received request matches with some specific mock request config.
+// Matcher checks if the received request matches with some specific mock request config.
 type Matcher interface {
 	Match(req *mock.Request, mock *mock.Definition, scenarioAware bool) (bool, error)
 }
 
 func (mm Request) Match(req *mock.Request, mock *mock.Definition, scenarioAware bool) (bool, error) {
 
-	routes := urlmatcher.New(mock.Request.Path)
+	route := route.NewRoute(mock.Request.Path)
 
 	if !mm.matchOnEqualsOrIfEmptyOrGlob(req.Host, mock.Request.Host) {
 		return false, fmt.Errorf("Host not match. Actual: %s, Expected: %s", req.Host, mock.Request.Host)
@@ -153,7 +152,7 @@ func (mm Request) Match(req *mock.Request, mock *mock.Definition, scenarioAware 
 		return false, fmt.Errorf("Fragment not match. Actual: %s, Expected: %s", req.Fragment, mock.Request.Fragment)
 	}
 
-	if !glob.Glob(mock.Request.Path, req.Path) && routes.Match(req.Path) == nil {
+	if !glob.Glob(mock.Request.Path, req.Path) && route.Match(req.Path) == nil {
 		return false, fmt.Errorf("Path not match. Actual: %s, Expected: %s", req.Path, mock.Request.Path)
 	}
 

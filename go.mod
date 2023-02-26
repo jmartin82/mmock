@@ -3,7 +3,6 @@ module github.com/jmartin82/mmock/v3
 go 1.14
 
 require (
-	github.com/azer/url-router v0.0.0-20140924232216-1a0aa252538c
 	github.com/basgys/goxml2json v1.1.0
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
