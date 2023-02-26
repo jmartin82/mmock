@@ -1,6 +1,10 @@
 package vars
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/jmartin82/mmock/v3/pkg/mock"
@@ -10,7 +14,7 @@ import (
 	"strings"
 )
 
-//DummyDataFaker is used in tests
+// DummyDataFaker is used in tests
 type DummyDataFaker struct {
 	Dummy string
 }
@@ -578,5 +582,34 @@ func TestReplaceTagsCallback(t *testing.T) {
 
 	if mock.Callback.Body != "Request Body hi!. Query valParam. Cookie: valCookie. Random: AleixMG" {
 		t.Error("Replaced tags in callback body not match", cb.Body)
+	}
+}
+
+func TestReplaceBigFile(t *testing.T) {
+	content := []byte("{{request.body}} this is a big file with holders replaced")
+	dir, err := ioutil.TempDir("", "mmock")
+	if err != nil {
+		t.Errorf("Error creating temporary folder")
+	}
+
+	tmpfn := filepath.Join(dir, "bigfile")
+	if err := ioutil.WriteFile(tmpfn, content, 0666); err != nil {
+		t.Errorf("Error updating temporary file")
+	}
+
+	defer os.RemoveAll(dir) // clean up
+
+	req := mock.Request{}
+	req.Body = "hi! Isona."
+
+	res := mock.Response{}
+	res.Body = fmt.Sprintf("Big file: {{file.contents(%s)}}", tmpfn)
+
+	mock := mock.Definition{Request: req, Response: res}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != "Big file: hi! Isona. this is a big file with holders replaced" {
+		t.Error("Replaced tags in a external stream doesn't work.", res.Body, mock.Response.Body)
 	}
 }
