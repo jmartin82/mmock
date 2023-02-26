@@ -26,7 +26,7 @@ import (
 	"github.com/jmartin82/mmock/v3/pkg/vars"
 )
 
-//Dispatcher is the mock http server
+// Dispatcher is the mock http server
 type Dispatcher struct {
 	IP         string
 	Port       int
@@ -68,8 +68,8 @@ func (di Dispatcher) callWebHook(url string, match *match.Transaction) {
 	log.Printf("WebHook response: %d\n", resp.StatusCode)
 }
 
-//ServerHTTP is the mock http server request handler.
-//It uses the router to decide the matching mock and translator as adapter between the HTTP impelementation and the mock mock.
+// ServerHTTP is the mock http server request handler.
+// It uses the router to decide the matching mock and translator as adapter between the HTTP impelementation and the mock mock.
 func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	mRequest := di.Translator.BuildRequestDefinitionFromHTTP(req)
 
@@ -138,7 +138,7 @@ func getProxyResponse(request *mock.Request, definition *mock.Definition) *mock.
 }
 
 func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition, *match.Transaction) {
-	response := &mock.Response{}
+	var response *mock.Response
 	mock, result := di.Resolver.Resolve(request)
 
 	log.Printf("Definition match found: %s. Name : %s\n", strconv.FormatBool(result.Found), mock.URI)
@@ -148,19 +148,17 @@ func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition
 			statistics.TrackProxyFeature()
 			response = getProxyResponse(request, mock)
 		} else {
-
 			di.Evaluator.Eval(request, mock)
-			if mock.Control.Crazy {
-				log.Println("Running crazy mode")
-				mock.Response.StatusCode = di.randomStatusCode(mock.Response.StatusCode)
-			}
-
-			if d := mock.Control.Delay.Duration; d > 0 {
-				log.Printf("Adding a delay of: %s\n", d)
-				time.Sleep(d)
-			}
-
 			response = &mock.Response
+		}
+
+		if mock.Control.Crazy {
+			log.Println("Running crazy mode")
+			response.StatusCode = di.randomStatusCode(response.StatusCode)
+		}
+		if d := mock.Control.Delay.Duration; d > 0 {
+			log.Printf("Adding a delay of: %s\n", d)
+			time.Sleep(d)
 		}
 
 		statistics.TrackMockRequest()
@@ -174,7 +172,7 @@ func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition
 
 }
 
-//Start initialize the HTTP mock server
+// Start initialize the HTTP mock server
 func (di Dispatcher) Start() {
 	addr := fmt.Sprintf("%s:%d", di.IP, di.Port)
 	addrTLS := fmt.Sprintf("%s:%d", di.IP, di.PortTLS)
