@@ -27,12 +27,15 @@ dockers:
   - 
     dockerfile: Dockerfile
     skip_push: false
+    goarch: amd64
     image_templates:
       - "jordimartin/mmock:{{.Tag}}"
       - "jordimartin/mmock:latest"
     extra_files:
       - tls/server.crt
       - tls/server.key
+    build_flag_templates:
+      - "--platform=linux/amd64"
 release:
   github:
     owner: jmartin82
