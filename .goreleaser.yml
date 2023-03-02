@@ -1,3 +1,5 @@
+# .goreleaser.yml
+# Build customization
 project_name: mmock
 builds:
   - main: cmd/mmock/main.go
@@ -8,22 +10,15 @@ builds:
       - linux
     goarch:
       - amd64
-      - arm
-      - arm64
     ldflags:
      - -X main.VERSION={{.Version}}
-    ignore:
-      - goos: linux
-        goarch: arm
-        goarm: 7
-      - goos: windows
-        goarch: arm64
 archives:
   - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     replacements:
       darwin: macOS
       linux: Linux
       windows: Windows
+      386: i386
       amd64: x86_64
     format_overrides:
     - goos: windows
@@ -31,7 +26,6 @@ archives:
 dockers:
   - 
     dockerfile: Dockerfile
-    goarch: amd64
     skip_push: false
     image_templates:
       - "jordimartin/mmock:{{.Tag}}"
