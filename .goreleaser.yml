@@ -10,6 +10,10 @@ builds:
       - linux
     goarch:
       - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
     ldflags:
      - -X main.VERSION={{.Version}}
 archives:
@@ -24,18 +28,31 @@ archives:
     - goos: windows
       format: zip
 dockers:
-  - 
-    dockerfile: Dockerfile
+  - dockerfile: Dockerfile
     skip_push: false
     goarch: amd64
     image_templates:
-      - "jordimartin/mmock:{{.Tag}}"
-      - "jordimartin/mmock:latest"
+      - "jordimartin/mmock:{{.Tag}}-amd64"
     extra_files:
       - tls/server.crt
       - tls/server.key
     build_flag_templates:
       - "--platform=linux/amd64"
+  - dockerfile: Dockerfile
+    skip_push: false
+    goarch: arm64
+    image_templates:
+      - "jordimartin/mmock:{{.Tag}}-arm64"
+    extra_files:
+      - tls/server.crt
+      - tls/server.key
+    build_flag_templates:
+      - "--platform=linux/arm64"
+docker_manifests:
+  - name_template: "jordimartin/mmock:{{.Tag}}"
+    image_templates:
+      - jordimartin/mmock:{{ .Tag }}-amd64
+      - jordimartin/mmock:{{ .Tag }}-arm64
 release:
   github:
     owner: jmartin82
