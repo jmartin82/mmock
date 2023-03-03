@@ -31,6 +31,7 @@ dockers:
   - dockerfile: Dockerfile
     skip_push: false
     goarch: amd64
+    use: buildx
     image_templates:
       - "jordimartin/mmock:{{.Tag}}-amd64"
     extra_files:
@@ -41,6 +42,7 @@ dockers:
   - dockerfile: Dockerfile
     skip_push: false
     goarch: arm64
+    use: buildx
     image_templates:
       - "jordimartin/mmock:{{.Tag}}-arm64"
     extra_files:
@@ -49,6 +51,10 @@ dockers:
     build_flag_templates:
       - "--platform=linux/arm64"
 docker_manifests:
+  - name_template: "jordimartin/mmock:latest"
+    image_templates:
+      - jordimartin/mmock:{{ .Tag }}-amd64
+      - jordimartin/mmock:{{ .Tag }}-arm64
   - name_template: "jordimartin/mmock:{{.Tag}}"
     image_templates:
       - jordimartin/mmock:{{ .Tag }}-amd64
