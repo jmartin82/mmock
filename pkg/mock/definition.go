@@ -53,30 +53,34 @@ type Delay struct {
 	time.Duration
 }
 
+func (d Delay) MarshalJSON() (data []byte, err error) {
+	return json.Marshal(d.Duration.String())
+}
+
 func (d *Delay) UnmarshalJSON(data []byte) (err error) {
-	var (
-		v interface{}
-		s string
-	)
-	if err = json.Unmarshal(data, &v); err != nil {
+
+	var i interface{}
+	if err = json.Unmarshal(data, &i); err != nil {
 		return err
 	}
 
-	switch v.(type) {
+	switch v := i.(type) {
 	case float64:
-		s = fmt.Sprintf("%ds", int(v.(float64)))
 		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 		fmt.Println("! DEPRECATION NOTICE:                                        !")
 		fmt.Println("! Please use a time unit (m,s,ms) to define the delay value. !")
 		fmt.Println("! Ex: \"delay\":\"1s\" instead \"delay\":1                   !")
 		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+		s := fmt.Sprintf("%ds", int(v))
+		d.Duration, err = time.ParseDuration(s)
 	case string:
-		s = v.(string)
+		d.Duration, err = time.ParseDuration(v)
+	case time.Duration:
+		d.Duration = v
 	default:
 		return fmt.Errorf("invalid value for delay, got: %v", reflect.TypeOf(v))
 	}
 
-	d.Duration, err = time.ParseDuration(s)
 	return err
 }
 
@@ -89,7 +93,7 @@ type Control struct {
 	WebHookURL   string   `json:"webHookURL"`
 }
 
-//Definition contains the user mock config
+// Definition contains the user mock config
 type Definition struct {
 	URI         string
 	Description string   `json:"description"`
