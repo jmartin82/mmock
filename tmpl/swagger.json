@@ -277,6 +277,42 @@
           }
         }
       },
+      "post": {
+        "summary": "Create mock definition",
+        "tags": [
+          "mapping"
+        ],
+        "operationId": "Create mock definition",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "mock_path",
+            "in": "path",
+            "description": "Mock path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MockDefinition"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Action result",
+            "schema": {
+              "$ref": "#/definitions/ActionResponse"
+            }
+          }
+        }
+      },
       "delete": {
         "summary": "Delete mock definition",
         "tags": [
@@ -446,7 +482,7 @@
         },
         "delay": {
           "description": "",
-          "type": "string",
+          "type": "string"
         },
         "crazy": {
           "description": "",
