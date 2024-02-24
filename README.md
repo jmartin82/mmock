@@ -196,7 +196,7 @@ A core feature of Mmock is the ability to return canned HTTP responses for reque
 * *queryStringParameters*: Array of query strings. It allows more than one value for the same key.
 * *headers*: Array of headers. It allows more than one value for the same key. **Case sensitive!**
 * *cookies*: Array of cookies.
-* *body*: Body string. It allows * pattern.
+* *body*: Body string. It allows * pattern. It also supports regular expressions for field values within JSON request bodies.
 
 In case of queryStringParameters, headers and cookies, the request can be matched only if all defined keys in mock will be present with the exact or glob value.
 
@@ -280,7 +280,7 @@ You can also use "regex" and "concat" commands to complement GJson query:
 {
   "email": "hilari@sapo.pt",
   "age": 4,
-  "uuid":"0bd74115-2307-458f-8288-b726724045ef",
+  "uuid":"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
   "discarded": "do not return"
 }
 ```
@@ -610,6 +610,7 @@ You can always disable this behavior adding the following flag `-server-statisti
 - Create mapping via console thanks to [@inabajunmr](https://github.com/inabajunmr)
 - Thanks to [@joel-44](https://github.com/joel-44) for bug fixing 
 - Enviroment variables as mock variables thanks to [@marcoreni](https://github.com/marcoreni)
+- Support Regular Expressions for Field Values in JSON Request Body thanks to [@rosspatil](https://github.com/rosspatil)
 
 ### Contributing
 
