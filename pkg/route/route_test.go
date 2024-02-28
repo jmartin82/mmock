@@ -36,6 +36,9 @@ func TestParams(t *testing.T) {
 	route = NewRoute("/fruits/:fruit/:page")
 	equal(t, route.Match("/fruits/cherry/452").Params["fruit"], "cherry")
 	equal(t, route.Match("/fruits/cherry/452").Params["page"], "452")
+
+	route = NewRoute("/fruits/prefix-:fruit")
+	equal(t, route.Match("/fruits/prefix-cherry").Params["fruit"], "cherry")
 }
 
 func equal(t *testing.T, a string, b string) {

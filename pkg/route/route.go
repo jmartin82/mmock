@@ -46,7 +46,7 @@ func NewRoute(pattern string) *Route {
 }
 
 func pathToRegex(path string) (*regexp.Regexp, []string) {
-	pattern, _ := regexp.Compile("\\/:([A-Za-z0-9]+)")
+	pattern, _ := regexp.Compile(`:([A-Za-z0-9]+)`)
 	matches := pattern.FindAllStringSubmatch(path, -1)
 	keys := []string{}
 
@@ -56,7 +56,7 @@ func pathToRegex(path string) (*regexp.Regexp, []string) {
 
 	str := fmt.Sprintf("^%s\\/?$", strings.Replace(path, "/", "\\/", -1))
 
-	str = pattern.ReplaceAllString(str, "/([^\\/]+)")
+	str = pattern.ReplaceAllString(str, "([^\\/]+)")
 	str = strings.Replace(str, ".", "\\.", -1)
 
 	regex, _ := regexp.Compile(str)
