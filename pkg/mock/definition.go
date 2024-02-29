@@ -65,20 +65,12 @@ func (d *Delay) UnmarshalJSON(data []byte) (err error) {
 	}
 
 	switch v := i.(type) {
-	case float64:
-		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-		fmt.Println("! DEPRECATION NOTICE:                                        !")
-		fmt.Println("! Please use a time unit (m,s,ms) to define the delay value. !")
-		fmt.Println("! Ex: \"delay\":\"1s\" instead \"delay\":1                   !")
-		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-		s := fmt.Sprintf("%ds", int(v))
-		d.Duration, err = time.ParseDuration(s)
 	case string:
 		d.Duration, err = time.ParseDuration(v)
 	case time.Duration:
 		d.Duration = v
 	default:
-		return fmt.Errorf("invalid value for delay, got: %v", reflect.TypeOf(v))
+		return fmt.Errorf("invalid value for delay got: %v. Ex: \"delay\":\"1s\" ", reflect.TypeOf(v))
 	}
 
 	return err

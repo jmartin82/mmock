@@ -60,7 +60,7 @@ control:
    - another_state_name
   newState: new_stat_neme
  proxyBaseURL: "http://www.jordi.io"
- delay: 5
+ delay: 5s
  crazy: true
  priority: 1`)
 	invalidDefinition := []byte("sfsdf")

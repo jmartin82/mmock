@@ -2,11 +2,12 @@ package config
 
 import (
 	"errors"
-	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 var MockContent = "{\"URI\":\"test\",\"description\":\"\",\"request\":{\"host\":\"\",\"method\":\"\",\"path\":\"\",\"queryStringParameters\":null,\"headers\":null,\"cookies\":null,\"body\":\"\"},\"response\":{\"statusCode\":0,\"headers\":null,\"cookies\":null,\"body\":\"\"},\"control\":{\"priority\":0,\"delay\":0,\"crazy\":false,\"scenario\":{\"name\":\"\",\"requiredState\":null,\"newState\":\"\"},\"proxyBaseURL\":\"\"}})"
@@ -40,7 +41,7 @@ func TestReadMockDefinition(t *testing.T) {
 	}
 
 	tmpfn := filepath.Join(dir, "tmpfile_1")
-	if err := ioutil.WriteFile(tmpfn, content, 0666); err != nil {
+	if err := os.WriteFile(tmpfn, content, 0666); err != nil {
 		t.Error("Error creating temporary file")
 	}
 

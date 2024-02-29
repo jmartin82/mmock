@@ -24,7 +24,6 @@
     },
     "control":{
        "priority":1,
-       "delay":0,
        "crazy":false,
        "scenario":{
           "name":"",

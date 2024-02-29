@@ -162,26 +162,3 @@ func TestJSONRead(t *testing.T) {
 	}
 
 }
-
-func TestJSONCompat(t *testing.T) {
-	v1 := []byte(`{
-		"control":{
-		   "delay": 5
-		}
-	 }`)
-
-	v2 := []byte(`{
-		"control": {
-			"delay": "5s"
-		}
-	}`)
-
-	json := JSONReader{}
-	m1, _ := json.Parse(v1)
-	m2, _ := json.Parse(v2)
-
-	if m1.Control.Delay != m2.Control.Delay {
-		t.Errorf("Error with delay field compatibility")
-	}
-
-}
