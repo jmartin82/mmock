@@ -37,7 +37,7 @@ vet:
 	go vet -v  ./...
 
 release:
-	goreleaser --rm-dist
+	goreleaser --clean
 
 docker-push:
 	docker build --no-cache=true  -t $(NS)/$(PKG_NAME):$(VERSION) .
