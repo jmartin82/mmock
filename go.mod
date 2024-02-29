@@ -20,7 +20,7 @@ require (
 	github.com/stathat/go v1.0.0
 	github.com/tidwall/gjson v1.9.3
 	github.com/twinj/uuid v1.0.0
-	golang.org/x/net v0.0.0-20200602114024-627f9648deb9
+	golang.org/x/net v0.7.0
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
