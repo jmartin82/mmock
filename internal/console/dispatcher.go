@@ -16,7 +16,7 @@ import (
 	"github.com/jmartin82/mmock/v3/pkg/mock"
 
 	"github.com/jmartin82/mmock/v3/internal/statistics"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"golang.org/x/net/websocket"
 )
 
