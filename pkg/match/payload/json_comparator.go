@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"log"
 )
 
 type JSONComparator struct {
@@ -20,9 +21,11 @@ func (jc *JSONComparator) doCompareJSONRegex(jsonWithPatterns, jsonWithValues st
 	var patterns map[string]interface{}
 	var values map[string]interface{}
 	if err := json.Unmarshal([]byte(jsonWithPatterns), &patterns); err != nil {
+  log.Printf("error in json patterns: %v", err)
 		return false
 	}
 	if err := json.Unmarshal([]byte(jsonWithValues), &values); err != nil {
+  log.Printf("error in json values: %v", err)
 		return false
 	}
 	return match(patterns, values)
