@@ -3,6 +3,8 @@ package match
 import (
 	"errors"
 	"fmt"
+	"log"
+	"os"
 	"regexp"
 	"strings"
 
@@ -86,7 +88,6 @@ func globMatch(m string, v string) bool {
 func regexpMatch(m string, v string) bool {
 	matched, err := regexp.MatchString(m, fmt.Sprint(v))
 	log.Debugf("value %v regexpMatch %v: %v [%v]", v, m, matched, err)
-
 	return (err == nil && matched)
 }
 
