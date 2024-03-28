@@ -13,7 +13,7 @@ import (
 
 var errMissingParameterValue = errors.New("The requested method needs input parameters which are not supplied!")
 
-//Fake parses the data looking for fake data tags or request data tags
+// Fake parses the data looking for fake data tags or request data tags
 type Fake struct {
 	Fake fake.Generator
 }

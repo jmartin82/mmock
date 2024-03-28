@@ -1,6 +1,6 @@
 package fake
 
-//Generator interface contains the funtions to obtain the fake data to fill the response.
+// Generator interface contains the funtions to obtain the fake data to fill the response.
 type Generator interface {
 	Brand() string
 	Character() string
