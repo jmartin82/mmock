@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/gob"
+	"errors"
 
 	"log"
 
@@ -63,7 +64,7 @@ func (rr *Router) Resolve(req *mock.Request) (*mock.Definition, *match.Result) {
 			return &md, mLog
 		}
 		mLog.Errors = append(mLog.Errors, match.Error{URI: m.URI, Reason: err.Error()})
-		if err != match.ErrPathNotMatch {
+		if ! errors.Is(err, match.ErrPathNotMatch) {
 			log.Printf("Discarding mock: %s Reason: %s\n", m.URI, err.Error())
 		}
 	}
