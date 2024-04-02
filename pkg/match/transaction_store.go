@@ -14,7 +14,7 @@ type TransactionStorer interface {
 	Get(limit int, offset int) []Transaction
 }
 
-//InMemoryTransactionStore stores all received request and their matches in memory until the last reset
+// InMemoryTransactionStore stores all received request and their matches in memory until the last reset
 type InMemoryTransactionStore struct {
 	matches []Transaction
 	sync.Mutex
@@ -22,7 +22,7 @@ type InMemoryTransactionStore struct {
 	limit   int
 }
 
-//Save store a match information
+// Save store a match information
 func (mrs *InMemoryTransactionStore) Save(req Transaction) {
 	mrs.Lock()
 	if mrs.limit > 0 && mrs.limit == len(mrs.matches) {
@@ -34,14 +34,14 @@ func (mrs *InMemoryTransactionStore) Save(req Transaction) {
 	mrs.Unlock()
 }
 
-//Reset clean the request stored in memory
+// Reset clean the request stored in memory
 func (mrs *InMemoryTransactionStore) Reset() {
 	mrs.Lock()
 	mrs.matches = make([]Transaction, 0, mrs.limit)
 	mrs.Unlock()
 }
 
-//ResetMatch clean the request stored in memory that matches a particular criteria
+// ResetMatch clean the request stored in memory that matches a particular criteria
 func (mrs *InMemoryTransactionStore) ResetMatch(req mock.Request) {
 	matches := mrs.GetAll()
 	mrs.Lock()
@@ -56,7 +56,7 @@ func (mrs *InMemoryTransactionStore) ResetMatch(req mock.Request) {
 	mrs.Unlock()
 }
 
-//GetAll return current matches (positive and negative) in memory
+// GetAll return current matches (positive and negative) in memory
 func (mrs *InMemoryTransactionStore) GetAll() []Transaction {
 	mrs.Lock()
 	r := make([]Transaction, len(mrs.matches))
@@ -65,7 +65,7 @@ func (mrs *InMemoryTransactionStore) GetAll() []Transaction {
 	return r
 }
 
-//Get return an subset of current matches (positive and negative) in memory
+// Get return an subset of current matches (positive and negative) in memory
 func (mrs *InMemoryTransactionStore) Get(limit int, offset int) []Transaction {
 	mrs.Lock()
 	defer mrs.Unlock()
@@ -85,7 +85,7 @@ func (mrs *InMemoryTransactionStore) Get(limit int, offset int) []Transaction {
 	return r
 }
 
-//NewInMemoryScenarioStore is the InMemoryTransactionStore constructor
+// NewInMemoryScenarioStore is the InMemoryTransactionStore constructor
 func NewInMemoryTransactionStore(checker Matcher, limit int) *InMemoryTransactionStore {
 	l := 100
 	if limit > 0 {

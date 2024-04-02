@@ -12,13 +12,13 @@ import (
 type DummyReader struct {
 }
 
-//CanParse return true if is a json file
+// CanParse return true if is a json file
 func (jp DummyReader) CanParse(filename string) bool {
 
 	return strings.Contains(filename, "tmpfile_populate")
 }
 
-//Read Unmarshal a json file to Mock struct
+// Read Unmarshal a json file to Mock struct
 func (jp DummyReader) Parse(buf []byte) (mock.Definition, error) {
 	return mock.Definition{URI: "test_mapping"}, nil
 }

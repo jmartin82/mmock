@@ -13,12 +13,12 @@ import (
 	"github.com/jmartin82/mmock/v3/pkg/match"
 )
 
-//RequestResolver contains the functions to check the http request and return the matching mock.
+// RequestResolver contains the functions to check the http request and return the matching mock.
 type RequestResolver interface {
 	Resolve(req *mock.Request) (*mock.Definition, *match.Result)
 }
 
-//NewRouter returns a pointer to new Router
+// NewRouter returns a pointer to new Router
 func NewRouter(mapping config.Mapping, checker match.Matcher) *Router {
 	return &Router{
 		Mapping: mapping,
@@ -26,7 +26,7 @@ func NewRouter(mapping config.Mapping, checker match.Matcher) *Router {
 	}
 }
 
-//Router checks http requesta and try to figure out what is the best mock for each one.
+// Router checks http requesta and try to figure out what is the best mock for each one.
 type Router struct {
 	Mapping config.Mapping
 	Checker match.Matcher
@@ -47,7 +47,7 @@ func (rr *Router) copy(src, dst *mock.Definition) {
 
 }
 
-//Route checks the request with all available mock definitions and return the matching mock for it.
+// Route checks the request with all available mock definitions and return the matching mock for it.
 func (rr *Router) Resolve(req *mock.Request) (*mock.Definition, *match.Result) {
 	mocks := rr.Mapping.List()
 	mLog := &match.Result{Found: false}
