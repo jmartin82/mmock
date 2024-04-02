@@ -22,14 +22,14 @@ import (
 
 var pagePattern = regexp.MustCompile(`^[1-9]([0-9]+)?$`)
 
-//ErrInvalidPage the page parameters is invalid
+// ErrInvalidPage the page parameters is invalid
 var ErrInvalidPage = errors.New("Invalid page")
 
 type ActionResponse struct {
 	Result string `json:"result"`
 }
 
-//Dispatcher is the http console server.
+// Dispatcher is the http console server.
 type Dispatcher struct {
 	IP             string
 	Port           int
@@ -63,7 +63,7 @@ func (di *Dispatcher) logFanOut() {
 	}
 }
 
-//Start initiates the http console.
+// Start initiates the http console.
 func (di *Dispatcher) Start() {
 	e := echo.New()
 	e.HideBanner = true
@@ -109,7 +109,7 @@ func (di *Dispatcher) Start() {
 	e.Logger.Fatal(e.Start(addr))
 }
 
-//CONSOLE
+// CONSOLE
 func (di *Dispatcher) consoleHandler(c echo.Context) error {
 	statistics.TrackConsoleRequest()
 	tmpl, _ := Asset("tmpl/index.html")
@@ -139,7 +139,7 @@ func (di *Dispatcher) getMappingUri(path string) string {
 	return strings.TrimPrefix(path, root)
 }
 
-//API REQUEST
+// API REQUEST
 func (di *Dispatcher) mappingListHandler(c echo.Context) (err error) {
 	mocks := di.Mapping.List()
 	return c.JSON(http.StatusOK, mocks)
