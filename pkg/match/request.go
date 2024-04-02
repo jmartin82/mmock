@@ -8,7 +8,6 @@ import (
 	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"github.com/jmartin82/mmock/v3/pkg/route"
 	"github.com/ryanuber/go-glob"
-	"os"
 	"strings"
 )
 
@@ -67,7 +66,6 @@ func (mm Request) matchKeyAndValues(reqMap mock.Values, mockMap mock.Values) boo
 				}
 			} else {
 				log.Debugf("value [%v] doesn't appear in mock", key)
-			}
 
 				return false
 			}
