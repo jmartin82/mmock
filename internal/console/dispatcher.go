@@ -196,7 +196,7 @@ func (di *Dispatcher) mappingCreateHandler(c echo.Context) (err error) {
 
 	if err = c.Bind(mock); err != nil {
 		ar := &ActionResponse{
-			Result: fmt.Sprintf("invalid_mock_definition: %s", err),
+			Result: "invalid_mock_definition",
 		}
 		return c.JSON(http.StatusBadRequest, ar)
 	}
@@ -227,7 +227,7 @@ func (di *Dispatcher) mappingUpdateHandler(c echo.Context) (err error) {
 
 	if err = c.Bind(mock); err != nil {
 		ar := &ActionResponse{
-			Result: fmt.Sprintf("invalid_mock_definition: %s", err),
+			Result: "invalid_mock_definition",
 		}
 		return c.JSON(http.StatusBadRequest, ar)
 	}
