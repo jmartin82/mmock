@@ -23,7 +23,7 @@ type Mapping interface {
 	List() []mock.Definition
 }
 
-// PrioritySort mock array sorted by priority
+//PrioritySort mock array sorted by priority
 type PrioritySort []mock.Definition
 
 func (s PrioritySort) Len() int {

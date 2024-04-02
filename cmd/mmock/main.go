@@ -22,16 +22,16 @@ import (
 	"github.com/jmartin82/mmock/v3/pkg/vars/fake"
 )
 
-// VERSION of the application
+//VERSION of the application
 var VERSION string = "development"
 
-// ErrNotFoundPath error from missing or configuration path
+//ErrNotFoundPath error from missing or configuration path
 var ErrNotFoundPath = errors.New("Configuration path not found")
 
-// ErrNotFoundDefaultPath if we can't resolve the current path
+//ErrNotFoundDefaultPath if we can't resolve the current path
 var ErrNotFoundDefaultPath = errors.New("We can't determinate the current path")
 
-// ErrNotFoundAnyMock when we don't found any valid mock config to load
+//ErrNotFoundAnyMock when we don't found any valid mock config to load
 var ErrNotFoundAnyMock = errors.New("No valid mock config found")
 
 func banner() {
