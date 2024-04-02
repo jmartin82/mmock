@@ -210,6 +210,52 @@ func TestMatchQueryMultiStringGlob(t *testing.T) {
 	}
 }
 
+func TestMatchQueryStringRegexp(t *testing.T) {
+	rval := make(mock.Values)
+	rval["test"] = []string{"test"}
+	req := mock.Request{}
+	req.QueryStringParameters = rval
+
+	m := mock.Definition{}
+	mval := make(mock.Values)
+	mval["test"] = []string{"^t.*t$"}
+	m.Request.QueryStringParameters = mval
+
+	mm := Request{}
+	if b, err := mm.Match(&req, &m, true); !b {
+		t.Error(err)
+	}
+
+	mval["test2"] = []string{"tes.*\\d"}
+	if b, err := mm.Match(&req, &m, true); b {
+		t.Error(err)
+	}
+}
+
+func TestMatchQueryMultiStringRegexp(t *testing.T) {
+	rval := make(mock.Values)
+	rval["first"] = []string{"test"}
+	rval["second"] = []string{"another_test"}
+	req := mock.Request{}
+	req.QueryStringParameters = rval
+
+	m := mock.Definition{}
+	mval := make(mock.Values)
+	mval["first"] = []string{"t.*"}
+	mval["second"] = []string{"another[-_@]test"}
+	m.Request.QueryStringParameters = mval
+
+	mm := Request{}
+	if b, err := mm.Match(&req, &m, true); !b {
+		t.Error(err)
+	}
+
+	mval["first"] = []string{"t*"}
+	mval["second"] = []string{"*another_test_2"}
+	if b, err := mm.Match(&req, &m, true); b {
+		t.Error(err)
+	}
+}
 func TestMatchCookies(t *testing.T) {
 	rval := make(mock.Cookies)
 	rval["test"] = "test"

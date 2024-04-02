@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
 	"regexp"
 	"strings"
 
@@ -67,9 +66,10 @@ func (mm Request) matchKeyAndValues(reqMap mock.Values, mockMap mock.Values) boo
 				}
 			} else {
 
-				if DEBUG {
+				// TODO: wrap to conditionally write
+				// if DEBUG {
 					log.Printf("value %v doesn't appear in mock", key)
-				}
+				// }
 
 				return false
 			}
@@ -83,18 +83,21 @@ type valueMatcher func(string, string) bool
 func globMatch(m string, v string) bool {
 
 	matched := ((strings.Contains(m, glob.GLOB) && glob.Glob(m, v)) || (m == v))
-	if DEBUG {
+				 
+	// TODO: wrap to conditionally write
+	// if DEBUG {
 		log.Printf("value %v globMatch %v: %v", v, m, matched)
-	}
+	// }
 
 	return matched
 }
 
 func regexpMatch(m string, v string) bool {
 	matched, err := regexp.MatchString(m, fmt.Sprint(v))
-	if DEBUG {
+	// TODO: wrap to conditionally write
+	// if DEBUG {
 		log.Printf("value %v regexpMatch %v: %v [%v]", v, m, matched, err)
-	}
+	// }
 
 	return (err == nil && matched)
 }
