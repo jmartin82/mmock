@@ -3,23 +3,21 @@ package server
 import (
 	"bytes"
 	"fmt"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
-
-	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 // HandleCallback makes a callback required after a request
 func HandleCallback(cb mock.Callback) (*http.Response, error) {
 	if d := cb.Delay.Duration; d > 0 {
-		log.Printf("Delaying callback by: %s\n", d)
+		log.Infof("Delaying callback by: %s\n", d)
 		time.Sleep(d)
 	}
 
 	url := cb.Url
-	log.Printf("Making callback to %s\n", url)
+	log.Infof("Making callback to %s\n", url)
 	req, err := http.NewRequest(cb.Method, url, bytes.NewBufferString(cb.Body))
 	if err != nil {
 		return nil, fmt.Errorf("Error creating HTTP request: %w", err)

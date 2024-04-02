@@ -3,14 +3,16 @@ package match
 import (
 	"errors"
 	"fmt"
-	"strings"
-
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
 	"github.com/jmartin82/mmock/v3/pkg/match/payload"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"github.com/jmartin82/mmock/v3/pkg/route"
-
 	"github.com/ryanuber/go-glob"
+	"os"
+	"strings"
 )
+
+var log = logger.Log
 
 var (
 	ErrCookiesNotMatch  = errors.New("Cookies not match")
@@ -28,8 +30,9 @@ type Request struct {
 }
 
 func (mm Request) matchKeyAndValues(reqMap mock.Values, mockMap mock.Values) bool {
-
 	if len(mockMap) > len(reqMap) {
+			log.Debugf("mock contains more values [%d] than request [%d]",
+				len(mockMap), len(reqMap))
 
 		return false
 	}
@@ -38,11 +41,16 @@ func (mm Request) matchKeyAndValues(reqMap mock.Values, mockMap mock.Values) boo
 		if rval, exists := reqMap[key]; exists {
 
 			if len(mval) > len(rval) {
+				log.Debugf("length of mock value [%d] > request value [%d]",
+					len(mval), len(rval))
+
 				return false
 			}
 
 			for i, v := range mval {
 				if (!strings.Contains(v, glob.GLOB) && v != rval[i]) || !glob.Glob(v, rval[i]) {
+					log.Debugf("value [%v] doesn't match mock [%v]", rval[i], v)
+
 					return false
 				}
 			}
@@ -52,10 +60,15 @@ func (mm Request) matchKeyAndValues(reqMap mock.Values, mockMap mock.Values) boo
 
 				for i, v := range mval {
 					if (!strings.Contains(v, glob.GLOB) && v != rval[i]) || !glob.Glob(v, rval[i]) {
+						log.Debugf("value [%v] doesn't match mock [%v]", rval[i], v)
+
 						return false
 					}
 				}
 			} else {
+				log.Debugf("value [%v] doesn't appear in mock", key)
+			}
+
 				return false
 			}
 		}
