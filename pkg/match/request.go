@@ -153,7 +153,7 @@ func (mm Request) Match(req *mock.Request, mock *mock.Definition, scenarioAware 
 	}
 
 	if !glob.Glob(mock.Request.Path, req.Path) && route.Match(req.Path) == nil {
-		return false, fmt.Errorf("Path not match. Actual: %s, Expected: %s", req.Path, mock.Request.Path)
+		return false, fmt.Errorf("%w Actual: %s, Expected: %s", ErrPathNotMatch, req.Path, mock.Request.Path)
 	}
 
 	if !mm.mockIncludesMethod(req.Method, &mock.Request) {
