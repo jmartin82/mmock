@@ -628,7 +628,7 @@ You can always disable this behavior adding the following flag `-server-statisti
 - Enviroment variables as mock variables thanks to [@marcoreni](https://github.com/marcoreni)
 - Support Regular Expressions for Field Values in JSON Request Body thanks to [@rosspatil](https://github.com/rosspatil)
 - Improved logging with levels thanks to [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
-- Support for Regular Expressions for QueryStringParameters @jcdietrich [@jdietrich-tc](https://github.com/jdietrich-tc)
+- Support for Regular Expressions for QueryStringParameters [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
 
 ### Contributing
 
