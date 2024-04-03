@@ -30,8 +30,8 @@ type Request struct {
 
 func (mm Request) matchKeyAndValues(reqMap mock.Values, mockMap mock.Values) bool {
 	if len(mockMap) > len(reqMap) {
-			log.Debugf("mock contains more values [%d] than request [%d]",
-				len(mockMap), len(reqMap))
+		log.Debugf("mock contains more values [%d] than request [%d]",
+			len(mockMap), len(reqMap))
 
 		return false
 	}
