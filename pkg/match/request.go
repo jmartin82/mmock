@@ -3,7 +3,6 @@ package match
 import (
 	"errors"
 	"fmt"
-	"log"
 	"regexp"
 	"strings"
 
