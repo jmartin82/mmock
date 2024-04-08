@@ -128,6 +128,16 @@ To configure Mmock, use command line flags described in help.
 		TLS config folder (server.crt and server.key should be inside) (default "execution_path/tls")
 ```
 
+The default logging level is INFO, but you can change it by setting the
+environment variable LOG_LEVEL to one of the following:
+
+  * CRITICAL
+  * ERROR
+  * WARNING
+  * NOTICE
+  * INFO
+  * DEBUG
+
 ### Mock
 
 Mock definition:
@@ -614,6 +624,7 @@ You can always disable this behavior adding the following flag `-server-statisti
 - Thanks to [@joel-44](https://github.com/joel-44) for bug fixing 
 - Enviroment variables as mock variables thanks to [@marcoreni](https://github.com/marcoreni)
 - Support Regular Expressions for Field Values in JSON Request Body thanks to [@rosspatil](https://github.com/rosspatil)
+- Improved logging with levels thanks to [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
 
 ### Contributing
 

@@ -4,13 +4,9 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
-
-	"log"
-
 	"github.com/jmartin82/mmock/v3/internal/config"
-	"github.com/jmartin82/mmock/v3/pkg/mock"
-
 	"github.com/jmartin82/mmock/v3/pkg/match"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 // RequestResolver contains the functions to check the http request and return the matching mock.
@@ -65,7 +61,7 @@ func (rr *Router) Resolve(req *mock.Request) (*mock.Definition, *match.Result) {
 		}
 		mLog.Errors = append(mLog.Errors, match.Error{URI: m.URI, Reason: err.Error()})
 		if !errors.Is(err, match.ErrPathNotMatch) {
-			log.Printf("Discarding mock: %s Reason: %s\n", m.URI, err.Error())
+			log.Infof("Discarding mock: %s Reason: %s\n", m.URI, err.Error())
 		}
 	}
 	return getNotFoundResult(), mLog

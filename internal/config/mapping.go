@@ -2,16 +2,17 @@ package config
 
 import (
 	"errors"
-	"log"
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"os"
 	"path"
 	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
-
-	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
+
+var log = logger.Log
 
 var ErrFilePathIsNotUnderConfigPath = errors.New("File path is not under config path")
 var ErrMockDoesntExist = errors.New("Definition doesn't exist")
@@ -127,7 +128,7 @@ func (fm *ConfigMapping) populate() {
 		if !fileInfo.IsDir() {
 			URI := strings.TrimPrefix(filePath, fm.path)
 			if err := fm.load(URI); err != nil {
-				log.Printf("Error %v. Loading config: %v\n", err, URI)
+				log.Errorf("Error %v. Loading config: %v\n", err, URI)
 			}
 		}
 		return nil
@@ -162,7 +163,7 @@ func (fm *ConfigMapping) resolveFile(URI string) (string, error) {
 	}
 
 	if !strings.HasPrefix(filename, fm.path) {
-		log.Printf("File path not under the config path\n")
+		log.Error("File path not under the config path\n")
 		return "", ErrFilePathIsNotUnderConfigPath
 	}
 	return filename, nil
