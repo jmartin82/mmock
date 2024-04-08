@@ -2,17 +2,15 @@ package vars
 
 import (
 	"fmt"
+	xj "github.com/basgys/goxml2json"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/route"
+	"github.com/tidwall/gjson"
 	"net/url"
 	"os"
 	"regexp"
 	"sort"
 	"strings"
-
-	"github.com/jmartin82/mmock/v3/pkg/mock"
-	"github.com/jmartin82/mmock/v3/pkg/route"
-
-	xj "github.com/basgys/goxml2json"
-	"github.com/tidwall/gjson"
 )
 
 type Request struct {
@@ -184,7 +182,6 @@ func (rp Request) getBodyParam(name string) (string, bool) {
 func (rp Request) getXmlBodyParam(body string, name string) (string, bool) {
 	xml := strings.NewReader(body)
 	json, err := xj.Convert(xml)
-	//log.Printf("XML to JSON: %v", json)
 
 	if err != nil {
 		return "", false
