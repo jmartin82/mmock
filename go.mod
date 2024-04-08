@@ -14,7 +14,7 @@ require (
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/myesui/uuid v1.0.0 // indirect
-	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
+	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/radovskyb/watcher v1.0.7
 	github.com/ryanuber/go-glob v1.0.0
 	github.com/stathat/go v1.0.0
