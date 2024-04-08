@@ -227,6 +227,12 @@ Query strings and headers support also global matches (*) in the header/paramete
 		}
 ```
 
+Regexp matching is available for:
+- body
+- query strings
+
+See https://pkg.go.dev/regexp/syntax for regexp syntax
+
 #### Response (Optional on proxy call)
 
 * *statusCode*: Response status code
@@ -622,6 +628,7 @@ You can always disable this behavior adding the following flag `-server-statisti
 - Enviroment variables as mock variables thanks to [@marcoreni](https://github.com/marcoreni)
 - Support Regular Expressions for Field Values in JSON Request Body thanks to [@rosspatil](https://github.com/rosspatil)
 - Improved logging with levels thanks to [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
+- Support for Regular Expressions for QueryStringParameters [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
 
 ### Contributing
 
