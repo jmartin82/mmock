@@ -49,7 +49,6 @@ func (mm Request) matchKeyAndValues(reqMap mock.Values, mockMap mock.Values) boo
 				return false
 			}
 
-
 			if !((mm.matchKey(rval, mval, globMatch)) ||
 				(mm.matchKey(rval, mval, regexpMatch))) {
 
@@ -57,6 +56,7 @@ func (mm Request) matchKeyAndValues(reqMap mock.Values, mockMap mock.Values) boo
 			}
 
 		} else {
+
 			if rval, exists = mm.findByPartialKey(reqMap, key); exists {
 
 				if !((mm.matchKey(rval, mval, globMatch)) ||
@@ -65,13 +65,9 @@ func (mm Request) matchKeyAndValues(reqMap mock.Values, mockMap mock.Values) boo
 					return false
 				}
 			} else {
+			  log.Debugf("value %v doesn't appear in mock", key)
 
-				// TODO: wrap to conditionally write
-				// if DEBUG {
-					log.Printf("value %v doesn't appear in mock", key)
-				// }
-
-				return false
+			  return false
 			}
 		}
 	}
@@ -83,21 +79,14 @@ type valueMatcher func(string, string) bool
 func globMatch(m string, v string) bool {
 
 	matched := ((strings.Contains(m, glob.GLOB) && glob.Glob(m, v)) || (m == v))
-				 
-	// TODO: wrap to conditionally write
-	// if DEBUG {
-		log.Printf("value %v globMatch %v: %v", v, m, matched)
-	// }
+	log.Debugf("value %v globMatch %v: %v", v, m, matched)
 
 	return matched
 }
 
 func regexpMatch(m string, v string) bool {
 	matched, err := regexp.MatchString(m, fmt.Sprint(v))
-	// TODO: wrap to conditionally write
-	// if DEBUG {
-		log.Printf("value %v regexpMatch %v: %v [%v]", v, m, matched, err)
-	// }
+	log.Debugf("value %v regexpMatch %v: %v [%v]", v, m, matched, err)
 
 	return (err == nil && matched)
 }
