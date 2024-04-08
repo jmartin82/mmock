@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-//HTTP is and adaptor beteewn the http and mock config.
+// HTTP is and adaptor beteewn the http and mock config.
 type HTTP struct {
 }
 
-//BuildRequestDefinitionFromHTTP Read the request config and return a mock request.
+// BuildRequestDefinitionFromHTTP Read the request config and return a mock request.
 func (t HTTP) BuildRequestDefinitionFromHTTP(req *http.Request) Request {
 
 	res := Request{}
@@ -67,7 +67,7 @@ func getHostAndPort(req *http.Request) (string, string) {
 	return host, "80"
 }
 
-//WriteHTTPResponseFromDefinition read a mock response and write a http response.
+// WriteHTTPResponseFromDefinition read a mock response and write a http response.
 func (t HTTP) WriteHTTPResponseFromDefinition(fr *Response, w http.ResponseWriter) {
 
 	for header, values := range fr.Headers {

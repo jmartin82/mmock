@@ -3,12 +3,14 @@ package payload
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
 	"reflect"
 	"regexp"
 	"strings"
 	"log"
 )
+
+var log = logger.Log
 
 type JSONComparator struct {
 }
@@ -31,11 +33,12 @@ func (jc *JSONComparator) doCompareJSONRegex(jsonWithPatterns, jsonWithValues st
 	var patterns map[string]interface{}
 	var values map[string]interface{}
 	if err := json.Unmarshal([]byte(jsonWithPatterns), &patterns); err != nil {
-  log.Printf("error in json patterns: %v", err)
+		log.Errorf("error in json patterns: %v", err)
 		return false
 	}
+
 	if err := json.Unmarshal([]byte(jsonWithValues), &values); err != nil {
-  log.Printf("error in json values: %v", err)
+		log.Errorf("error in json values: %v", err)
 		return false
 	}
 	return jc.doCompareJSONRegexUnmarshaled(patterns, values)
@@ -46,9 +49,12 @@ func (jc *JSONComparator) doCompareArrayRegex(jsonWithPatterns, jsonWithValues s
 	var values []map[string]interface{}
 
 	if err := json.Unmarshal([]byte(jsonWithPatterns), &patterns); err != nil {
+		log.Errorf("error in json patterns: %v", err)
+
 		return false
 	}
 	if err := json.Unmarshal([]byte(jsonWithValues), &values); err != nil {
+		log.Errorf("error in json patterns: %v", err)
 		return false
 	}
 	return jc.doCompareArrayRegexUnmarshaled(patterns, values)
@@ -70,10 +76,12 @@ func (jc *JSONComparator) match(p, v map[string]interface{}) bool {
 	for field, pattern := range p {
 
 		value, exists := v[field]
-			log.Printf("comparing field %v with pattern %v against value %v",
-				field, pattern, value)
+		log.Debugf("comparing field %v with pattern %v against value %v",
+			field, pattern, value)
 
 		if !exists {
+			log.Debugf("field doesn't exist: %v", field)
+
 			return false
 		}
 		str, ok := pattern.(string)
@@ -127,8 +135,7 @@ func (jc *JSONComparator) match(p, v map[string]interface{}) bool {
 		}
 		matched, err := regexp.MatchString(str, fmt.Sprint(value))
 		if err != nil || !matched {
-				log.Printf("value %v doesn't match %v : %v", fmt.Sprint(value), str, err)
-
+			log.Debugf("value %v doesn't match %v : %v", fmt.Sprint(value), str, err)
 			return false
 		}
 	}
@@ -138,8 +145,7 @@ func (jc *JSONComparator) match(p, v map[string]interface{}) bool {
 func (jc *JSONComparator) Compare(s1, s2 string) bool {
 
 	if isArray(s1) != isArray(s2) {
-			log.Printf("only one of these is an array %v %v", s1, s2)
-
+		log.Debugf("only one of these is an array %v %v", s1, s2)
 		return false
 	}
 

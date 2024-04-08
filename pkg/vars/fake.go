@@ -2,18 +2,16 @@ package vars
 
 import (
 	"errors"
-	"log"
+	"github.com/jmartin82/mmock/v3/pkg/vars/fake"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/jmartin82/mmock/v3/pkg/vars/fake"
 )
 
 var errMissingParameterValue = errors.New("The requested method needs input parameters which are not supplied!")
 
-//Fake parses the data looking for fake data tags or request data tags
+// Fake parses the data looking for fake data tags or request data tags
 type Fake struct {
 	Fake fake.Generator
 }
@@ -81,7 +79,7 @@ func (fv Fake) callMethod(name string) (string, bool) {
 
 					result, err := fv.call(data, method.Name)
 					if err != nil {
-						log.Println(err.Error())
+						log.Error(err.Error())
 					}
 					return result, err == nil
 				}

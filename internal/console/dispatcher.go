@@ -3,33 +3,32 @@ package console
 import (
 	"errors"
 	"fmt"
-	"log"
+	assetfs "github.com/elazarl/go-bindata-assetfs"
+	"github.com/jmartin82/mmock/v3/internal/config"
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
+	"github.com/jmartin82/mmock/v3/internal/statistics"
+	"github.com/jmartin82/mmock/v3/pkg/match"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
+	"github.com/labstack/echo/v4"
+	"golang.org/x/net/websocket"
 	"net/http"
 	"regexp"
 	"strconv"
-
 	"strings"
-
-	assetfs "github.com/elazarl/go-bindata-assetfs"
-	"github.com/jmartin82/mmock/v3/internal/config"
-	"github.com/jmartin82/mmock/v3/pkg/match"
-	"github.com/jmartin82/mmock/v3/pkg/mock"
-
-	"github.com/jmartin82/mmock/v3/internal/statistics"
-	"github.com/labstack/echo/v4"
-	"golang.org/x/net/websocket"
 )
+
+var log = logger.Log
 
 var pagePattern = regexp.MustCompile(`^[1-9]([0-9]+)?$`)
 
-//ErrInvalidPage the page parameters is invalid
+// ErrInvalidPage the page parameters is invalid
 var ErrInvalidPage = errors.New("Invalid page")
 
 type ActionResponse struct {
 	Result string `json:"result"`
 }
 
-//Dispatcher is the http console server.
+// Dispatcher is the http console server.
 type Dispatcher struct {
 	IP             string
 	Port           int
@@ -63,7 +62,7 @@ func (di *Dispatcher) logFanOut() {
 	}
 }
 
-//Start initiates the http console.
+// Start initiates the http console.
 func (di *Dispatcher) Start() {
 	e := echo.New()
 	e.HideBanner = true
@@ -109,7 +108,7 @@ func (di *Dispatcher) Start() {
 	e.Logger.Fatal(e.Start(addr))
 }
 
-//CONSOLE
+// CONSOLE
 func (di *Dispatcher) consoleHandler(c echo.Context) error {
 	statistics.TrackConsoleRequest()
 	tmpl, _ := Asset("tmpl/index.html")
@@ -139,7 +138,7 @@ func (di *Dispatcher) getMappingUri(path string) string {
 	return strings.TrimPrefix(path, root)
 }
 
-//API REQUEST
+// API REQUEST
 func (di *Dispatcher) mappingListHandler(c echo.Context) (err error) {
 	mocks := di.Mapping.List()
 	return c.JSON(http.StatusOK, mocks)
@@ -196,7 +195,7 @@ func (di *Dispatcher) mappingCreateHandler(c echo.Context) (err error) {
 
 	if err = c.Bind(mock); err != nil {
 		ar := &ActionResponse{
-			Result: "invalid_mock_definition",
+			Result: fmt.Sprintf("invalid_mock_definition: %s", err),
 		}
 		return c.JSON(http.StatusBadRequest, ar)
 	}
@@ -227,7 +226,7 @@ func (di *Dispatcher) mappingUpdateHandler(c echo.Context) (err error) {
 
 	if err = c.Bind(mock); err != nil {
 		ar := &ActionResponse{
-			Result: "invalid_mock_definition",
+			Result: fmt.Sprintf("invalid_mock_definition: %s", err),
 		}
 		return c.JSON(http.StatusBadRequest, ar)
 	}
@@ -351,7 +350,7 @@ func (di *Dispatcher) pageParamToInt(c echo.Context) (int, error) {
 
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
-		log.Println(ErrInvalidPage, err)
+		log.Errorf("%v %v", ErrInvalidPage, err)
 		return 0, ErrInvalidPage
 	}
 

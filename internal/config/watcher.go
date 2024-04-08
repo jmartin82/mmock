@@ -1,13 +1,11 @@
 package config
 
 import (
-	"log"
-	"time"
-
 	"github.com/radovskyb/watcher"
+	"time"
 )
 
-//Watcher interface contains the function watching process
+// Watcher interface contains the function watching process
 type Watcher interface {
 	Bind()
 	UnBind()
@@ -29,7 +27,7 @@ func (fw *FileWatcher) UnBind() {
 	}
 }
 
-//Bind start the watching process to detect any change on defintions
+// Bind start the watching process to detect any change on defintions
 func (fw *FileWatcher) Bind() {
 
 	fw.watcher = watcher.New()
@@ -40,24 +38,24 @@ func (fw *FileWatcher) Bind() {
 		for {
 			select {
 			case event := <-fw.watcher.Event:
-				log.Println("Changes detected in mock definitions ", event.String())
+				log.Infof("Changes detected in mock definitions ", event.String())
 				fw.fsUpdate <- struct{}{}
 			case err := <-fw.watcher.Error:
-				log.Println("File monitor error", err)
+				log.Errorf("File monitor error", err)
 			}
 		}
 	}()
 
 	// Watch dir recursively for changes.
 	if err := fw.watcher.AddRecursive(fw.path); err != nil {
-		log.Println("Impossible bind the config folder to the files monitor: ", err)
+		log.Errorf("Impossible bind the config folder to the files monitor: ", err)
 		return
 	}
 
 	go func() {
-		log.Println("File monitor started")
+		log.Info("File monitor started")
 		if err := fw.watcher.Start(time.Millisecond * 100); err != nil {
-			log.Println("Impossible to start the config files monitor: ", err)
+			log.Errorf("Impossible to start the config files monitor: ", err)
 		}
 	}()
 
