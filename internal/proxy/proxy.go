@@ -2,11 +2,13 @@ package proxy
 
 import (
 	"bytes"
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
+
+var log = logger.Log
 
 type HttpClient interface {
 	Do(req *http.Request) (*http.Response, error)
@@ -22,7 +24,7 @@ type Proxy struct {
 func (pr *Proxy) MakeRequest(request *mock.Request) *mock.Response {
 
 	r := &mock.Response{}
-	log.Println("Proxy to URL:>", pr.URL)
+	log.Infof("Proxy to URL:>", pr.URL)
 	req, err := http.NewRequest(request.Method, pr.URL, bytes.NewBufferString(request.Body))
 	for h, values := range request.Headers {
 		for _, value := range values {
@@ -38,12 +40,12 @@ func (pr *Proxy) MakeRequest(request *mock.Request) *mock.Response {
 	}
 	req.URL.RawQuery = q.Encode()
 
-	log.Println("Query string parameters: ", req.URL.RawQuery)
-	log.Println("Request body: ", req.Body)
+	log.Infof("Query string parameters: ", req.URL.RawQuery)
+	log.Infof("Request body: ", req.Body)
 
 	resp, err := pr.Client.Do(req)
 	if err != nil {
-		log.Println("Impossible create a proxy request: ", err)
+		log.Errorf("Impossible create a proxy request: ", err)
 		r.StatusCode = http.StatusInternalServerError
 		return r
 	}

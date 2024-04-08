@@ -4,13 +4,13 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/jmartin82/mmock/v3/internal/config"
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
 	"github.com/jmartin82/mmock/v3/internal/config/parser"
 	"github.com/jmartin82/mmock/v3/internal/console"
 	"github.com/jmartin82/mmock/v3/internal/server"
@@ -33,6 +33,8 @@ var ErrNotFoundDefaultPath = errors.New("We can't determinate the current path")
 
 // ErrNotFoundAnyMock when we don't found any valid mock config to load
 var ErrNotFoundAnyMock = errors.New("No valid mock config found")
+
+var log = logger.Log
 
 func banner() {
 	fmt.Printf("MMock v %s", VERSION)
@@ -65,7 +67,7 @@ func getOutboundIP() string {
 	}
 	defer conn.Close()
 
-	log.Println("Getting external IP")
+	log.Info("Getting external IP")
 	localAddr := conn.LocalAddr().String()
 	idx := strings.LastIndex(localAddr, ":")
 
@@ -90,7 +92,7 @@ func existsConfigPath(path string) bool {
 func getMapping(path string) config.Mapping {
 	path, _ = filepath.Abs(path)
 	if !existsConfigPath(path) {
-		log.Fatalln(ErrNotFoundPath.Error())
+		log.Fatal(ErrNotFoundPath.Error())
 	}
 
 	fsMapper := config.NewFileSystemMapper()
@@ -196,11 +198,11 @@ func main() {
 	defer statistics.Stop()
 
 	go startServer(*sIP, *sPort, *sPortTLS, *cTLS, done, router, mLog, scenario, varsProcessor, spy)
-	log.Printf("HTTP Server running at http://%s:%d\n", *sIP, *sPort)
-	log.Printf("HTTPS Server running at https://%s:%d\n", *sIP, *sPortTLS)
+	log.Infof("HTTP Server running at http://%s:%d\n", *sIP, *sPort)
+	log.Infof("HTTPS Server running at https://%s:%d\n", *sIP, *sPortTLS)
 	if *console {
 		go startConsole(*cIP, *cPort, *cResultsPerPage, spy, scenario, mapping, done, mLog)
-		log.Printf("Console running at http://%s:%d\n", *cIP, *cPort)
+		log.Infof("Console running at http://%s:%d\n", *cIP, *cPort)
 	}
 
 	<-done

@@ -2,12 +2,14 @@ package vars
 
 import (
 	"fmt"
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"regexp"
 	"strings"
 )
+
+var log = logger.Log
 
 var re = regexp.MustCompile(`(?m)\((.*)\)`)
 
@@ -30,7 +32,7 @@ func (st Stream) Fill(holders []string) map[string][]string {
 func (st Stream) getOutput(o []byte, err error) string {
 
 	if err != nil {
-		log.Printf("Impossible read mock stream: %s", err)
+		log.Errorf("Impossible read mock stream: %s", err)
 		return fmt.Sprintf("ERROR: %s", err.Error())
 	}
 	return string(o)

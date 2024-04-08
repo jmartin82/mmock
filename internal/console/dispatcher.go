@@ -3,22 +3,21 @@ package console
 import (
 	"errors"
 	"fmt"
-	"log"
+	assetfs "github.com/elazarl/go-bindata-assetfs"
+	"github.com/jmartin82/mmock/v3/internal/config"
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
+	"github.com/jmartin82/mmock/v3/internal/statistics"
+	"github.com/jmartin82/mmock/v3/pkg/match"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
+	"github.com/labstack/echo/v4"
+	"golang.org/x/net/websocket"
 	"net/http"
 	"regexp"
 	"strconv"
-
 	"strings"
-
-	assetfs "github.com/elazarl/go-bindata-assetfs"
-	"github.com/jmartin82/mmock/v3/internal/config"
-	"github.com/jmartin82/mmock/v3/pkg/match"
-	"github.com/jmartin82/mmock/v3/pkg/mock"
-
-	"github.com/jmartin82/mmock/v3/internal/statistics"
-	"github.com/labstack/echo/v4"
-	"golang.org/x/net/websocket"
 )
+
+var log = logger.Log
 
 var pagePattern = regexp.MustCompile(`^[1-9]([0-9]+)?$`)
 
@@ -351,7 +350,7 @@ func (di *Dispatcher) pageParamToInt(c echo.Context) (int, error) {
 
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
-		log.Println(ErrInvalidPage, err)
+		log.Errorf("%v %v", ErrInvalidPage, err)
 		return 0, ErrInvalidPage
 	}
 
