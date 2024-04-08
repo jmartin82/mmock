@@ -4,7 +4,6 @@ debug.test
 data/*
 /vendor
 coverage.txt
-.github
 dist
 .vscode
 .idea
