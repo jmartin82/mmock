@@ -3,14 +3,17 @@ package match
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
 	"github.com/jmartin82/mmock/v3/pkg/match/payload"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"github.com/jmartin82/mmock/v3/pkg/route"
-
 	"github.com/ryanuber/go-glob"
 )
+
+var log = logger.Log
 
 var (
 	ErrCookiesNotMatch  = errors.New("Cookies not match")
@@ -28,8 +31,9 @@ type Request struct {
 }
 
 func (mm Request) matchKeyAndValues(reqMap mock.Values, mockMap mock.Values) bool {
-
 	if len(mockMap) > len(reqMap) {
+		log.Debugf("mock contains more values [%d] than request [%d]",
+			len(mockMap), len(reqMap))
 
 		return false
 	}
@@ -38,29 +42,62 @@ func (mm Request) matchKeyAndValues(reqMap mock.Values, mockMap mock.Values) boo
 		if rval, exists := reqMap[key]; exists {
 
 			if len(mval) > len(rval) {
+				log.Debugf("length of mock value [%d] > request value [%d]",
+					len(mval), len(rval))
+
 				return false
 			}
 
-			for i, v := range mval {
-				if (!strings.Contains(v, glob.GLOB) && v != rval[i]) || !glob.Glob(v, rval[i]) {
-					return false
-				}
+			if !((mm.matchKey(rval, mval, globMatch)) ||
+				(mm.matchKey(rval, mval, regexpMatch))) {
+
+				return false
 			}
 
 		} else {
+
 			if rval, exists = mm.findByPartialKey(reqMap, key); exists {
 
-				for i, v := range mval {
-					if (!strings.Contains(v, glob.GLOB) && v != rval[i]) || !glob.Glob(v, rval[i]) {
-						return false
-					}
+				if !((mm.matchKey(rval, mval, globMatch)) ||
+					(mm.matchKey(rval, mval, regexpMatch))) {
+
+					return false
 				}
 			} else {
-				return false
+			  log.Debugf("value %v doesn't appear in mock", key)
+
+			  return false
 			}
 		}
 	}
 	return true
+}
+
+type valueMatcher func(string, string) bool
+
+func globMatch(m string, v string) bool {
+
+	matched := ((strings.Contains(m, glob.GLOB) && glob.Glob(m, v)) || (m == v))
+	log.Debugf("value %v globMatch %v: %v", v, m, matched)
+
+	return matched
+}
+
+func regexpMatch(m string, v string) bool {
+	matched, err := regexp.MatchString(m, fmt.Sprint(v))
+	log.Debugf("value %v regexpMatch %v: %v [%v]", v, m, matched, err)
+
+	return (err == nil && matched)
+}
+
+func (mm Request) matchKey(rval []string, mval []string, findMatch valueMatcher) bool {
+	for i, m := range mval {
+		if findMatch(m, rval[i]) {
+
+			return true
+		}
+	}
+	return false
 }
 
 func (mm Request) findByPartialKey(reqMap mock.Values, partialMatch string) ([]string, bool) {

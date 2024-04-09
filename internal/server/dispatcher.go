@@ -6,25 +6,24 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"math/rand"
-	"net/http"
-	"path/filepath"
-	"strconv"
-	"time"
-
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
 	"github.com/jmartin82/mmock/v3/internal/proxy"
-	"github.com/jmartin82/mmock/v3/pkg/match"
-
-	"net/url"
-	"regexp"
-	"strings"
-
 	"github.com/jmartin82/mmock/v3/internal/statistics"
+	"github.com/jmartin82/mmock/v3/pkg/match"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"github.com/jmartin82/mmock/v3/pkg/vars"
+	"io/ioutil"
+	"math/rand"
+	"net/http"
+	"net/url"
+	"path/filepath"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
 )
+
+var log = logger.Log
 
 // Dispatcher is the mock http server
 type Dispatcher struct {
@@ -53,19 +52,19 @@ func (di Dispatcher) randomStatusCode(currentStatus int) int {
 }
 
 func (di Dispatcher) callWebHook(url string, match *match.Transaction) {
-	log.Printf("Running webhook: %s\n", url)
+	log.Infof("Running webhook: %s\n", url)
 	content, err := json.Marshal(match)
 	if err != nil {
-		log.Println("Impossible encode the WebHook payload")
+		log.Error("Impossible encode the WebHook payload")
 		return
 	}
 	reader := bytes.NewReader(content)
 	resp, err := http.Post(url, "application/json", reader)
 	if err != nil {
-		log.Printf("Impossible send payload to: %s\n", url)
+		log.Errorf("Impossible send payload to: %s\n", url)
 		return
 	}
-	log.Printf("WebHook response: %d\n", resp.StatusCode)
+	log.Infof("WebHook response: %d\n", resp.StatusCode)
 }
 
 // ServerHTTP is the mock http server request handler.
@@ -77,7 +76,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	log.Printf("New request: %s %s\n", req.Method, req.URL.String())
+	log.Infof("New request: %s %s\n", req.Method, req.URL.String())
 
 	mock, transaction := di.getMatchingResult(&mRequest)
 
@@ -101,9 +100,9 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		go func() {
 			_, err := HandleCallback(mock.Callback)
 			if err != nil {
-				log.Printf("Error from HandleCallback: %s", err)
+				log.Errorf("Error from HandleCallback: %s", err)
 			} else {
-				log.Println("Callback made successfully")
+				log.Info("Callback made successfully")
 			}
 		}()
 	}
@@ -141,7 +140,7 @@ func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition
 	var response *mock.Response
 	mock, result := di.Resolver.Resolve(request)
 
-	log.Printf("Definition match found: %s. Name : %s\n", strconv.FormatBool(result.Found), mock.URI)
+	log.Infof("Definition match found: %s. Name : %s\n", strconv.FormatBool(result.Found), mock.URI)
 
 	if result.Found {
 		if len(mock.Control.ProxyBaseURL) > 0 {
@@ -153,11 +152,11 @@ func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition
 		}
 
 		if mock.Control.Crazy {
-			log.Println("Running crazy mode")
+			log.Info("Running crazy mode")
 			response.StatusCode = di.randomStatusCode(response.StatusCode)
 		}
 		if d := mock.Control.Delay.Duration; d > 0 {
-			log.Printf("Adding a delay of: %s\n", d)
+			log.Infof("Adding a delay of: %s\n", d)
 			time.Sleep(d)
 		}
 
@@ -186,7 +185,7 @@ func (di Dispatcher) Start() {
 	go func() {
 		err := di.listenAndServeTLS(addrTLS)
 		if err != nil {
-			log.Println("Impossible start the application.")
+			log.Errorf("Impossible start the application.")
 			errCh <- err
 		}
 	}()
@@ -204,7 +203,7 @@ func (di Dispatcher) listenAndServeTLS(addrTLS string) error {
 	pattern := fmt.Sprintf("%s/*.crt", di.ConfigTLS)
 	files, err := filepath.Glob(pattern)
 	if err != nil || len(files) == 0 {
-		log.Println("TLS certificates not found, impossible to start the TLS server.")
+		log.Info("TLS certificates not found, impossible to start the TLS server.")
 		return nil
 	}
 
@@ -213,7 +212,7 @@ func (di Dispatcher) listenAndServeTLS(addrTLS string) error {
 		name := crt[0 : len(crt)-len(extension)]
 
 		if filepath.Base(crt) == "ca.crt" {
-			log.Println("Found ca cert", crt)
+			log.Info("Found ca cert", crt)
 			ca, err := ioutil.ReadFile(crt)
 			if err != nil {
 				return fmt.Errorf("could not load CA Certificate '%s'", crt)
@@ -224,13 +223,13 @@ func (di Dispatcher) listenAndServeTLS(addrTLS string) error {
 				return fmt.Errorf("could not append ca cert '%s' to CertPool", crt)
 			}
 
-			log.Println("Added ca certificate to server ", crt)
+			log.Infof("Added ca certificate to server ", crt)
 			tlsConfig.RootCAs = certPool
 			continue
 		}
 
 		key := fmt.Sprint(name, ".key")
-		log.Printf("Loading X509KeyPair (%s/%s)\n", filepath.Base(crt), filepath.Base(key))
+		log.Infof("Loading X509KeyPair (%s/%s)\n", filepath.Base(crt), filepath.Base(key))
 		certificate, err := tls.LoadX509KeyPair(crt, key)
 		if err != nil {
 			return fmt.Errorf("Invalid certificate: %v", crt)

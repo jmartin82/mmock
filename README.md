@@ -3,8 +3,6 @@ I am maintaining all of my changes to this fork in the [jcd-all](https://github.
 
 ![Mmock](/docs/logo.png "Mmock logo")
 =========
-[![Build Status](https://app.travis-ci.com/jmartin82/mmock.svg?branch=master)](https://app.travis-ci.com/jmartin82/mmock)
-
 
 Mmock is a testing and fast prototyping tool for developers:
 
@@ -128,6 +126,16 @@ To configure Mmock, use command line flags described in help.
 		TLS config folder (server.crt and server.key should be inside) (default "execution_path/tls")
 ```
 
+The default logging level is INFO, but you can change it by setting the
+environment variable LOG_LEVEL to one of the following:
+
+  * CRITICAL
+  * ERROR
+  * WARNING
+  * NOTICE
+  * INFO
+  * DEBUG
+
 ### Mock
 
 Mock definition:
@@ -219,6 +227,12 @@ Query strings and headers support also global matches (*) in the header/paramete
 			]
 		}
 ```
+
+Regexp matching is available for:
+- body
+- query strings
+
+See https://pkg.go.dev/regexp/syntax for regexp syntax
 
 #### Response (Optional on proxy call)
 
@@ -614,6 +628,8 @@ You can always disable this behavior adding the following flag `-server-statisti
 - Thanks to [@joel-44](https://github.com/joel-44) for bug fixing 
 - Enviroment variables as mock variables thanks to [@marcoreni](https://github.com/marcoreni)
 - Support Regular Expressions for Field Values in JSON Request Body thanks to [@rosspatil](https://github.com/rosspatil)
+- Improved logging with levels thanks to [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
+- Support for Regular Expressions for QueryStringParameters [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
 
 ### Contributing
 

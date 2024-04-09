@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"io/ioutil"
-	"log"
 	"reflect"
 	"strings"
 )
@@ -66,13 +65,13 @@ func (fd *FSMapper) Read(filename string) (mock.Definition, error) {
 		if parser.CanParse(filename) {
 			buf, err := ioutil.ReadFile(filename)
 			if err != nil {
-				log.Printf("Invalid mock config in: %s\n", filename)
+				log.Errorf("Invalid mock config in: %s\n", filename)
 				return mock.Definition{}, ErrInvalidMockDefinition
 			}
-			log.Printf("Loading config file: %s\n", filename)
+			log.Infof("Loading config file: %s\n", filename)
 			mock, erd := parser.Parse(buf)
 			if erd != nil {
-				log.Printf("Invalid mock format in: %s Err: %s", filename, erd)
+				log.Errorf("Invalid mock format in: %s Err: %s", filename, erd)
 			}
 			if reflect.TypeOf(parser).String() == "parser.YAMLReader" {
 				if mock.Request.Body != "" {
