@@ -61,7 +61,7 @@ func (rr *Router) Resolve(req *mock.Request) (*mock.Definition, *match.Result) {
 		}
 		mLog.Errors = append(mLog.Errors, match.Error{URI: m.URI, Reason: err.Error()})
 		if !errors.Is(err, match.ErrPathNotMatch) {
-			log.Infof("Discarding mock: %s Reason: %s\n", m.URI, err.Error())
+			log.Infof("\033[31mDiscarding mock:\033[0m %s Reason: %s\n", m.URI, err.Error())
 		}
 	}
 	return getNotFoundResult(), mLog
