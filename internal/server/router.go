@@ -50,7 +50,7 @@ func (rr *Router) Resolve(req *mock.Request) (*mock.Definition, *match.Result) {
 	mLog.Errors = make([]match.Error, 0, len(mocks))
 
 	for _, m := range mocks {
-		log.Debugf("\033[34mConsidering %s", m.URI)
+	  log.Debugf("\033[34mConsidering:\033[0m %s", m.URI)
 		r, err := rr.Checker.Match(req, &m, true)
 		if r {
 			//we return a copy of it, not the config itself because we will working on it.
