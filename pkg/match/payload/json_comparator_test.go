@@ -24,6 +24,7 @@ func TestJSONComparator_Compare(t *testing.T) {
 		{"Test different arrays", args{"[{\"name\":\"john\",\"age\":30}]", "[{\"age\":30,\"name\":\"bob\"}]"}, false},
 		{"Test different format", args{"{\"name\":\"bob\",\"age\":30}", "{\"name\" : \"bob\"\n,\"age\" : 30}"}, true},
 		{"Test different values", args{"{\"name\":\"bobs\",\"age\":30}", "{\"name\":\"bob\",\"age\":30}"}, false},
+		{"Test different values - Regression JSON check", args{"{\"age\":30,\"name\":\"Name 1\"}", "{\"age\":30,\"name\":\"Name 2\"}"}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
