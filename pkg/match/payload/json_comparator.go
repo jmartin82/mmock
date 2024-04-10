@@ -3,10 +3,11 @@ package payload
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/jmartin82/mmock/v3/internal/config/logger"
 	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
 )
 
 var log = logger.Log
@@ -22,7 +23,7 @@ func isArray(s string) bool {
 func (jc *JSONComparator) doCompareJSONRegexUnmarshaled(patterns, values map[string]interface{}) bool {
 	var matches bool
 	matches = jc.match(patterns, values)
-	if !matches{
+	if !matches {
 		log.Debugf("values: %v don't match: %v", values, patterns)
 	}
 	return matches
@@ -63,8 +64,8 @@ func (jc *JSONComparator) doCompareArrayRegexUnmarshaled(patterns, values []map[
 
 	for i := 0; i < len(patterns); i++ {
 		if !jc.match(patterns[i], values[i]) {
-				log.Debugf("value %v doesn't match %v",
-					values[i], patterns[i])
+			log.Debugf("value %v doesn't match %v",
+				values[i], patterns[i])
 			return false
 		}
 	}
@@ -93,7 +94,7 @@ func (jc *JSONComparator) match(p, v map[string]interface{}) bool {
 			patternType = reflect.ValueOf(pattern).Kind()
 
 			if valueType == reflect.Map && patternType == reflect.Map {
-					log.Debugf("recursing into map %v", field)
+				log.Debugf("recursing into map %v", field)
 
 				result = jc.doCompareJSONRegexUnmarshaled(
 					pattern.(map[string]interface{}),
@@ -105,13 +106,13 @@ func (jc *JSONComparator) match(p, v map[string]interface{}) bool {
 			} else if (valueType == reflect.Array || valueType == reflect.Slice) &&
 				(patternType == reflect.Array || patternType == reflect.Slice) {
 
-					log.Debugf("recursing into array %v", field)
+				log.Debugf("recursing into array %v", field)
 				valueJsonBytes, err1 := json.Marshal(value)
 				patternJsonBytes, err2 := json.Marshal(pattern)
 
 				if err1 != nil || err2 != nil {
-						log.Errorf("value %v raised %v and pattern %v raised %v",
-							value, err1, pattern, err2)
+					log.Errorf("value %v raised %v and pattern %v raised %v",
+						value, err1, pattern, err2)
 					return false
 				}
 
@@ -121,15 +122,9 @@ func (jc *JSONComparator) match(p, v map[string]interface{}) bool {
 				if !result {
 					return false
 				}
-			} else {
-				var eql bool
-				eql = reflect.DeepEqual(pattern, value)
-
-				if !eql {
-						log.Debugf("value %v doesn't DeepEqual %v", value, pattern)
-				}
-
-				return eql
+			} else if eql := reflect.DeepEqual(pattern, value); !eql {
+				log.Debugf("value %v doesn't DeepEqual %v", value, pattern)
+				return false
 			}
 		}
 		matched, err := regexp.MatchString(str, fmt.Sprint(value))
