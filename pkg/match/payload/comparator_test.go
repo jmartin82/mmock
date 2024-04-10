@@ -10,6 +10,7 @@ func TestComparator_Compare(t *testing.T) {
 		contentType string
 		s1          string
 		s2          string
+		optionalPaths map[string]bool
 	}
 
 	tests := []struct {
@@ -19,9 +20,9 @@ func TestComparator_Compare(t *testing.T) {
 		wantComparable bool
 		wantEquals     bool
 	}{
-		{"Compare json ok", fields{map[string]Comparer{"application/json": &JSONComparator{}}}, args{"application/json", "{\"name\":\"bob\",\"age\":30}", "{\"name\":\"bob\",\"age\":30}"}, true, true},
-		{"Compare json ko", fields{map[string]Comparer{"application/json": &JSONComparator{}}}, args{"application/json", "{\"name\":\"bob\",\"age\":30}", "{\"name\":\"bob\",\"age\":40}"}, true, false},
-		{"Not comparable", fields{map[string]Comparer{"application/xml": &XMLComparator{}}}, args{"application/json", "{\"name\":\"bob\",\"age\":30}", "{\"name\":\"bob\",\"age\":40}"}, false, false},
+		{"Compare json ok", fields{map[string]Comparer{"application/json": &JSONComparator{}}}, args{"application/json", "{\"name\":\"bob\",\"age\":30}", "{\"name\":\"bob\",\"age\":30}", map[string]bool{}}, true, true},
+		{"Compare json ko", fields{map[string]Comparer{"application/json": &JSONComparator{}}}, args{"application/json", "{\"name\":\"bob\",\"age\":30}", "{\"name\":\"bob\",\"age\":40}", map[string]bool{}}, true, false},
+		{"Not comparable", fields{map[string]Comparer{"application/xml": &XMLComparator{}}}, args{"application/json", "{\"name\":\"bob\",\"age\":30}", "{\"name\":\"bob\",\"age\":40}", map[string]bool{}}, false, false},
 	}
 
 	for _, tt := range tests {
@@ -29,7 +30,12 @@ func TestComparator_Compare(t *testing.T) {
 			c := Comparator{
 				comparers: tt.fields.comparers,
 			}
-			gotComparable, gotEquals := c.Compare(tt.args.contentType, tt.args.s1, tt.args.s2)
+			gotComparable, gotEquals := c.Compare(
+			  tt.args.contentType,
+			  tt.args.s1,
+			  tt.args.s2,
+			  tt.args.optionalPaths,
+			)
 			if gotComparable != tt.wantComparable {
 				t.Errorf("Comparator.Compare() gotComparable = %v, want %v", gotComparable, tt.wantComparable)
 			}

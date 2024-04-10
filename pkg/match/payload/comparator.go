@@ -5,7 +5,7 @@ import (
 )
 
 type Comparer interface {
-	Compare(s1, s2 string) bool
+	Compare(s1, s2 string, optionalPaths map[string]bool, currentPath string) bool
 }
 
 type Comparator struct {
@@ -33,12 +33,12 @@ func (c Comparator) AddComparer(contentType string, comparer Comparer) {
 	c.comparers[contentType] = comparer
 }
 
-func (c Comparator) Compare(contentType, s1, s2 string) (comparable bool, equals bool) {
+func (c Comparator) Compare(contentType, s1, s2 string, optionalPaths map[string]bool) (comparable bool, equals bool) {
 	parts := strings.Split(contentType, ";")
 	comparer, ok := c.comparers[parts[0]]
 	if !ok {
 		return false, false
 	}
 
-	return true, comparer.Compare(s1, s2)
+	return true, comparer.Compare(s1, s2, optionalPaths, "")
 }
