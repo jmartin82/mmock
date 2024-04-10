@@ -72,4 +72,4 @@ changelog:
       - typo
       - rollback
 env_files:
-  github_token: .github
+  github_token: .github/token
