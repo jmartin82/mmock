@@ -94,6 +94,39 @@ func TestPathVars(t *testing.T) {
 	}
 }
 
+func TestPathVariables(t *testing.T) {
+	req := mock.Request{}
+	req.Path = "/a/b/c"
+
+	m := mock.Definition{}
+	m.Request.Path = "/a/:b/:c"
+	m.Request.PathVariables = map[string]string{
+	  "b": "[a-z]",
+	  "c": "[a-z]",
+	}
+
+	mm := Request{}
+
+	// match
+	if b, err := mm.Match(&req, &m, true); !b {
+		t.Error(err)
+	}
+
+	// not match
+	req.Path = "a/b/3"
+	
+	if b, err := mm.Match(&req, &m, true); b {
+		t.Error(err)
+	}
+
+	// not present
+	req.Path = "a/b"
+	
+	if b, err := mm.Match(&req, &m, true); b {
+		t.Error(err)
+	}
+}
+
 func TestPathGlob(t *testing.T) {
 	req := mock.Request{}
 	req.Path = "/a/b/c"
