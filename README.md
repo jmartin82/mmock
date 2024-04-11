@@ -1,6 +1,3 @@
-# NOTE from jcdietrich
-I am maintaining all of my changes to this fork in the [jcd-all](https://github.com/jdietrich-tc/mmock/tree/jcd_all) branch
-
 ![Mmock](/docs/logo.png "Mmock logo")
 =========
 
@@ -320,6 +317,10 @@ You can also use "regex" and "concat" commands to complement GJson query:
 }
 ```
 
+**Environment variables:** fill with the env var that is set in the mmock Environment
+ 
+ - env(VARIABLE) will be replaced with the value of the environment variable VARIABLE 
+
 **External streams:** Perfect for embedding big payloads or getting data from another service.
 
  - file.contents(FILE_PATH)
@@ -630,6 +631,7 @@ You can always disable this behavior adding the following flag `-server-statisti
 - Support Regular Expressions for Field Values in JSON Request Body thanks to [@rosspatil](https://github.com/rosspatil)
 - Improved logging with levels thanks to [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
 - Support for Regular Expressions for QueryStringParameters [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
+- Support for Environment variable replacement [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
 
 ### Contributing
 
