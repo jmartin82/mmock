@@ -64,9 +64,9 @@ func (mm Request) matchKeyAndValues(reqMap mock.Values, mockMap mock.Values) boo
 					return false
 				}
 			} else {
-			  log.Debugf("value %v doesn't appear in mock", key)
+				log.Debugf("value %v doesn't appear in mock", key)
 
-			  return false
+				return false
 			}
 		}
 	}

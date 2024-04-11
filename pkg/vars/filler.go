@@ -13,6 +13,7 @@ type FillerFactory interface {
 	CreateRequestFiller(req *mock.Request, mock *mock.Definition) Filler
 	CreateFakeFiller() Filler
 	CreateStreamFiller() Filler
+	CreateEnvVarFiller() Filler
 }
 
 type MockFillerFactory struct {
@@ -34,4 +35,9 @@ func (mff MockFillerFactory) CreateFakeFiller() Filler {
 
 func (mff MockFillerFactory) CreateStreamFiller() Filler {
 	return Stream{}
+}
+
+func (mff MockFillerFactory) CreateEnvVarFiller() Filler {
+
+	return EnvVars{}
 }
