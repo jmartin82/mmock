@@ -82,7 +82,7 @@ func (fp ResponseMessageEvaluator) walkAndFill(res mock.ReplacementRequiredPaylo
 }
 
 func (fp ResponseMessageEvaluator) replaceVars(input string, vars map[string][]string) string {
-	result := varsRegex.ReplaceAllStringFunc(input, func(value string) string {
+	return varsRegex.ReplaceAllStringFunc(input, func(value string) string {
 		varName := strings.Trim(value, "{} ")
 		// replace the strings
 		if v, found := vars[varName]; found {
@@ -93,8 +93,6 @@ func (fp ResponseMessageEvaluator) replaceVars(input string, vars map[string][]s
 		// replace regexes
 		return value
 	})
-
-	return result
 }
 
 func (fp ResponseMessageEvaluator) extractVars(input string, vars *[]string) {
