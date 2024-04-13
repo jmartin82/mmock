@@ -123,9 +123,3 @@ type Definition struct {
 	Callback    Callback `json:"callback"`
 	Control     Control  `json:"control"`
 }
-
-func CreateDefinition(request Request, response Response) Definition {
-	definition := Definition{Request: request, Response: response}
-	log.Debugf("definition: %v", definition)
-	return definition
-}
