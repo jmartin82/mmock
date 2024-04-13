@@ -184,10 +184,10 @@ func (ddf DummyDataFaker) Hex(n int) string {
 	return strings.Repeat("0", n)
 }
 
-func getProcessor() ResponseMessageEvaluator {
+func getProcessor() *ResponseMessageEvaluator {
 	dfp := NewDummyDataFaker("AleixMG")
 	ff := NewFillerFactory(dfp)
-	return ResponseMessageEvaluator{FillerFactory: ff}
+	return &ResponseMessageEvaluator{FillerFactory: ff}
 }
 
 func TestReplaceTags(t *testing.T) {
@@ -208,15 +208,17 @@ func TestReplaceTags(t *testing.T) {
 	cookie = make(mock.Cookies)
 	cookie["cookie1"] = "valCookie"
 	cookie["cookie2"] = "{{fake.UserName}}"
-	res.Cookies = cookie
 
 	val = make(mock.Values)
 	val["header1"] = []string{"valHeader"}
 	val["header2"] = []string{"valHeader", "{{request.query.param1}}"}
 
-	res.Headers = val
+	res.HttpHeaders = mock.HttpHeaders{Headers: val, Cookies: cookie}
+	log.Debugf("TestReplaceTags res: %v", res)
 
 	mock := mock.Definition{Request: req, Response: res}
+	log.Debugf("TestReplaceTags mock: %v", mock)
+
 	varsProcessor := getProcessor()
 	varsProcessor.Eval(&req, &mock)
 
@@ -224,11 +226,11 @@ func TestReplaceTags(t *testing.T) {
 		t.Error("Replaced tags in body not match", res.Body)
 	}
 
-	if mock.Response.Cookies["cookie2"] != "AleixMG" {
+	if mock.Response.HttpHeaders.Cookies["cookie2"] != "AleixMG" {
 		t.Error("Replaced tags in cookie match", mock.Response.Cookies["cookie2"])
 	}
 
-	if mock.Response.Headers["header2"][1] != "valParam" {
+	if mock.Response.HttpHeaders.Headers["header2"][1] != "valParam" {
 		t.Error("Replaced tags in headers match", mock.Response.Headers["header2"][1])
 	}
 }

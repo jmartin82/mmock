@@ -27,53 +27,62 @@ func (fp ResponseMessageEvaluator) Eval(req *mock.Request, m *mock.Definition) {
 	streamFiller := fp.FillerFactory.CreateStreamFiller()
 
 	//replace stream holders for their content
-	fp.walkAndFill(m, streamFiller.Fill(fp.walkAndGet(m.Response)))
+	m.Response.HttpHeaders, m.Response.Body = fp.walkAndFill(m.Response, streamFiller.Fill(fp.walkAndGet(m.Response)))
+	m.Callback.HttpHeaders, m.Callback.Body = fp.walkAndFill(m.Callback, streamFiller.Fill(fp.walkAndGet(m.Callback)))
 
 	//extract holders
 	holders := fp.walkAndGet(m.Response)
-	fp.extractVars(m.Callback.Body, &holders)
+	holders = append(holders, fp.walkAndGet(m.Callback)...)
 
 	//fill holders
 	vars := requestFiller.Fill(holders)
 	fp.mergeVars(vars, fakeFiller.Fill(holders))
-	fp.walkAndFill(m, vars)
+
+	m.Response.HttpHeaders, m.Response.Body = fp.walkAndFill(m.Response, vars)
+	m.Callback.HttpHeaders, m.Callback.Body = fp.walkAndFill(m.Callback, vars)
 }
 
-func (fp ResponseMessageEvaluator) walkAndGet(res mock.Response) []string {
-
+func (fp ResponseMessageEvaluator) walkAndGet(res mock.ReplacementRequiredPayload) []string {
 	vars := []string{}
-	for _, header := range res.Headers {
+	for _, header := range res.GetHeaders().Headers {
 		for _, value := range header {
 			fp.extractVars(value, &vars)
 		}
 
 	}
-	for _, value := range res.Cookies {
+
+	for _, value := range res.GetHeaders().Cookies {
 		fp.extractVars(value, &vars)
 	}
 
-	fp.extractVars(res.Body, &vars)
+	fp.extractVars(res.GetBody(), &vars)
+
 	return vars
 }
 
-func (fp ResponseMessageEvaluator) walkAndFill(m *mock.Definition, vars map[string][]string) {
-	res := &m.Response
-	for header, values := range res.Headers {
+func (fp ResponseMessageEvaluator) walkAndFill(res mock.ReplacementRequiredPayload, vars map[string][]string) (mock.HttpHeaders, string) {
+	headers := res.GetHeaders().Headers
+	cookies := res.GetHeaders().Cookies
+	body := res.GetBody()
+
+	for header, values := range headers {
 		for i, value := range values {
-			res.Headers[header][i] = fp.replaceVars(value, vars)
+			headers[header][i] = fp.replaceVars(value, vars)
 		}
 
 	}
-	for cookie, value := range res.Cookies {
-		res.Cookies[cookie] = fp.replaceVars(value, vars)
+
+	for cookie, value := range cookies {
+		cookies[cookie] = fp.replaceVars(value, vars)
 	}
 
-	res.Body = fp.replaceVars(res.Body, vars)
-	m.Callback.Body = fp.replaceVars(m.Callback.Body, vars)
+	newBody := fp.replaceVars(body, vars)
+
+	return mock.HttpHeaders{Headers: headers, Cookies: cookies}, newBody
 }
 
 func (fp ResponseMessageEvaluator) replaceVars(input string, vars map[string][]string) string {
-	return varsRegex.ReplaceAllStringFunc(input, func(value string) string {
+	result := varsRegex.ReplaceAllStringFunc(input, func(value string) string {
 		varName := strings.Trim(value, "{} ")
 		// replace the strings
 		if v, found := vars[varName]; found {
@@ -84,6 +93,8 @@ func (fp ResponseMessageEvaluator) replaceVars(input string, vars map[string][]s
 		// replace regexes
 		return value
 	})
+
+	return result
 }
 
 func (fp ResponseMessageEvaluator) extractVars(input string, vars *[]string) {

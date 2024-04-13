@@ -3,9 +3,12 @@ package mock
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
 	"reflect"
 	"time"
 )
+
+var log = logger.Log
 
 type Values map[string][]string
 
@@ -28,10 +31,35 @@ type Request struct {
 	Body string `json:"body"`
 }
 
+type ReplacementRequiredPayload interface {
+	GetHeaders() HttpHeaders
+	GetBody() string
+}
+
+type ReplacementRequired struct {
+}
+
+func (rr Response) GetHeaders() HttpHeaders {
+	return rr.HttpHeaders
+}
+
+func (rr Response) GetBody() string {
+	return rr.Body
+}
+
+func (rr Callback) GetHeaders() HttpHeaders {
+	return rr.HttpHeaders
+}
+
+func (rr Callback) GetBody() string {
+	return rr.Body
+}
+
 type Response struct {
 	StatusCode int `json:"statusCode"`
 	HttpHeaders
 	Body string `json:"body"`
+	*ReplacementRequired
 }
 
 type Callback struct {
@@ -41,6 +69,7 @@ type Callback struct {
 	HttpHeaders
 	Body    string `json:"body"`
 	Timeout Delay  `json:"timeout"`
+	*ReplacementRequired
 }
 
 type Scenario struct {
@@ -93,4 +122,10 @@ type Definition struct {
 	Response    Response `json:"response"`
 	Callback    Callback `json:"callback"`
 	Control     Control  `json:"control"`
+}
+
+func CreateDefinition(request Request, response Response) Definition {
+	definition := Definition{Request: request, Response: response}
+	log.Debugf("definition: %v", definition)
+	return definition
 }

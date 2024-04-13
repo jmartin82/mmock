@@ -69,19 +69,21 @@ func getHostAndPort(req *http.Request) (string, string) {
 
 // WriteHTTPResponseFromDefinition read a mock response and write a http response.
 func (t HTTP) WriteHTTPResponseFromDefinition(fr *Response, w http.ResponseWriter) {
+	headers := fr.Headers
+	cookies := fr.Cookies
 
-	for header, values := range fr.Headers {
+	for header, values := range headers {
 		for _, value := range values {
 			w.Header().Add(header, value)
 		}
 
 	}
-	if len(fr.Cookies) > 0 {
-		cookies := []string{}
-		for cookie, value := range fr.Cookies {
-			cookies = append(cookies, fmt.Sprintf("%s=%s", cookie, value))
+	if len(cookies) > 0 {
+		cookiesToWrite := []string{}
+		for cookie, value := range cookies {
+			cookiesToWrite = append(cookiesToWrite, fmt.Sprintf("%s=%s", cookie, value))
 		}
-		w.Header().Add("Set-Cookie", strings.Join(cookies, ";"))
+		w.Header().Add("Set-Cookie", strings.Join(cookiesToWrite, ";"))
 	}
 
 	w.WriteHeader(fr.StatusCode)
