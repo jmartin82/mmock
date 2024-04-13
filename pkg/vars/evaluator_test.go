@@ -214,10 +214,8 @@ func TestReplaceTags(t *testing.T) {
 	val["header2"] = []string{"valHeader", "{{request.query.param1}}"}
 
 	res.HttpHeaders = mock.HttpHeaders{Headers: val, Cookies: cookie}
-	log.Debugf("TestReplaceTags res: %v", res)
 
 	mock := mock.Definition{Request: req, Response: res}
-	log.Debugf("TestReplaceTags mock: %v", mock)
 
 	varsProcessor := getProcessor()
 	varsProcessor.Eval(&req, &mock)
