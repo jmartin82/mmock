@@ -203,8 +203,11 @@ func TestReplaceTags(t *testing.T) {
 	req.Cookies = cookie
 
 	res := mock.Response{}
-	res.Body = "Request Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}. Random: {{fake.UserName}}"
+	cb := mock.Callback{}
 
+	res.Body = "Request Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}. Random: {{fake.UserName}}"
+	cb.Body = "Callback Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}. Random: {{fake.UserName}}"
+	
 	cookie = make(mock.Cookies)
 	cookie["cookie1"] = "valCookie"
 	cookie["cookie2"] = "{{fake.UserName}}"
@@ -215,7 +218,17 @@ func TestReplaceTags(t *testing.T) {
 
 	res.HttpHeaders = mock.HttpHeaders{Headers: val, Cookies: cookie}
 
-	mock := mock.Definition{Request: req, Response: res}
+	cookie = make(mock.Cookies)
+	cookie["cookie1"] = "valCookie"
+	cookie["cookie2"] = "{{fake.UserName}}"
+
+	val = make(mock.Values)
+	val["header1"] = []string{"valHeader"}
+	val["header2"] = []string{"valHeader", "{{request.query.param1}}"}
+
+	cb.HttpHeaders = mock.HttpHeaders{Headers: val, Cookies: cookie}
+
+	mock := mock.Definition{Request: req, Response: res, Callback: cb}
 
 	varsProcessor := getProcessor()
 	varsProcessor.Eval(&req, &mock)
@@ -225,12 +238,25 @@ func TestReplaceTags(t *testing.T) {
 	}
 
 	if mock.Response.HttpHeaders.Cookies["cookie2"] != "AleixMG" {
-		t.Error("Replaced tags in cookie match", mock.Response.Cookies["cookie2"])
+		t.Error("Replaced tags in cookie match", mock.Response.HttpHeaders.Cookies["cookie2"])
 	}
 
 	if mock.Response.HttpHeaders.Headers["header2"][1] != "valParam" {
-		t.Error("Replaced tags in headers match", mock.Response.Headers["header2"][1])
+		t.Error("Replaced tags in headers match", mock.Response.HttpHeaders.Headers["header2"][1])
 	}
+
+	if mock.Callback.Body != "Callback Body hi!. Query valParam. Cookie: valCookie. Random: AleixMG" {
+		t.Error("Replaced tags in body not match", cb.Body)
+	}
+
+	if mock.Callback.HttpHeaders.Cookies["cookie2"] != "AleixMG" {
+		t.Error("Replaced tags in Callback cookie match", mock.Callback.HttpHeaders.Cookies["cookie2"])
+	}
+
+	if mock.Callback.HttpHeaders.Headers["header2"][1] != "valParam" {
+		t.Error("Replaced tags in Callback headers match", mock.Callback.HttpHeaders.Headers["header2"][1])
+	}
+
 }
 
 func TestReplaceUndefinedFakeTag(t *testing.T) {
