@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sync"
 	"path/filepath"
 	"strings"
 	"testing"
+	"github.com/jmartin82/mmock/v3/internal/dummyServer"
 )
 
 func TestReadFile(t *testing.T) {
@@ -43,17 +45,24 @@ func TestReadFile(t *testing.T) {
 
 func TestHTTPContent(t *testing.T) {
 	st := Stream{}
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
 
-	k := "http.contents(https://golang.org/)"
+	dums := dummyServer.Start(wg, 8937)
+	log.Debugf("DUMS after Start: %v", dums)
+	k := "http.contents(http://localhost:8937/hello)"
 	holders := []string{k}
 
 	result := st.Fill(holders)
+	log.Debugf("DUMS before Stop: %v", dums)
+	dums.Stop()
+	log.Debugf("DUMS after Stop: %v", dums)
 	v, f := result[k]
 	if !f {
 		t.Errorf("Stream key not found")
 	}
 
-	if !strings.Contains(v[0], "Go") {
+	if !strings.Contains(v[0], "hello") {
 		t.Errorf("Couldn't get the content. Value: %s", v)
 	}
 }
