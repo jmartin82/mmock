@@ -152,7 +152,14 @@ func TestJSONComparator_Compare(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			jc := &JSONComparator{}
-			if got := jc.Compare(tt.args.s1, tt.args.s2, tt.args.optionalPaths, tt.args.currentPath); got != tt.want {
+			got := jc.Compare(
+				tt.args.s1,
+				tt.args.s2,
+				tt.args.optionalPaths,
+				tt.args.currentPath,
+			)
+
+			if got != tt.want {
 				t.Errorf("JSONComparator.Compare() = %v, want %v", got, tt.want)
 			}
 		})
