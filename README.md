@@ -1,6 +1,3 @@
-# NOTE from jcdietrich
-I am maintaining all of my changes to this fork in the [jcd-all](https://github.com/jdietrich-tc/mmock/tree/jcd_all) branch
-
 ![Mmock](/docs/logo.png "Mmock logo")
 =========
 
