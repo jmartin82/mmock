@@ -235,10 +235,10 @@ func (mm Request) bodyMatch(mockReq mock.Request, req *mock.Request) bool {
 
 	if value, ok := req.Headers["Content-Type"]; ok && len(value) > 0 {
 		if comparable, ok := mm.comparator.Compare(
-		  value[0],
-		  mockReq.Body,
-		  req.Body,
-		  mockReq.OptionalPaths); comparable {
+			value[0],
+			mockReq.Body,
+			req.Body,
+			mockReq.OptionalPaths); comparable {
 			return ok
 		}
 	}

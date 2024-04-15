@@ -7,9 +7,9 @@ func TestComparator_Compare(t *testing.T) {
 		comparers map[string]Comparer
 	}
 	type args struct {
-		contentType string
-		s1          string
-		s2          string
+		contentType   string
+		s1            string
+		s2            string
 		optionalPaths map[string]bool
 	}
 
@@ -31,10 +31,10 @@ func TestComparator_Compare(t *testing.T) {
 				comparers: tt.fields.comparers,
 			}
 			gotComparable, gotEquals := c.Compare(
-			  tt.args.contentType,
-			  tt.args.s1,
-			  tt.args.s2,
-			  tt.args.optionalPaths,
+				tt.args.contentType,
+				tt.args.s1,
+				tt.args.s2,
+				tt.args.optionalPaths,
 			)
 			if gotComparable != tt.wantComparable {
 				t.Errorf("Comparator.Compare() gotComparable = %v, want %v", gotComparable, tt.wantComparable)

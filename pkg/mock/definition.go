@@ -26,7 +26,7 @@ type Request struct {
 	Fragment              string `json:"fragment"`
 	HttpHeaders
 	OptionalPaths map[string]bool `json:"optionalPaths"`
-	Body string `json:"body"`
+	Body          string          `json:"body"`
 }
 
 type Response struct {

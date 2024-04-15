@@ -4,10 +4,10 @@ import "testing"
 
 func TestXMLComparator_Compare(t *testing.T) {
 	type args struct {
-		s1 string
-		s2 string
+		s1            string
+		s2            string
 		optionalPaths map[string]bool
-		currentPath string
+		currentPath   string
 	}
 	tests := []struct {
 		name string

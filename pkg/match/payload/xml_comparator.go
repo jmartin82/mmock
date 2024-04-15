@@ -11,9 +11,9 @@ type XMLComparator struct {
 }
 
 func (jc *XMLComparator) Compare(
-  s1, s2 string,
-  optionalPaths map[string]bool,
-  currentPath string) bool {
+	s1, s2 string,
+	optionalPaths map[string]bool,
+	currentPath string) bool {
 	var o1 interface{}
 	var o2 interface{}
 
@@ -37,12 +37,12 @@ func (jc *XMLComparator) Compare(
 	if err != nil {
 		return false
 	}
-	
+
 	json := &JSONComparator{}
-	
+
 	return json.doCompareJSONRegexUnmarshaled(
-	  o1.(map[string]interface{}),
-	  o2.(map[string]interface{}),
-	  optionalPaths,
-	  currentPath)
+		o1.(map[string]interface{}),
+		o2.(map[string]interface{}),
+		optionalPaths,
+		currentPath)
 }

@@ -21,21 +21,21 @@ func isArray(s string) bool {
 }
 
 func (jc *JSONComparator) doCompareJSONRegexUnmarshaled(
-    patterns, values map[string]interface{},
-    optionalPaths map[string]bool,
-    currentPath string) bool {
+	patterns, values map[string]interface{},
+	optionalPaths map[string]bool,
+	currentPath string) bool {
 	var matches bool
 	matches = jc.match(patterns, values, optionalPaths, currentPath)
-	if !matches{
+	if !matches {
 		log.Debugf("values: %v don't match: %v", values, patterns)
 	}
 	return matches
 }
 
 func (jc *JSONComparator) doCompareJSONRegex(
-  jsonWithPatterns, jsonWithValues string,
-  optionalPaths map[string]bool,
-  currentPath string) bool {
+	jsonWithPatterns, jsonWithValues string,
+	optionalPaths map[string]bool,
+	currentPath string) bool {
 	var patterns map[string]interface{}
 	var values map[string]interface{}
 	if err := json.Unmarshal([]byte(jsonWithPatterns), &patterns); err != nil {
@@ -51,9 +51,9 @@ func (jc *JSONComparator) doCompareJSONRegex(
 }
 
 func (jc *JSONComparator) doCompareArrayRegex(
-  jsonWithPatterns, jsonWithValues string,
-  optionalPaths map[string]bool,
-  currentPath string) bool {
+	jsonWithPatterns, jsonWithValues string,
+	optionalPaths map[string]bool,
+	currentPath string) bool {
 	var patterns []map[string]interface{}
 	var values []map[string]interface{}
 
@@ -70,14 +70,14 @@ func (jc *JSONComparator) doCompareArrayRegex(
 }
 
 func (jc *JSONComparator) doCompareArrayRegexUnmarshaled(
-  patterns, values []map[string]interface{},
-  optionalPaths map[string]bool,
-  currentPath string) bool {
+	patterns, values []map[string]interface{},
+	optionalPaths map[string]bool,
+	currentPath string) bool {
 
 	for i := 0; i < len(patterns); i++ {
 		if !jc.match(patterns[i], values[i], optionalPaths, currentPath) {
-				log.Debugf("value %v doesn't match %v",
-					values[i], patterns[i])
+			log.Debugf("value %v doesn't match %v",
+				values[i], patterns[i])
 			return false
 		}
 	}
@@ -85,9 +85,9 @@ func (jc *JSONComparator) doCompareArrayRegexUnmarshaled(
 }
 
 func (jc *JSONComparator) match(
-  p, v map[string]interface{},
-  optionalPaths map[string]bool,
-  currentPath string) bool {
+	p, v map[string]interface{},
+	optionalPaths map[string]bool,
+	currentPath string) bool {
 	for field, pattern := range p {
 		var currentFieldPath = fmt.Sprintf("%s.%s", currentPath, field)
 		value, exists := v[field]
@@ -98,7 +98,7 @@ func (jc *JSONComparator) match(
 			log.Debugf("field doesn't exist, and isn't optional: %v", currentFieldPath)
 
 			return false
-		} else if !exists && optionalPaths[currentFieldPath]{
+		} else if !exists && optionalPaths[currentFieldPath] {
 
 			log.Debugf("field doesn't exist, but is optional: %v", currentFieldPath)
 			continue
@@ -114,14 +114,14 @@ func (jc *JSONComparator) match(
 			patternType = reflect.ValueOf(pattern).Kind()
 
 			if valueType == reflect.Map && patternType == reflect.Map {
-					log.Debugf("recursing into map %v", currentFieldPath)
+				log.Debugf("recursing into map %v", currentFieldPath)
 
 				result = jc.doCompareJSONRegexUnmarshaled(
 					pattern.(map[string]interface{}),
 					value.(map[string]interface{}),
 					optionalPaths,
 					currentFieldPath,
-				      )
+				)
 
 				if !result {
 					return false
@@ -129,7 +129,8 @@ func (jc *JSONComparator) match(
 			} else if (valueType == reflect.Array || valueType == reflect.Slice) &&
 				(patternType == reflect.Array || patternType == reflect.Slice) {
 
-					log.Debugf("recursing into array %v", currentFieldPath)
+				log.Debugf("recursing into array %v", currentFieldPath)
+
 				valueJsonBytes, err1 := json.Marshal(value)
 				patternJsonBytes, err2 := json.Marshal(pattern)
 
@@ -160,9 +161,9 @@ func (jc *JSONComparator) match(
 }
 
 func (jc *JSONComparator) Compare(
-  s1, s2 string,
-  optionalPaths map[string]bool,
-  currentPath string) bool {
+	s1, s2 string,
+	optionalPaths map[string]bool,
+	currentPath string) bool {
 
 	if isArray(s1) != isArray(s2) {
 		log.Debugf("only one of these is an array %v %v", s1, s2)
