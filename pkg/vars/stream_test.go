@@ -49,14 +49,11 @@ func TestHTTPContent(t *testing.T) {
 	wg.Add(1)
 
 	dums := dummyServer.Start(wg, 8937)
-	log.Debugf("DUMS after Start: %v", dums)
 	k := "http.contents(http://localhost:8937/hello)"
 	holders := []string{k}
 
 	result := st.Fill(holders)
-	log.Debugf("DUMS before Stop: %v", dums)
 	dums.Stop()
-	log.Debugf("DUMS after Stop: %v", dums)
 	v, f := result[k]
 	if !f {
 		t.Errorf("Stream key not found")

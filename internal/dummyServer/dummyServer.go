@@ -32,15 +32,13 @@ func (ds DummyServer) headers(w http.ResponseWriter, req *http.Request) {
 
 func Start(wg *sync.WaitGroup, port int) DummyServer {
   ds := DummyServer{Port: port, Srv: &http.Server{Addr: fmt.Sprintf(":%v", port)}}
-  log.Debugf("DUMSSTART dr after assign: %v", ds)
 
     http.HandleFunc("/hello", ds.hello)
     http.HandleFunc("/headers", ds.headers)
 
     go func() {
       wg.Done() 
-
-      log.Debugf("DUMSSTART after Done: %v", ds)
+      log.Debugf("DummyServer listening on port: %v", port)
       if err := ds.Srv.ListenAndServe(); err != http.ErrServerClosed {
 	// unexpected error. port in use?
 	log.Fatalf("ListenAndServe(): %v", err)
@@ -52,7 +50,7 @@ func Start(wg *sync.WaitGroup, port int) DummyServer {
    }
 
 func (ds DummyServer) Stop(){
-  log.Infof("DummyServer.Stop ds.Srv: %v", ds.Srv)
+  log.Debug("Stopping DummyServer...")
   if err := ds.Srv.Shutdown(context.TODO()); err != nil {
         panic(err) // failure/timeout shutting down the server gracefully
    }
