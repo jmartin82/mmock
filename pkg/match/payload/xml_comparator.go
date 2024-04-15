@@ -21,24 +21,29 @@ func (jc *XMLComparator) Compare(
 
 	b1, err := xj.Convert(strings.NewReader(s1))
 	if err != nil {
+		log.Errorf("XMLComparator s1 err: %v", err)
 		return false
 	}
 
 	b2, err := xj.Convert(strings.NewReader(s2))
 	if err != nil {
+		log.Errorf("XMLComparator s2 err: %v", err)
 		return false
 	}
 
 	err = json.Unmarshal(b1.Bytes(), &o1)
 	if err != nil {
+		log.Errorf("XMLComparator o1 err: %v", err)
 		return false
 	}
 	err = json.Unmarshal(b2.Bytes(), &o2)
 	if err != nil {
+		log.Errorf("XMLComparator o2 err: %v", err)
 		return false
 	}
 
 	json := &JSONComparator{}
+	log.Debugf("XMLComparator optionalPaths: %v", optionalPaths)
 
 	return json.doCompareJSONRegexUnmarshaled(
 		o1.(map[string]interface{}),
