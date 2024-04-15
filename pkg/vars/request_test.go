@@ -1,7 +1,9 @@
 package vars
 
 import (
+	"fmt"
 	"os"
+	"slices"
 	"strings"
 	"testing"
 
@@ -143,5 +145,44 @@ func TestGetBodyParam(t *testing.T) {
 
 	if mock.Response.Body != expected {
 		t.Error("Replaced tags from body form do not match", mock.Response.Body)
+	}
+}
+func TestURI(t *testing.T) {
+	const MOCK_URI = "Test_URI.yml"
+	const MOCK_HEADER_NAME = "x-test-uri"
+
+	req := mock.Request{}
+	req.Headers = make(mock.Values)
+	req.Headers["Content-Type"] = []string{"application/json"}
+
+	res := mock.Response{}
+	res.Headers = make(mock.Values)
+	res.Headers["Content-Type"] = []string{"application/json"}
+	res.Headers[MOCK_HEADER_NAME] = []string{"{{ URI }}"}
+
+	res.Body = `
+{
+  "URI": "{{ URI }}",
+}
+`
+	var expectedBody = fmt.Sprintf(`
+{
+  "URI": "%v",
+}
+`, MOCK_URI)
+
+	mock := mock.Definition{Request: req, Response: res}
+	mock.URI = MOCK_URI
+
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != expectedBody {
+		t.Error("failed to replace URI in response body", mock.Response.Body)
+	}
+
+	var uriHeaderReplaced = slices.Contains(mock.Response.Headers[MOCK_HEADER_NAME], MOCK_URI)
+	if !uriHeaderReplaced {
+		t.Error("failed to replace URI in response headers", mock.Response.Body)
 	}
 }

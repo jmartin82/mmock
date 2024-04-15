@@ -53,6 +53,10 @@ func (rp Request) Fill(holders []string) map[string][]string {
 			s, found = rp.getHeaderParam(tag[15:])
 		} else if strings.HasPrefix(tag, "env.") {
 			s, found = os.LookupEnv(tag[4:])
+		} else if tag == "URI" {
+			s, found = rp.Mock.URI, true
+		} else if tag == "Description" {
+			s, found = rp.Mock.Description, true
 		}
 
 		if found {
