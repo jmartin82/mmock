@@ -147,6 +147,7 @@ func TestGetBodyParam(t *testing.T) {
 		t.Error("Replaced tags from body form do not match", mock.Response.Body)
 	}
 }
+
 func TestURI(t *testing.T) {
 	const MOCK_URI = "Test_URI.yml"
 	const MOCK_HEADER_NAME = "x-test-uri"
@@ -181,8 +182,48 @@ func TestURI(t *testing.T) {
 		t.Error("failed to replace URI in response body", mock.Response.Body)
 	}
 
-	var uriHeaderReplaced = slices.Contains(mock.Response.Headers[MOCK_HEADER_NAME], MOCK_URI)
-	if !uriHeaderReplaced {
+	var headerReplaced = slices.Contains(mock.Response.Headers[MOCK_HEADER_NAME], MOCK_URI)
+	if !headerReplaced {
+		t.Error("failed to replace URI in response headers", mock.Response.Body)
+	}
+}
+
+func TestDescription(t *testing.T) {
+	const MOCK_DESCRIPTION = "TestDescription.yml"
+	const MOCK_HEADER_NAME = "x-test-description"
+
+	req := mock.Request{}
+	req.Headers = make(mock.Values)
+	req.Headers["Content-Type"] = []string{"application/json"}
+
+	res := mock.Response{}
+	res.Headers = make(mock.Values)
+	res.Headers["Content-Type"] = []string{"application/json"}
+	res.Headers[MOCK_HEADER_NAME] = []string{"{{ Description }}"}
+
+	res.Body = `
+{
+  "Description": "{{ Description }}",
+}
+`
+	var expectedBody = fmt.Sprintf(`
+{
+  "Description": "%v",
+}
+`, MOCK_DESCRIPTION)
+
+	mock := mock.Definition{Request: req, Response: res}
+	mock.Description = MOCK_DESCRIPTION
+
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != expectedBody {
+		t.Error("failed to replace URI in response body", mock.Response.Body)
+	}
+
+	var headerReplaced = slices.Contains(mock.Response.Headers[MOCK_HEADER_NAME], MOCK_DESCRIPTION)
+	if !headerReplaced {
 		t.Error("failed to replace URI in response headers", mock.Response.Body)
 	}
 }
