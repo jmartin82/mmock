@@ -199,11 +199,11 @@ func TestDescription(t *testing.T) {
 	res := mock.Response{}
 	res.Headers = make(mock.Values)
 	res.Headers["Content-Type"] = []string{"application/json"}
-	res.Headers[MOCK_HEADER_NAME] = []string{"{{ Description }}"}
+	res.Headers[MOCK_HEADER_NAME] = []string{"{{ description }}"}
 
 	res.Body = `
 {
-  "Description": "{{ Description }}",
+  "Description": "{{ description }}",
 }
 `
 	var expectedBody = fmt.Sprintf(`
@@ -219,11 +219,11 @@ func TestDescription(t *testing.T) {
 	varsProcessor.Eval(&req, &mock)
 
 	if mock.Response.Body != expectedBody {
-		t.Error("failed to replace URI in response body", mock.Response.Body)
+		t.Error("failed to replace Description in response body", mock.Response.Body)
 	}
 
 	var headerReplaced = slices.Contains(mock.Response.Headers[MOCK_HEADER_NAME], MOCK_DESCRIPTION)
 	if !headerReplaced {
-		t.Error("failed to replace URI in response headers", mock.Response.Body)
+		t.Error("failed to replace Description in response headers", mock.Response.Body)
 	}
 }
