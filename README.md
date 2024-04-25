@@ -262,6 +262,9 @@ This is used to have mmock make an API request after receiving the mocked reques
 
 You can use variable data in response. The variables will be defined as tags like this {{nameVar}}
 
+ - URI
+ - Description
+
 **Request data:** Use them if you want to add request data in your response.
 
  - request.scheme
@@ -627,6 +630,7 @@ You can always disable this behavior adding the following flag `-server-statisti
 - Support Regular Expressions for Field Values in JSON Request Body thanks to [@rosspatil](https://github.com/rosspatil)
 - Improved logging with levels thanks to [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
 - Support for Regular Expressions for QueryStringParameters [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
+- Support for URI and Description tags [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
 
 ### Contributing
 
