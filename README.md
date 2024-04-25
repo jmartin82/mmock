@@ -263,7 +263,7 @@ This is used to have mmock make an API request after receiving the mocked reques
 You can use variable data in response. The variables will be defined as tags like this {{nameVar}}
 
  - URI
- - Description
+ - description
 
 **Request data:** Use them if you want to add request data in your response.
 

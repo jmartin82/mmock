@@ -2,15 +2,16 @@ package vars
 
 import (
 	"fmt"
-	xj "github.com/basgys/goxml2json"
-	"github.com/jmartin82/mmock/v3/pkg/mock"
-	"github.com/jmartin82/mmock/v3/pkg/route"
-	"github.com/tidwall/gjson"
 	"net/url"
 	"os"
 	"regexp"
 	"sort"
 	"strings"
+
+	xj "github.com/basgys/goxml2json"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/route"
+	"github.com/tidwall/gjson"
 )
 
 type Request struct {
@@ -53,9 +54,9 @@ func (rp Request) Fill(holders []string) map[string][]string {
 			s, found = rp.getHeaderParam(tag[15:])
 		} else if strings.HasPrefix(tag, "env.") {
 			s, found = os.LookupEnv(tag[4:])
-		} else if tag == "URI" {
+		} else if strings.ToUpper(tag) == "URI" {
 			s, found = rp.Mock.URI, true
-		} else if tag == "Description" {
+		} else if strings.ToLower(tag) == "description" {
 			s, found = rp.Mock.Description, true
 		}
 
