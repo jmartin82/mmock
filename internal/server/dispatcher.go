@@ -76,7 +76,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	log.Infof("New request: %s %s\n", req.Method, req.URL.String())
+	log.Infof("\033[35mNew request:\033[0m %s %s\n",  req.Method, req.URL.String())
 
 	mock, transaction := di.getMatchingResult(&mRequest)
 
@@ -138,9 +138,16 @@ func getProxyResponse(request *mock.Request, definition *mock.Definition) *mock.
 
 func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition, *match.Transaction) {
 	var response *mock.Response
+	var colour = "\033[31m"
+	var stop_colour = "\033[0m"
 	mock, result := di.Resolver.Resolve(request)
 
-	log.Infof("Definition match found: %s. Name : %s\n", strconv.FormatBool(result.Found), mock.URI)
+	if result.Found {
+	  colour = "\033[32m"
+	}
+
+	log.Infof("%sDefinition match found:%s%s. Name : %s\n", colour, stop_colour, strconv.FormatBool(result.Found), mock.URI)
+	
 
 	if result.Found {
 		if len(mock.Control.ProxyBaseURL) > 0 {

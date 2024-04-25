@@ -50,6 +50,7 @@ func (rr *Router) Resolve(req *mock.Request) (*mock.Definition, *match.Result) {
 	mLog.Errors = make([]match.Error, 0, len(mocks))
 
 	for _, m := range mocks {
+	  log.Debugf("\033[34mConsidering:\033[0m %s", m.URI)
 		r, err := rr.Checker.Match(req, &m, true)
 		if r {
 			//we return a copy of it, not the config itself because we will working on it.
@@ -61,7 +62,7 @@ func (rr *Router) Resolve(req *mock.Request) (*mock.Definition, *match.Result) {
 		}
 		mLog.Errors = append(mLog.Errors, match.Error{URI: m.URI, Reason: err.Error()})
 		if !errors.Is(err, match.ErrPathNotMatch) {
-			log.Infof("Discarding mock: %s Reason: %s\n", m.URI, err.Error())
+			log.Infof("\033[31mDiscarding mock:\033[0m %s Reason: %s\n", m.URI, err.Error())
 		}
 	}
 	return getNotFoundResult(), mLog
