@@ -6,12 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
-	"github.com/jmartin82/mmock/v3/internal/config/logger"
-	"github.com/jmartin82/mmock/v3/internal/proxy"
-	"github.com/jmartin82/mmock/v3/internal/statistics"
-	"github.com/jmartin82/mmock/v3/pkg/match"
-	"github.com/jmartin82/mmock/v3/pkg/mock"
-	"github.com/jmartin82/mmock/v3/pkg/vars"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -21,6 +15,13 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
+	"github.com/jmartin82/mmock/v3/internal/proxy"
+	"github.com/jmartin82/mmock/v3/internal/statistics"
+	"github.com/jmartin82/mmock/v3/pkg/match"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/vars"
 )
 
 var log = logger.Log
@@ -76,7 +77,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	log.Infof("New request: %s %s\n", req.Method, req.URL.String())
+	log.Infof("%s %s %s\n", terminal.Info("New request:"), req.Method, req.URL.String())
 
 	mock, transaction := di.getMatchingResult(&mRequest)
 
@@ -138,9 +139,9 @@ func getProxyResponse(request *mock.Request, definition *mock.Definition) *mock.
 
 func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition, *match.Transaction) {
 	var response *mock.Response
-	mock, result := di.Resolver.Resolve(request)
 
-	log.Infof("Definition match found: %s. Name : %s\n", strconv.FormatBool(result.Found), mock.URI)
+	mock, result := di.Resolver.Resolve(request)
+	colorTerminalOutput(result, mock)
 
 	if result.Found {
 		if len(mock.Control.ProxyBaseURL) > 0 {
@@ -169,6 +170,14 @@ func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition
 
 	return mock, match
 
+}
+
+func colorTerminalOutput(result *match.Result, mock *mock.Definition) {
+	msg := fmt.Sprintf("%s %s\n", terminal.Error("Definition match found:"), strconv.FormatBool(result.Found))
+	if result.Found {
+		msg = fmt.Sprintf("%s %s %s %s\n", terminal.Success("Definition match found:"), strconv.FormatBool(result.Found), terminal.Success("Name:"), mock.URI)
+	}
+	log.Info(msg)
 }
 
 // Start initialize the HTTP mock server

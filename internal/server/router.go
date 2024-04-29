@@ -3,7 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/gob"
-	"errors"
+
 	"github.com/jmartin82/mmock/v3/internal/config"
 	"github.com/jmartin82/mmock/v3/pkg/match"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
@@ -50,6 +50,8 @@ func (rr *Router) Resolve(req *mock.Request) (*mock.Definition, *match.Result) {
 	mLog.Errors = make([]match.Error, 0, len(mocks))
 
 	for _, m := range mocks {
+		log.Debugf("%s %s", terminal.Info("Considering:"), m.URI)
+
 		r, err := rr.Checker.Match(req, &m, true)
 		if r {
 			//we return a copy of it, not the config itself because we will working on it.
@@ -57,12 +59,11 @@ func (rr *Router) Resolve(req *mock.Request) (*mock.Definition, *match.Result) {
 			rr.copy(&m, &md)
 			mLog.Found = true
 			mLog.URI = m.URI
+			log.Debugf("%s %s\n", terminal.Success("Found mock:"), m.URI)
 			return &md, mLog
 		}
 		mLog.Errors = append(mLog.Errors, match.Error{URI: m.URI, Reason: err.Error()})
-		if !errors.Is(err, match.ErrPathNotMatch) {
-			log.Infof("Discarding mock: %s Reason: %s\n", m.URI, err.Error())
-		}
+		log.Debugf("%s %s %s %s\n", terminal.Error("Discarding mock:"), m.URI, terminal.Error("Reason:"), err.Error())
 	}
 	return getNotFoundResult(), mLog
 }
