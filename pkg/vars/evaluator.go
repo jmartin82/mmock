@@ -26,20 +26,27 @@ func (fp ResponseMessageEvaluator) Eval(req *mock.Request, m *mock.Definition) {
 	fakeFiller := fp.FillerFactory.CreateFakeFiller()
 	streamFiller := fp.FillerFactory.CreateStreamFiller()
 
-	//replace stream holders for their content
-	fp.walkAndFill(m, streamFiller.Fill(fp.walkAndGet(m.Response)))
+	//first replace the external streams
+	holders := fp.walkAndGet(m.Response.HTTPEntity)
+	vars := streamFiller.Fill(holders)
+	fp.walkAndFill(&m.Response.HTTPEntity, vars)
 
-	//extract holders
-	holders := fp.walkAndGet(m.Response)
-	fp.extractVars(m.Callback.Body, &holders)
+	//repeat the same opration in order to replace any holder coming from the external streams
 
-	//fill holders
-	vars := requestFiller.Fill(holders)
+	//get the holders in the response and the callback structs
+	holders = fp.walkAndGet(m.Response.HTTPEntity)
+	holders = append(holders, fp.walkAndGet(m.Callback.HTTPEntity)...)
+
+	//fill holders with the correct values
+	vars = requestFiller.Fill(holders)
 	fp.mergeVars(vars, fakeFiller.Fill(holders))
-	fp.walkAndFill(m, vars)
+
+	//replace the holders in the response and the callback
+	fp.walkAndFill(&m.Response.HTTPEntity, vars)
+	fp.walkAndFill(&m.Callback.HTTPEntity, vars)
 }
 
-func (fp ResponseMessageEvaluator) walkAndGet(res mock.Response) []string {
+func (fp ResponseMessageEvaluator) walkAndGet(res mock.HTTPEntity) []string {
 
 	vars := []string{}
 	for _, header := range res.Headers {
@@ -56,8 +63,7 @@ func (fp ResponseMessageEvaluator) walkAndGet(res mock.Response) []string {
 	return vars
 }
 
-func (fp ResponseMessageEvaluator) walkAndFill(m *mock.Definition, vars map[string][]string) {
-	res := &m.Response
+func (fp ResponseMessageEvaluator) walkAndFill(res *mock.HTTPEntity, vars map[string][]string) {
 	for header, values := range res.Headers {
 		for i, value := range values {
 			res.Headers[header][i] = fp.replaceVars(value, vars)
@@ -69,7 +75,6 @@ func (fp ResponseMessageEvaluator) walkAndFill(m *mock.Definition, vars map[stri
 	}
 
 	res.Body = fp.replaceVars(res.Body, vars)
-	m.Callback.Body = fp.replaceVars(m.Callback.Body, vars)
 }
 
 func (fp ResponseMessageEvaluator) replaceVars(input string, vars map[string][]string) string {

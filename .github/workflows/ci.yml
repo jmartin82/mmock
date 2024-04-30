@@ -31,6 +31,9 @@ jobs:
 
     - name: Test with coverage
       run: make coverage
-
-    - name: Upload coverage to Codecov
-      run: bash <(curl -s https://codecov.io/bash)
+    - name: Upload coverage reports to Codecov
+      run: |
+        # Replace `linux` below with the appropriate OS
+        curl -Os https://uploader.codecov.io/latest/linux/codecov
+        chmod +x codecov
+        ./codecov -t ${CODECOV_TOKEN}
