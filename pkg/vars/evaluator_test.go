@@ -194,8 +194,10 @@ func TestReplaceTags(t *testing.T) {
 
 	req := mock.Request{}
 	req.Body = "hi!"
+
 	val := make(mock.Values)
 	val["param1"] = []string{"valParam"}
+
 	req.QueryStringParameters = val
 
 	cookie := make(mock.Cookies)
@@ -203,20 +205,25 @@ func TestReplaceTags(t *testing.T) {
 	req.Cookies = cookie
 
 	res := mock.Response{}
+	cb := mock.Callback{}
 	res.Body = "Request Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}. Random: {{fake.UserName}}"
+	cb.Body = "Callback Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}. Random: {{fake.UserName}}"
 
 	cookie = make(mock.Cookies)
 	cookie["cookie1"] = "valCookie"
 	cookie["cookie2"] = "{{fake.UserName}}"
+
 	res.Cookies = cookie
+	cb.Cookies = cookie
 
 	val = make(mock.Values)
 	val["header1"] = []string{"valHeader"}
 	val["header2"] = []string{"valHeader", "{{request.query.param1}}"}
 
 	res.Headers = val
+	cb.Headers = val
 
-	mock := mock.Definition{Request: req, Response: res}
+	mock := mock.Definition{Request: req, Response: res, Callback: cb}
 	varsProcessor := getProcessor()
 	varsProcessor.Eval(&req, &mock)
 
@@ -230,6 +237,18 @@ func TestReplaceTags(t *testing.T) {
 
 	if mock.Response.Headers["header2"][1] != "valParam" {
 		t.Error("Replaced tags in headers match", mock.Response.Headers["header2"][1])
+	}
+
+	if mock.Callback.Cookies["cookie2"] != "AleixMG" {
+		t.Error("Replaced tags in Callback cookie match", mock.Callback.Cookies["cookie2"])
+	}
+
+	if mock.Callback.Headers["header2"][1] != "valParam" {
+		t.Error("Replaced tags in Callback headers match", mock.Callback.Headers["header2"][1])
+	}
+
+	if mock.Callback.Body != "Callback Body hi!. Query valParam. Cookie: valCookie. Random: AleixMG" {
+		t.Error("Replaced tags in body not match", cb.Body)
 	}
 }
 
@@ -564,7 +583,7 @@ func TestReplaceXmlBodyEncodedTags(t *testing.T) {
 func TestReplaceTagsCallback(t *testing.T) {
 
 	req := mock.Request{}
-	req.Body = "hi!"
+	req.Body = "hi Isona!"
 	val := make(mock.Values)
 	val["param1"] = []string{"valParam"}
 	req.QueryStringParameters = val
@@ -580,7 +599,7 @@ func TestReplaceTagsCallback(t *testing.T) {
 	varsProcessor := getProcessor()
 	varsProcessor.Eval(&req, &mock)
 
-	if mock.Callback.Body != "Request Body hi!. Query valParam. Cookie: valCookie. Random: AleixMG" {
+	if mock.Callback.Body != "Request Body hi Isona!. Query valParam. Cookie: valCookie. Random: AleixMG" {
 		t.Error("Replaced tags in callback body not match", cb.Body)
 	}
 }

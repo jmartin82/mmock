@@ -45,9 +45,9 @@ func TestPost(t *testing.T) {
 	defer ts.Close()
 
 	cb := mock.Callback{
-		Url:    ts.URL,
-		Method: "POST",
-		Body:   "Some post body",
+		Url:        ts.URL,
+		Method:     "POST",
+		HTTPEntity: mock.HTTPEntity{Body: "Some post body"},
 	}
 
 	resp, err := HandleCallback(cb)

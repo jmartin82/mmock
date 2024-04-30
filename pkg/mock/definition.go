@@ -16,6 +16,11 @@ type HttpHeaders struct {
 	Cookies Cookies `json:"cookies"`
 }
 
+type HTTPEntity struct {
+	HttpHeaders
+	Body string `json:"body"`
+}
+
 type Request struct {
 	Scheme                string `json:"scheme"`
 	Host                  string `json:"host"`
@@ -24,23 +29,20 @@ type Request struct {
 	Path                  string `json:"path"`
 	QueryStringParameters Values `json:"queryStringParameters"`
 	Fragment              string `json:"fragment"`
-	HttpHeaders
-	Body string `json:"body"`
+	HTTPEntity
 }
 
 type Response struct {
 	StatusCode int `json:"statusCode"`
-	HttpHeaders
-	Body string `json:"body"`
+	HTTPEntity
 }
 
 type Callback struct {
 	Delay  Delay  `json:"delay"`
 	Method string `json:"method"`
 	Url    string `json:"url"`
-	HttpHeaders
-	Body    string `json:"body"`
-	Timeout Delay  `json:"timeout"`
+	HTTPEntity
+	Timeout Delay `json:"timeout"`
 }
 
 type Scenario struct {
