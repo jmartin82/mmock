@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
 )
+
+var log = logger.Log
 
 type Route struct {
 	Keys    []string
@@ -38,6 +41,28 @@ func (route *Route) Match(url string) *Match {
 		return nil
 	}
 	return &Match{route.Params(url), route.Pattern}
+}
+
+func (route *Route) MatchPathVariables(match *Match, patterns map[string]string) bool{
+  for key, value := range match.Params {
+
+    pattern, exists := patterns[key]
+
+    if !exists {
+      log.Debugf("pathVariable %v isn't in request", key)
+      return false
+    }
+
+    log.Debugf("comparing pathVariable %v that has a value of %v against pattern %v", key, value, pattern)
+    matched, err := regexp.MatchString(pattern, value)
+
+    if !matched || err != nil {
+      log.Debugf("PathVariable %v with a value of %v either doesn't match %v or %v", key, value, pattern, err)
+      return false
+    }
+  }
+
+  return true
 }
 
 func NewRoute(pattern string) *Route {
