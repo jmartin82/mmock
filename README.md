@@ -270,6 +270,10 @@ You can use variable data in response. The variables will be defined as tags lik
  - URI
  - description
 
+**Enviroment variables:** You can access the server's environment variables using
+
+  * env."*VARIABLE_NAME*"
+
 **Request data:** Use them if you want to add request data in your response.
 
  - request.scheme
