@@ -87,7 +87,16 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	//set new scenario
 	if mock.Control.Scenario.NewState != "" {
 		statistics.TrackScenarioFeature()
-		di.Scenario.SetState(mock.Control.Scenario.Name, mock.Control.Scenario.NewState)
+
+		di.Scenario.SetState(
+		  mock.Control.Scenario.Name,
+		  mock.Control.Scenario.NewState)
+
+		if len(mock.Control.Scenario.Values) != 0 {
+		   di.Scenario.SetStateValues(
+		     mock.Control.Scenario.Name,
+		     mock.Control.Scenario.Values)
+		 }
 	}
 
 	if mock.Control.WebHookURL != "" {

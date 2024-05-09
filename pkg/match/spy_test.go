@@ -23,6 +23,22 @@ func (dsm DummyScenarioManager) GetState(name string) string {
 	return ""
 }
 
+func (dsm DummyScenarioManager) GetStateValues(name string) map[string]string {
+	return make(map[string]string)
+}
+
+func (dsm DummyScenarioManager) GetStateValue(name, valueName string) string {
+	return ""
+}
+
+func (dsm DummyScenarioManager) SetStateValues(name string, values map[string]string) {
+	return
+}
+
+func (dsm DummyScenarioManager) SetStateValue(name, valueName, value string) {
+	return
+}
+
 func (dsm DummyScenarioManager) GetPaused() bool {
 	return false
 }

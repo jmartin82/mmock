@@ -47,6 +47,7 @@ type Callback struct {
 
 type Scenario struct {
 	Name          string   `json:"name"`
+	Values		map[string]string `json:"values"` 
 	RequiredState []string `json:"requiredState"`
 	NewState      string   `json:"newState"`
 }
