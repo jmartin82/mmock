@@ -11,12 +11,15 @@ type ScenearioStorer interface {
 	SetStateValues(name string, values map[string]string)
 	SetStateValue(name, valueName, value string)
 	GetStateValues(name string) map[string]string
-	GetStateValue(name, valueName string) string
+	GetStateValue(name, valueName string) (string, bool)
 	Reset(name string) bool
 	ResetAll()
 	SetPaused(newstate bool)
 	GetPaused() bool
 	List() string
+}
+
+type ScenearioStore struct {
 }
 
 func NewInMemoryScenarioStore() *InMemoryScenarioStore {
@@ -32,6 +35,7 @@ type InMemoryScenarioStore struct {
 	status map[string]string
 	values map[string]map[string]string
 	paused bool
+	*ScenearioStore
 }
 
 func (sm *InMemoryScenarioStore) List() string {
@@ -90,12 +94,12 @@ func (sm *InMemoryScenarioStore) GetStateValues(name string) map[string]string {
 	return make(map[string]string)
 }
 
-func (sm *InMemoryScenarioStore) GetStateValue(name, valueName string) string {
+func (sm *InMemoryScenarioStore) GetStateValue(name, valueName string) (string, bool) {
 	if v, f := sm.values[strings.ToLower(name)][strings.ToLower(valueName)]; f {
-		return v
+		return v, true
 	}
 
-	return ""
+	return "", false
 }
 
 

@@ -157,7 +157,7 @@ func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition
 			statistics.TrackProxyFeature()
 			response = getProxyResponse(request, mock)
 		} else {
-			di.Evaluator.Eval(request, mock)
+			di.Evaluator.Eval(request, mock, di.Scenario)
 			response = &mock.Response
 		}
 

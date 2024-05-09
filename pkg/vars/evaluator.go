@@ -5,12 +5,13 @@ import (
 	"strings"
 
 	"github.com/jmartin82/mmock/v3/pkg/mock"
+	"github.com/jmartin82/mmock/v3/pkg/match"
 )
 
 var varsRegex = regexp.MustCompile(`\{\{\s*(.+?)\s*\}\}`)
 
 type Evaluator interface {
-	Eval(req *mock.Request, m *mock.Definition)
+	Eval(req *mock.Request, m *mock.Definition, scenearioStore match.ScenearioStorer)
 }
 
 type ResponseMessageEvaluator struct {
@@ -21,7 +22,7 @@ func NewResponseMessageEvaluator(fp FillerFactory) *ResponseMessageEvaluator {
 	return &ResponseMessageEvaluator{FillerFactory: fp}
 }
 
-func (fp ResponseMessageEvaluator) Eval(req *mock.Request, m *mock.Definition) {
+func (fp ResponseMessageEvaluator) Eval(req *mock.Request, m *mock.Definition, store match.ScenearioStorer) {
 	requestFiller := fp.FillerFactory.CreateRequestFiller(req, m)
 	fakeFiller := fp.FillerFactory.CreateFakeFiller()
 	streamFiller := fp.FillerFactory.CreateStreamFiller()
@@ -44,7 +45,12 @@ func (fp ResponseMessageEvaluator) Eval(req *mock.Request, m *mock.Definition) {
 	vars = requestFiller.Fill(holders)
 	fp.mergeVars(vars, fakeFiller.Fill(holders))
 
-	//replace the holders in the response
+	if m.Control.Scenario.Name != "" {
+	  scenarioFiller := fp.FillerFactory.CreateScenarioFiller(req, m, store, m.Control.Scenario.Name)
+	  fp.mergeVars(vars, scenarioFiller.Fill(holders))
+	}
+
+	//replace the holders in the response and the callback
 	fp.walkAndFill(&m.Response.HTTPEntity, vars)
 
 	// fill any response.* holders
