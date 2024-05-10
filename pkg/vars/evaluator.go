@@ -30,6 +30,9 @@ func (fp ResponseMessageEvaluator) Eval(req *mock.Request, m *mock.Definition, s
 
 	//first replace the external streams
 	holders := fp.walkAndGet(m.Response.HTTPEntity)
+	holders = append(holders, fp.walkAndGet(m.Callback.HTTPEntity)...)
+
+	//fill holders with the correct values
 	vars := streamFiller.Fill(holders)
 	fp.walkAndFill(&m.Response.HTTPEntity, vars)
 	fp.walkAndFill(&m.Callback.HTTPEntity, vars)
@@ -45,6 +48,7 @@ func (fp ResponseMessageEvaluator) Eval(req *mock.Request, m *mock.Definition, s
 	vars = requestFiller.Fill(holders)
 	fp.mergeVars(vars, fakeFiller.Fill(holders))
 
+	// if we have a scenario, fill any scenario.* holders
 	if m.Control.Scenario.Name != "" {
 	  scenarioFiller := fp.FillerFactory.CreateScenarioFiller(req, m, store, m.Control.Scenario.Name)
 	  fp.mergeVars(vars, scenarioFiller.Fill(holders))
@@ -107,6 +111,7 @@ func (fp ResponseMessageEvaluator) replaceVars(input string, vars map[string][]s
 
 func (fp ResponseMessageEvaluator) extractVars(input string, vars *[]string) {
 	if m := varsRegex.FindAllString(input, -1); m != nil {
+
 		for _, v := range m {
 			varName := strings.Trim(v, "{} ")
 			*vars = append(*vars, varName)

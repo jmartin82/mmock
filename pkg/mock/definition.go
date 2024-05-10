@@ -9,6 +9,8 @@ import (
 
 type Values map[string][]string
 
+type ScenarioValues map[string]string
+
 type Cookies map[string]string
 
 type HttpHeaders struct {
@@ -47,7 +49,7 @@ type Callback struct {
 
 type Scenario struct {
 	Name          string   `json:"name"`
-	Values		map[string]string `json:"values"` 
+	Values        ScenarioValues `json:"values"` 
 	RequiredState []string `json:"requiredState"`
 	NewState      string   `json:"newState"`
 }

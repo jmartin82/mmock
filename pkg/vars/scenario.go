@@ -19,8 +19,9 @@ func (sf ScenarioFiller) Fill(holders []string) map[string][]string {
      for _, tag := range holders {
          found := false
          s := ""
+
 	 if strings.HasPrefix(tag, "scenario.") {
-	   s, found = sf.Store.GetStateValue(sf.Name, tag[8:])
+	   s, found = sf.Store.GetStateValue(sf.Name, tag[9:])
 	 }
 
 	 if found {
