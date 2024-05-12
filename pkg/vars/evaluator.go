@@ -25,13 +25,16 @@ func (fp ResponseMessageEvaluator) Eval(req *mock.Request, m *mock.Definition) {
 	requestFiller := fp.FillerFactory.CreateRequestFiller(req, m)
 	fakeFiller := fp.FillerFactory.CreateFakeFiller()
 	streamFiller := fp.FillerFactory.CreateStreamFiller()
+	responseFiller := fp.FillerFactory.CreateResponseFiller(&m.Response)
 
 	//first replace the external streams
 	holders := fp.walkAndGet(m.Response.HTTPEntity)
 	vars := streamFiller.Fill(holders)
 	fp.walkAndFill(&m.Response.HTTPEntity, vars)
+	fp.walkAndFill(&m.Callback.HTTPEntity, vars)
 
-	//repeat the same opration in order to replace any holder coming from the external streams
+	//repeat the same opration in order to replace any holder
+	//coming from the external streams
 
 	//get the holders in the response and the callback structs
 	holders = fp.walkAndGet(m.Response.HTTPEntity)
@@ -41,8 +44,13 @@ func (fp ResponseMessageEvaluator) Eval(req *mock.Request, m *mock.Definition) {
 	vars = requestFiller.Fill(holders)
 	fp.mergeVars(vars, fakeFiller.Fill(holders))
 
-	//replace the holders in the response and the callback
+	//replace the holders in the response
 	fp.walkAndFill(&m.Response.HTTPEntity, vars)
+
+	// fill any response.* holders
+	fp.mergeVars(vars, responseFiller.Fill(holders))
+
+	//replace the holders in the response
 	fp.walkAndFill(&m.Callback.HTTPEntity, vars)
 }
 
