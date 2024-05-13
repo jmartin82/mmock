@@ -27,8 +27,8 @@ func (dsm DummyScenarioManager) GetStateValues(name string) map[string]string {
 	return make(map[string]string)
 }
 
-func (dsm DummyScenarioManager) GetStateValue(name, valueName string) string {
-	return ""
+func (dsm DummyScenarioManager) GetStateValue(name, valueName string) (string, bool) {
+	return "", false
 }
 
 func (dsm DummyScenarioManager) SetStateValues(name string, values map[string]string) {

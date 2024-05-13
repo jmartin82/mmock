@@ -140,8 +140,12 @@ func TestGetBodyParam(t *testing.T) {
 }
 `
 	mock := mock.Definition{Request: req, Response: res}
+		
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock)
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Response.Body != expected {
 		t.Error("Replaced tags from body form do not match", mock.Response.Body)
@@ -174,9 +178,12 @@ func TestURI(t *testing.T) {
 
 	mock := mock.Definition{Request: req, Response: res}
 	mock.URI = MOCK_URI
+		
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock)
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Response.Body != expectedBody {
 		t.Error("failed to replace URI in response body", mock.Response.Body)
@@ -214,9 +221,12 @@ func TestDescription(t *testing.T) {
 
 	mock := mock.Definition{Request: req, Response: res}
 	mock.Description = MOCK_DESCRIPTION
+	
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock)
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Response.Body != expectedBody {
 		t.Error("failed to replace Description in response body", mock.Response.Body)
