@@ -93,6 +93,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		  mock.Control.Scenario.NewState)
 
 		if len(mock.Control.Scenario.Values) != 0 {
+		  log.Debugf("Setting Scenario values: %v", mock.Control.Scenario.Values)
 		   di.Scenario.SetStateValues(
 		     mock.Control.Scenario.Name,
 		     mock.Control.Scenario.Values)
