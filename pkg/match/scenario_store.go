@@ -83,6 +83,9 @@ func (sm *InMemoryScenarioStore) SetStateValue(name, valueName, value string) {
 	if sm.paused {
 		return
 	}
+	if sm.values[strings.ToLower(name)] == nil {
+		sm.values[strings.ToLower(name)] = make(map[string]string)
+	}
 	sm.values[strings.ToLower(name)][strings.ToLower(valueName)] = value
 }
 

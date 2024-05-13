@@ -27,7 +27,7 @@ func (fp ResponseMessageEvaluator) Eval(req *mock.Request, m *mock.Definition, s
 	fakeFiller := fp.FillerFactory.CreateFakeFiller()
 	streamFiller := fp.FillerFactory.CreateStreamFiller()
 	responseFiller := fp.FillerFactory.CreateResponseFiller(&m.Response)
-	scenarioFiller := fp.FillerFactory.CreateScenarioFiller(req, m, store, m.Control.Scenario.Name)
+	scenarioFiller := fp.FillerFactory.CreateScenarioFiller(store, m.Control.Scenario.Name)
 
 	//first replace the external streams
 	holders := fp.walkAndGet(m.Response.HTTPEntity)

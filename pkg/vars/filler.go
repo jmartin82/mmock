@@ -16,8 +16,6 @@ type FillerFactory interface {
 	CreateStreamFiller() Filler
 	CreateResponseFiller(res *mock.Response) Filler
 	CreateScenarioFiller(
-		req *mock.Request,
-		mock *mock.Definition,
 		scenarioStore match.ScenearioStorer,
 		scenarioName string,
 	) Filler
@@ -48,15 +46,11 @@ func (mff MockFillerFactory) CreateResponseFiller(res *mock.Response) Filler {
 }
 
 func (mff MockFillerFactory) CreateScenarioFiller(
-	req *mock.Request,
-	mock *mock.Definition,
 	scenarioStore match.ScenearioStorer,
 	scenarioName string) Filler {
 
 	return ScenarioFiller{
-		Mock:    mock,
-		Request: req,
-		Name:    scenarioName,
-		Store:   scenarioStore,
+		Name:  scenarioName,
+		Store: scenarioStore,
 	}
 }

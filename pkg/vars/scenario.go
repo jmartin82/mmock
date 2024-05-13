@@ -2,15 +2,12 @@ package vars
 
 import (
 	"github.com/jmartin82/mmock/v3/pkg/match"
-	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"strings"
 )
 
 type ScenarioFiller struct {
-	Mock    *mock.Definition
-	Request *mock.Request
-	Name    string
-	Store   match.ScenearioStorer
+	Name  string
+	Store match.ScenearioStorer
 }
 
 func (sf ScenarioFiller) Fill(holders []string) map[string][]string {
