@@ -29,8 +29,6 @@ func getLoadedScenarioFiller() ScenarioFiller {
 		Store: store,
 	}
 
-	log.Errorf("filler: %v", filler)
-	log.Errorf("store: %v", store)
 	return filler
 }
 
@@ -38,13 +36,11 @@ func TestScenarioFiller(t *testing.T) {
 	var filler = getLoadedScenarioFiller()
 
 	for _, tt := range scenarioTestVars {
-		log.Errorf("testing: %v", tt)
 		holders := []string{
 			tt.key,
 		}
 
 		vars := filler.Fill(holders)
-		log.Errorf("vars: %v", vars)
 
 		if len(vars) == 0 {
 			if tt.expectToFind {

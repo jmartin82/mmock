@@ -47,13 +47,11 @@ func TestResponseFiller(t *testing.T) {
 	var filler = getLoadedResponseFiller()
 
 	for _, tt := range testVars {
-		log.Errorf("testing: %v", tt)
 		holders := []string{
 			tt.key,
 		}
 
 		vars := filler.Fill(holders)
-		log.Errorf("vars: %v", vars)
 
 		if len(vars) == 0 {
 			if tt.expectToFind {
