@@ -1,18 +1,18 @@
 package vars
 
 import (
-        "net/url"
-        "regexp"
-        "strings"
+	"net/url"
+	"regexp"
+	"strings"
 
-    "github.com/tidwall/gjson"
-    xj "github.com/basgys/goxml2json"
+	xj "github.com/basgys/goxml2json"
+	"github.com/tidwall/gjson"
 
-    "github.com/jmartin82/mmock/v3/pkg/mock"
-  )
+	"github.com/jmartin82/mmock/v3/pkg/mock"
+)
 
 type HttpEntityParams struct {
-  Entity  *mock.HTTPEntity
+	Entity *mock.HTTPEntity
 }
 
 func (ep HttpEntityParams) getCookieParam(name string) (string, bool) {
@@ -52,19 +52,18 @@ func (ep HttpEntityParams) getBodyParam(name string) (string, bool) {
 		return ep.getUrlEncodedFormBodyParam(ep.Entity.Body, name)
 
 	} else if strings.HasPrefix(contentType[0], "application/xml") ||
-	  strings.HasPrefix(contentType[0], "text/xml") {
+		strings.HasPrefix(contentType[0], "text/xml") {
 
 		return ep.getXmlBodyParam(ep.Entity.Body, name)
 
 	} else if strings.HasPrefix(contentType[0], "application/") &&
-	  strings.HasSuffix(contentType[0], "json") {
+		strings.HasSuffix(contentType[0], "json") {
 
 		return ep.getJsonBodyParam(ep.Entity.Body, name)
 	}
 
 	return "", false
 }
-
 
 func (ep HttpEntityParams) getXmlBodyParam(body string, name string) (string, bool) {
 	xml := strings.NewReader(body)

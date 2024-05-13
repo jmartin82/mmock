@@ -140,7 +140,7 @@ func TestGetBodyParam(t *testing.T) {
 }
 `
 	mock := mock.Definition{Request: req, Response: res}
-		
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
@@ -178,7 +178,7 @@ func TestURI(t *testing.T) {
 
 	mock := mock.Definition{Request: req, Response: res}
 	mock.URI = MOCK_URI
-		
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
@@ -221,7 +221,7 @@ func TestDescription(t *testing.T) {
 
 	mock := mock.Definition{Request: req, Response: res}
 	mock.Description = MOCK_DESCRIPTION
-	
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 

@@ -1,8 +1,8 @@
 package vars
 
 import (
-	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"github.com/jmartin82/mmock/v3/pkg/match"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"github.com/jmartin82/mmock/v3/pkg/vars/fake"
 )
 
@@ -16,10 +16,10 @@ type FillerFactory interface {
 	CreateStreamFiller() Filler
 	CreateResponseFiller(res *mock.Response) Filler
 	CreateScenarioFiller(
-	  req *mock.Request,
-	  mock *mock.Definition,
-	  scenarioStore match.ScenearioStorer,
-	  scenarioName string,
+		req *mock.Request,
+		mock *mock.Definition,
+		scenarioStore match.ScenearioStorer,
+		scenarioName string,
 	) Filler
 }
 
@@ -44,19 +44,19 @@ func (mff MockFillerFactory) CreateStreamFiller() Filler {
 }
 
 func (mff MockFillerFactory) CreateResponseFiller(res *mock.Response) Filler {
-  return ResponseFiller{Response: res}
+	return ResponseFiller{Response: res}
 }
 
 func (mff MockFillerFactory) CreateScenarioFiller(
-  req *mock.Request,
-  mock *mock.Definition,
-  scenarioStore match.ScenearioStorer,
-  scenarioName string) Filler {
+	req *mock.Request,
+	mock *mock.Definition,
+	scenarioStore match.ScenearioStorer,
+	scenarioName string) Filler {
 
-  return ScenarioFiller{
-    Mock: mock,
-    Request: req,
-    Name: scenarioName,
-    Store: scenarioStore,
-  }
+	return ScenarioFiller{
+		Mock:    mock,
+		Request: req,
+		Name:    scenarioName,
+		Store:   scenarioStore,
+	}
 }

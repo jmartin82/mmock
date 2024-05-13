@@ -4,8 +4,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"github.com/jmartin82/mmock/v3/pkg/match"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 var varsRegex = regexp.MustCompile(`\{\{\s*(.+?)\s*\}\}`)
@@ -44,7 +44,7 @@ func (fp ResponseMessageEvaluator) Eval(req *mock.Request, m *mock.Definition, s
 	//get the holders in the response and the callback structs
 	holders = fp.walkAndGet(m.Response.HTTPEntity)
 	holders = append(holders, fp.walkAndGet(m.Callback.HTTPEntity)...)
-	holders = append(holders, fp.walkAndGetScenario(m.Control.Scenario)...) 
+	holders = append(holders, fp.walkAndGetScenario(m.Control.Scenario)...)
 
 	//fill holders with the correct values
 	vars = requestFiller.Fill(holders)
@@ -97,20 +97,19 @@ func (fp ResponseMessageEvaluator) walkAndFill(res *mock.HTTPEntity, vars map[st
 
 func (fp ResponseMessageEvaluator) walkAndGetScenario(scenario mock.Scenario) []string {
 	vars := []string{}
-		for _, value := range scenario.Values {
+	for _, value := range scenario.Values {
 		fp.extractVars(value, &vars)
 	}
 	return vars
 }
 
-func  (fp ResponseMessageEvaluator) walkAndFillScenario(
-  scenario *mock.Scenario,
-  vars map[string][]string){
+func (fp ResponseMessageEvaluator) walkAndFillScenario(
+	scenario *mock.Scenario,
+	vars map[string][]string) {
 	for valueName, value := range scenario.Values {
 		scenario.Values[valueName] = fp.replaceVars(value, vars)
 	}
 }
-
 
 func (fp ResponseMessageEvaluator) replaceVars(input string, vars map[string][]string) string {
 	return varsRegex.ReplaceAllStringFunc(input, func(value string) string {

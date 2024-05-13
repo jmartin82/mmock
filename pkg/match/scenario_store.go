@@ -26,8 +26,8 @@ func NewInMemoryScenarioStore() *InMemoryScenarioStore {
 	status := make(map[string]string)
 	values := make(map[string]map[string]string)
 	return &InMemoryScenarioStore{
-	  status: status,
-	  values: values,
+		status: status,
+		values: values,
 	}
 }
 
@@ -101,7 +101,6 @@ func (sm *InMemoryScenarioStore) GetStateValue(name, valueName string) (string, 
 
 	return "", false
 }
-
 
 func (sm *InMemoryScenarioStore) GetPaused() bool {
 	return sm.paused

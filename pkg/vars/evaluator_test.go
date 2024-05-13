@@ -190,7 +190,6 @@ func getProcessor() ResponseMessageEvaluator {
 	return ResponseMessageEvaluator{FillerFactory: ff}
 }
 
-
 func TestReplaceTags(t *testing.T) {
 
 	req := mock.Request{}
@@ -228,9 +227,9 @@ func TestReplaceTags(t *testing.T) {
 
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test001", scenarioValues)
-	 
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock, storer )
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Response.Body != "Request Body hi!. Query valParam. Cookie: valCookie. Random: AleixMG" {
 		t.Error("Replaced tags in body not match", res.Body)
@@ -271,7 +270,7 @@ func TestReplaceUndefinedFakeTag(t *testing.T) {
 	res.Body = "Request {{request.query.param2}}. Cookie: {{request.cookie.cookie2}}. Random: {{fake.otherOption}}"
 
 	mock := mock.Definition{Request: req, Response: res}
-	
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
@@ -298,7 +297,7 @@ func TestReplaceTagWithSpace(t *testing.T) {
 	res.Body = "Request {{ request.query.param1}}. Cookie: {{request.cookie.cookie1 }}. Random: {{fake.UserName }}"
 
 	mock := mock.Definition{Request: req, Response: res}
-		
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
@@ -340,7 +339,7 @@ func TestReplaceTagWithParameter(t *testing.T) {
 	res.Body = "Random: {{fake.CharactersN(15)}}"
 
 	m := mock.Definition{Request: req, Response: res}
-		
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
@@ -359,7 +358,7 @@ func TestReplaceTagWithParameterNoParameterPassed(t *testing.T) {
 	res.Body = "Random: {{fake.CharactersN}}"
 
 	mock := mock.Definition{Request: req, Response: res}
-		
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
@@ -378,7 +377,7 @@ func TestReplaceMissingTags(t *testing.T) {
 	res.Body = "Request Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}."
 
 	mock := mock.Definition{Request: req, Response: res}
-		
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
@@ -400,7 +399,7 @@ func TestReplaceFormUrlEncodedBodyTags(t *testing.T) {
 	res.Body = "Form data placeholders. One '{{request.body.one}}'. Two '{{request.body.two[array]}}'."
 
 	mock := mock.Definition{Request: req, Response: res}
-		
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
@@ -431,7 +430,7 @@ func TestReplaceUrlInfo(t *testing.T) {
 	res.Body = "{{request.scheme}}://{{request.hostname}}:{{request.port}}{{request.path}}#{{request.fragment}}"
 
 	m := mock.Definition{Request: req, Response: res}
-		
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
@@ -446,7 +445,7 @@ func TestReplaceUrlInfo(t *testing.T) {
 	res.Body = "{{request.url}}"
 
 	m = mock.Definition{Request: req, Response: res}
-		
+
 	varsProcessor.Eval(&req, &m, storer)
 
 	if m.Response.Body != "ws://example.com:8001/home?param1=valParam1&param1=valParam2&param2=valParam1#anchor" {
@@ -532,7 +531,7 @@ func TestReplaceJsonBodyEncodedTags(t *testing.T) {
 }
 `
 	mock := mock.Definition{Request: req, Response: res}
-		
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
@@ -614,7 +613,7 @@ func TestReplaceXmlBodyEncodedTags(t *testing.T) {
 </root>
 `
 	mock := mock.Definition{Request: req, Response: res}
-		
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
@@ -642,7 +641,7 @@ func TestReplaceTagsCallback(t *testing.T) {
 	cb.Body = "Request Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}. Random: {{fake.UserName}}"
 
 	mock := mock.Definition{Request: req, Callback: cb}
-		
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 
@@ -675,7 +674,7 @@ func TestReplaceBigFile(t *testing.T) {
 	res.Body = fmt.Sprintf("Big file: {{file.contents(%s)}}", tmpfn)
 
 	mock := mock.Definition{Request: req, Response: res}
-		
+
 	scenarioValues := make(map[string]string)
 	storer := NewDummyScenarioStorer("test002", scenarioValues)
 

@@ -48,10 +48,10 @@ type Callback struct {
 }
 
 type Scenario struct {
-	Name          string   `json:"name"`
-	Values        ScenarioValues `json:"values"` 
-	RequiredState []string `json:"requiredState"`
-	NewState      string   `json:"newState"`
+	Name          string         `json:"name"`
+	Values        ScenarioValues `json:"values"`
+	RequiredState []string       `json:"requiredState"`
+	NewState      string         `json:"newState"`
 }
 
 type Delay struct {
