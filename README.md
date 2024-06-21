@@ -276,7 +276,7 @@ You can use variable data in response. The variables will be defined as tags lik
  - request.cookie."*key*"
  - request.fragment
  - request.url (full url with scheme, hostname, port, path and query parameters)
- - request.autority (return scheme, hostname and port (optional))
+ - request.authority (return scheme, hostname and port (optional))
  - request.body
 
 You can extract information from the request body too, using a dot notation path:
