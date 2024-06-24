@@ -224,8 +224,12 @@ func TestReplaceTags(t *testing.T) {
 	cb.Headers = val
 
 	mock := mock.Definition{Request: req, Response: res, Callback: cb}
+
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test001", scenarioValues)
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock)
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Response.Body != "Request Body hi!. Query valParam. Cookie: valCookie. Random: AleixMG" {
 		t.Error("Replaced tags in body not match", res.Body)
@@ -266,8 +270,12 @@ func TestReplaceUndefinedFakeTag(t *testing.T) {
 	res.Body = "Request {{request.query.param2}}. Cookie: {{request.cookie.cookie2}}. Random: {{fake.otherOption}}"
 
 	mock := mock.Definition{Request: req, Response: res}
+
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock)
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Response.Body != "Request {{request.query.param2}}. Cookie: {{request.cookie.cookie2}}. Random: {{fake.otherOption}}" {
 		t.Error("Replaced tags in body not match", mock.Response.Body)
@@ -289,8 +297,12 @@ func TestReplaceTagWithSpace(t *testing.T) {
 	res.Body = "Request {{ request.query.param1}}. Cookie: {{request.cookie.cookie1 }}. Random: {{fake.UserName }}"
 
 	mock := mock.Definition{Request: req, Response: res}
+
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock)
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Response.Body != "Request valParam. Cookie: valCookie. Random: AleixMG" {
 		t.Error("Replaced tags in body not match", mock.Response.Body)
@@ -309,7 +321,11 @@ func TestReplaceUrlPathVars(t *testing.T) {
 
 	req := mock.Request{}
 	req.Path = "/users/15"
-	varsProcessor.Eval(&req, &m)
+
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
+
+	varsProcessor.Eval(&req, &m, storer)
 
 	if m.Response.Body != "{ \"id\": 15 }" {
 		t.Error("Replaced url param in body not match", m.Response.Body)
@@ -323,8 +339,12 @@ func TestReplaceTagWithParameter(t *testing.T) {
 	res.Body = "Random: {{fake.CharactersN(15)}}"
 
 	m := mock.Definition{Request: req, Response: res}
+
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &m)
+	varsProcessor.Eval(&req, &m, storer)
 
 	if m.Response.Body != "Random: AleixMG15" {
 		t.Error("Replaced tags in body not match", m.Response.Body)
@@ -338,8 +358,12 @@ func TestReplaceTagWithParameterNoParameterPassed(t *testing.T) {
 	res.Body = "Random: {{fake.CharactersN}}"
 
 	mock := mock.Definition{Request: req, Response: res}
+
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock)
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Response.Body != "Random: {{fake.CharactersN}}" {
 		t.Error("Replaced tags in body not match", mock.Response.Body)
@@ -353,8 +377,12 @@ func TestReplaceMissingTags(t *testing.T) {
 	res.Body = "Request Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}."
 
 	mock := mock.Definition{Request: req, Response: res}
+
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock)
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Response.Body != "Request Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}." {
 		t.Error("Replaced missing tags not match", mock.Response.Body)
@@ -371,8 +399,12 @@ func TestReplaceFormUrlEncodedBodyTags(t *testing.T) {
 	res.Body = "Form data placeholders. One '{{request.body.one}}'. Two '{{request.body.two[array]}}'."
 
 	mock := mock.Definition{Request: req, Response: res}
+
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock)
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Response.Body != "Form data placeholders. One 'foo'. Two 'bar'." {
 		t.Error("Replaced tags from body form do not match", mock.Response.Body)
@@ -398,8 +430,12 @@ func TestReplaceUrlInfo(t *testing.T) {
 	res.Body = "{{request.scheme}}://{{request.hostname}}:{{request.port}}{{request.path}}#{{request.fragment}}"
 
 	m := mock.Definition{Request: req, Response: res}
+
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &m)
+	varsProcessor.Eval(&req, &m, storer)
 
 	if m.Response.Body != "ws://example.com:8001/home#anchor" {
 		t.Error("Replaced url info from body do not match", m.Response.Body)
@@ -409,7 +445,8 @@ func TestReplaceUrlInfo(t *testing.T) {
 	res.Body = "{{request.url}}"
 
 	m = mock.Definition{Request: req, Response: res}
-	varsProcessor.Eval(&req, &m)
+
+	varsProcessor.Eval(&req, &m, storer)
 
 	if m.Response.Body != "ws://example.com:8001/home?param1=valParam1&param1=valParam2&param2=valParam1#anchor" {
 		t.Error("Replaced url info from body do not match", m.Response.Body)
@@ -494,8 +531,12 @@ func TestReplaceJsonBodyEncodedTags(t *testing.T) {
 }
 `
 	mock := mock.Definition{Request: req, Response: res}
+
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock)
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Response.Body != expected {
 		t.Error("Replaced tags from body form do not match", mock.Response.Body)
@@ -572,8 +613,12 @@ func TestReplaceXmlBodyEncodedTags(t *testing.T) {
 </root>
 `
 	mock := mock.Definition{Request: req, Response: res}
+
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock)
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Response.Body != expected {
 		t.Error("Replaced tags from body form do not match", mock.Response.Body)
@@ -596,8 +641,12 @@ func TestReplaceTagsCallback(t *testing.T) {
 	cb.Body = "Request Body {{request.body}}. Query {{request.query.param1}}. Cookie: {{request.cookie.cookie1}}. Random: {{fake.UserName}}"
 
 	mock := mock.Definition{Request: req, Callback: cb}
+
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock)
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Callback.Body != "Request Body hi Isona!. Query valParam. Cookie: valCookie. Random: AleixMG" {
 		t.Error("Replaced tags in callback body not match", cb.Body)
@@ -625,8 +674,12 @@ func TestReplaceBigFile(t *testing.T) {
 	res.Body = fmt.Sprintf("Big file: {{file.contents(%s)}}", tmpfn)
 
 	mock := mock.Definition{Request: req, Response: res}
+
+	scenarioValues := make(map[string]string)
+	storer := NewDummyScenarioStorer("test002", scenarioValues)
+
 	varsProcessor := getProcessor()
-	varsProcessor.Eval(&req, &mock)
+	varsProcessor.Eval(&req, &mock, storer)
 
 	if mock.Response.Body != "Big file: hi! Isona. this is a big file with holders replaced" {
 		t.Error("Replaced tags in a external stream doesn't work.", res.Body, mock.Response.Body)

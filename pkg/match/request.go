@@ -161,6 +161,7 @@ func (mm Request) matchScenarioState(scenario *mock.Scenario) bool {
 	currentState := mm.scenario.GetState(scenario.Name)
 	for _, r := range scenario.RequiredState {
 		if strings.ToLower(r) == currentState {
+			log.Debugf("Scenario %v has matched %v state.", scenario.Name, currentState)
 			return true
 		}
 	}
