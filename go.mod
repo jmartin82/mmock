@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/basgys/goxml2json v1.1.0
-	github.com/elazarl/go-bindata-assetfs v1.0.0
 	github.com/fatih/color v1.16.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/icrowley/fake v0.0.0-20180203215853-4178557ae428
