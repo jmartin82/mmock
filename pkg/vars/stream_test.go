@@ -3,12 +3,12 @@ package vars
 import (
 	"fmt"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"os"
-	"sync"
 	"path/filepath"
 	"strings"
 	"testing"
-	"github.com/jmartin82/mmock/v3/internal/dummyServer"
 )
 
 func TestReadFile(t *testing.T) {
@@ -45,21 +45,23 @@ func TestReadFile(t *testing.T) {
 
 func TestHTTPContent(t *testing.T) {
 	st := Stream{}
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
 
-	dums := dummyServer.Start(wg, 8937)
-	k := "http.contents(http://localhost:8937/hello)"
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("Go\n"))
+	}))
+	defer server.Close()
+
+	k := fmt.Sprintf("http.contents(%s)", server.URL)
 	holders := []string{k}
 
 	result := st.Fill(holders)
-	dums.Stop()
 	v, f := result[k]
 	if !f {
 		t.Errorf("Stream key not found")
 	}
 
-	if !strings.Contains(v[0], "hello") {
+	if strings.TrimSpace(v[0]) != "Go" {
 		t.Errorf("Couldn't get the content. Value: %s", v)
 	}
 }
