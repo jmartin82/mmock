@@ -256,6 +256,33 @@ func TestReplaceTags(t *testing.T) {
 	}
 }
 
+func TestReplaceTagInScenarioName(t *testing.T) {
+	req := mock.Request{}
+	req.Body = "hi!"
+
+	val := make(mock.Values)
+        val["id"] = []string{"123454321:id:"}
+
+	req.QueryStringParameters = val
+
+	res := mock.Response{}
+	cb := mock.Callback{}
+	mock := mock.Definition{Request: req, Response: res, Callback: cb}
+        mock.Control.Scenario.Name = "scenarioName_{{request.query.id}}"
+
+	scenarioValues := make(map[string]string)
+        scenarioValues["tested"] = "ok"
+
+	storer := NewDummyScenarioStorer("scenarioName_{{request.query.id}}", scenarioValues)
+
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock, storer)
+
+        if mock.Control.Scenario.Name != "scenarioName_123454321:id:" {
+              t.Error("Scenario name not updated", mock.Control.Scenario.Name)
+        }
+}
+
 func TestReplaceUndefinedFakeTag(t *testing.T) {
 	req := mock.Request{}
 	val := make(mock.Values)
