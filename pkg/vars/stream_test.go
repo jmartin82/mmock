@@ -3,6 +3,8 @@ package vars
 import (
 	"fmt"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -44,7 +46,13 @@ func TestReadFile(t *testing.T) {
 func TestHTTPContent(t *testing.T) {
 	st := Stream{}
 
-	k := "http.contents(https://golang.org/)"
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("Go\n"))
+	}))
+	defer server.Close()
+
+	k := fmt.Sprintf("http.contents(%s)", server.URL)
 	holders := []string{k}
 
 	result := st.Fill(holders)
@@ -53,7 +61,7 @@ func TestHTTPContent(t *testing.T) {
 		t.Errorf("Stream key not found")
 	}
 
-	if !strings.Contains(v[0], "Go") {
+	if strings.TrimSpace(v[0]) != "Go" {
 		t.Errorf("Couldn't get the content. Value: %s", v)
 	}
 }
