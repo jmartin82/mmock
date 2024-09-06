@@ -1,6 +1,6 @@
 module github.com/jmartin82/mmock/v3
 
-go 1.18
+go 1.23
 
 require (
 	github.com/basgys/goxml2json v1.1.0
