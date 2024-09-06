@@ -1,0 +1,530 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0",
+    "title": "MMock",
+    "description": "Mmock is a testing and fast prototyping tool for developers",
+    "license": {
+      "name": "MIT",
+      "url": "https://github.com/jmartin82/mmock/blob/master/LICENSE.md"
+    }
+  },
+  "host": "localhost:8082",
+  "tags": [
+    {
+      "name": "request",
+      "description": "The Mmock records all requests it receives in memory (at least until it is reset). This makes it possible to verify that a request matching a specific pattern was received, and also to fetch the requests details."
+    },
+    {
+      "name": "scenario",
+      "description": "A scenario is essentially a state machine whose states can be arbitrarily assigned."
+    },
+    {
+      "name": "mapping",
+      "description": "You can manage remotely your stub mappings whenever you need"
+    }
+  ],
+  "basePath": "/api",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/request/all": {
+      "get": {
+        "summary": "Get all requests",
+        "tags": [
+          "request"
+        ],
+        "operationId": "Get all requests",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Array of match",
+            "schema": {
+              "$ref": "#/definitions/MockMatchList"
+            }
+          }
+        }
+      }
+    },
+    "/request/matched": {
+      "get": {
+        "summary": "Get all matched requests",
+        "tags": [
+          "request"
+        ],
+        "operationId": "Get all matched requests",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Array of match",
+            "schema": {
+              "$ref": "#/definitions/MockMatchList"
+            }
+          }
+        }
+      }
+    },
+    "/request/reset": {
+      "get": {
+        "summary": "Reset stored requests",
+        "tags": [
+          "request"
+        ],
+        "operationId": "Reset stored requests",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ActionResponse"
+            }
+          }
+        }
+      }
+    },
+    "/request/reset_match": {
+      "get": {
+        "summary": "Reset stored requests that matches specific criteria",
+        "tags": [
+          "request"
+        ],
+        "operationId": "Reset stored requests with criteria",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ActionResponse"
+            }
+          }
+        }
+      }
+    },
+    "/request/unmatched": {
+      "get": {
+        "summary": "Get all unmatched requests",
+        "tags": [
+          "request"
+        ],
+        "operationId": "Get all unmatched requests",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Array of match",
+            "schema": {
+              "$ref": "#/definitions/MockMatchList"
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/request/verify": {
+      "post": {
+        "summary": "Verify requests",
+        "tags": [
+          "request"
+        ],
+        "operationId": "Verify requests",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Request"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of match",
+            "schema": {
+              "$ref": "#/definitions/MockMatchList"
+            }
+          }
+        }
+      }
+    },
+    "/scenarios/reset_all": {
+      "get": {
+        "summary": "Reset all stored scenarios",
+        "tags": [
+          "scenario"
+        ],
+        "operationId": "Reset all stored scenarios",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ActionResponse"
+            }
+          }
+        }
+      }
+    },
+    "/mapping": {
+      "get": {
+        "summary": "Get all mock mappings",
+        "tags": [
+          "mapping"
+        ],
+        "operationId": "Get all mock mappings",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Mock definition list",
+            "schema": {
+              "$ref": "#/definitions/MockDefinitionList"
+            }
+          }
+        }
+      }
+    },
+    "/mapping/{mock_path}": {
+      "get": {
+        "summary": "Get mock definition",
+        "tags": [
+          "mapping"
+        ],
+        "operationId": "Get mock definition",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "mock_path",
+            "in": "path",
+            "description": "Mock path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mock definition list",
+            "schema": {
+              "$ref": "#/definitions/MockDefinition"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update mock definition",
+        "tags": [
+          "mapping"
+        ],
+        "operationId": "Update mock definition",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "mock_path",
+            "in": "path",
+            "description": "Mock path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MockDefinition"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Action result",
+            "schema": {
+              "$ref": "#/definitions/ActionResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create mock definition",
+        "tags": [
+          "mapping"
+        ],
+        "operationId": "Create mock definition",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "mock_path",
+            "in": "path",
+            "description": "Mock path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/MockDefinition"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Action result",
+            "schema": {
+              "$ref": "#/definitions/ActionResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete mock definition",
+        "tags": [
+          "mapping"
+        ],
+        "operationId": "Delete mock definition",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "mock_path",
+            "in": "path",
+            "description": "Mock path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Action result",
+            "schema": {
+              "$ref": "#/definitions/ActionResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "MockDefinitionList": {
+      "title": "Mock List",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/MockDefinition"
+      }
+    },
+    "MockMatchList": {
+      "title": "Match List",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/MockDefinition"
+      }
+    },
+    "MockDefinition": {
+      "title": "Mock definition",
+      "type": "object",
+      "properties": {
+        "URI": {
+          "description": "",
+          "type": "string"
+        },
+        "description": {
+          "description": "",
+          "type": "string"
+        },
+        "request": {
+          "$ref": "#/definitions/Request"
+        },
+        "response": {
+          "$ref": "#/definitions/Response"
+        },
+        "control": {
+          "$ref": "#/definitions/Control"
+        }
+      },
+      "required": [
+        "URI",
+        "description",
+        "request",
+        "response",
+        "control"
+      ]
+    },
+    "Request": {
+      "title": "Request",
+      "type": "object",
+      "properties": {
+        "host": {
+          "description": "",
+          "type": "string"
+        },
+        "method": {
+          "description": "",
+          "type": "string"
+        },
+        "path": {
+          "description": "",
+          "type": "string"
+        },
+        "queryStringParameters": {
+          "$ref": "#/definitions/QueryStringParameters"
+        },
+        "headers": {
+          "$ref": "#/definitions/KeyArray"
+        },
+        "cookies": {
+          "$ref": "#/definitions/Cookie"
+        },
+        "body": {
+          "description": "",
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "path"
+      ]
+    },
+    "QueryStringParameters": {
+      "$ref": "#/definitions/KeyArray"
+    },
+    "Response": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "description": "",
+          "type": "integer",
+          "format": "int32"
+        },
+        "headers": {
+          "$ref": "#/definitions/KeyArray"
+        },
+        "cookies": {
+          "$ref": "#/definitions/Cookie"
+        },
+        "body": {
+          "description": "",
+          "type": "string"
+        }
+      },
+      "required": [
+        "statusCode"
+      ]
+    },
+    "KeyArray": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "description": "",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Cookie": {
+      "type": "object",
+      "description": "",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "Control": {
+      "type": "object",
+      "properties": {
+        "priority": {
+          "description": "",
+          "type": "integer",
+          "format": "int32"
+        },
+        "delay": {
+          "description": "",
+          "type": "string"
+        },
+        "crazy": {
+          "description": "",
+          "type": "boolean"
+        },
+        "scenario": {
+          "$ref": "#/definitions/Scenario"
+        },
+        "proxyBaseURL": {
+          "description": "",
+          "type": "string"
+        }
+      }
+    },
+    "Scenario": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "",
+          "type": "string"
+        },
+        "requiredState": {
+          "description": "",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "newState": {
+          "description": "",
+          "type": "string"
+        }
+      }
+    },
+    "ActionResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "description": "",
+          "type": "string"
+        }
+      }
+    }
+  }
+}
