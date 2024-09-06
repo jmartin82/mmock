@@ -9,6 +9,7 @@ export GO111MODULE=on
 
 build: vet \
 	test
+	npm --prefix ui run build
 	go build  -v -o ./bin/$(PKG_NAME) cmd/mmock/main.go
 
 doc:

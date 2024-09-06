@@ -4,6 +4,12 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"io/fs"
+	"net/http"
+	"regexp"
+	"strconv"
+	"strings"
+
 	"github.com/jmartin82/mmock/v3/internal/config"
 	"github.com/jmartin82/mmock/v3/internal/config/logger"
 	"github.com/jmartin82/mmock/v3/internal/statistics"
@@ -11,13 +17,9 @@ import (
 	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/net/websocket"
-	"net/http"
-	"regexp"
-	"strconv"
-	"strings"
 )
 
-//go:embed tmpl
+//go:embed all:ui
 var assetFS embed.FS
 
 var log = logger.Log
@@ -76,10 +78,14 @@ func (di *Dispatcher) Start() {
 	e.GET("/echo", di.webSocketHandler)
 
 	//HTTP
-	statics := http.FileServer(http.FS(assetFS))
-	e.GET("/js/*", echo.WrapHandler(statics))
-	e.GET("/css/*", echo.WrapHandler(statics))
-	e.GET("/swagger.json", di.swaggerHandler)
+	sub, _ := fs.Sub(assetFS, "ui")
+	statics := http.FileServer(http.FS(sub))
+	e.GET("/assets/*.js", echo.WrapHandler(statics))
+	e.GET("/assets/*.css", echo.WrapHandler(statics))
+	e.GET("/favicon.ico", echo.WrapHandler(statics))
+	e.GET("/swagger.json", echo.WrapHandler(statics))
+	e.GET("/mapping", di.consoleHandler)
+	e.GET("/about", di.consoleHandler)
 	e.GET("/", di.consoleHandler)
 
 	//verification
@@ -114,14 +120,9 @@ func (di *Dispatcher) Start() {
 // CONSOLE
 func (di *Dispatcher) consoleHandler(c echo.Context) error {
 	statistics.TrackConsoleRequest()
-	tmpl, _ := Asset("tmpl/index.html")
+	tmpl, _ := assetFS.ReadFile("ui/index.html")
 	content := string(tmpl)
 	return c.HTML(http.StatusOK, content)
-}
-
-func (di *Dispatcher) swaggerHandler(c echo.Context) error {
-	tmpl, _ := Asset("tmpl/swagger.json")
-	return c.JSONBlob(http.StatusOK, tmpl)
 }
 
 func (di *Dispatcher) webSocketHandler(c echo.Context) error {
