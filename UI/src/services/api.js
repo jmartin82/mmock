@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const API_URL = window.location.protocol + "//" + location.host + "/api";
+//if it's on devmode
+let  API_URL = window.location.protocol + "//" + location.host + "/api";
+if (process.env.NODE_ENV === 'development') {
+  API_URL = "http://localhost:8082/api";
+}
 
 export const getMockDefinitions = async () => {
   try {

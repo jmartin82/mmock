@@ -67,79 +67,45 @@
           <ClipboardListIcon class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600" />
           <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No Mocks</h3>
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new mock.</p>
-          <div class="mt-6">
-            <button @click="showAddModal = true"
-              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              <PlusIcon class="h-5 w-5 mr-2" />
-              Add
-            </button>
-          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Add/Edit Modal -->
-  <div v-if="showAddModal || showEditModal" class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title"
-    role="dialog" aria-modal="true">
-    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-      <div
-        class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full dark:bg-gray-800">
-        <form @submit.prevent="showAddModal ? addItem() : updateItem()">
-          <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div class="mb-4">
-              <label for="edit-uri" class="block text-sm font-medium text-gray-700 dark:text-gray-300">URI</label>
-              <input type="text" id="edit-uri" v-model="editingItem.uri"
-                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                required />
+<!-- Add/Edit Modal -->
+<div v-if="showAddModal || showEditModal" class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full dark:bg-gray-800">
+          <form @submit.prevent="showAddModal ? addItem() : updateItem()">
+            <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div class="mb-4">
+                <label for="edit-uri" class="block text-sm font-medium text-gray-700 dark:text-gray-300">URI</label>
+                <input type="text" id="edit-uri" v-model="editingItem.URI" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" required :readonly="showEditModal ? true : false" />
+              </div>
+              <div class="mb-4">
+                <label for="edit-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                <input type="text" id="edit-description" v-model="editingItem.description" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" readonly />
+              </div>
+              <div class="mb-4">
+                <label for="edit-mock" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Definition</label>
+                <textarea id="edit-mock" v-model="editingItem.definition" rows="4" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" required></textarea>
+              </div>
             </div>
-            <div class="mb-4">
-              <label for="edit-description"
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-              <input type="text" id="edit-description" v-model="editingItem.description"
-                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                required />
+            <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                {{ showAddModal ? 'Add' : 'Update' }}
+              </button>
+              <button @click="closeModal" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                Cancel
+              </button>
             </div>
-            <div class="mb-4">
-              <label for="edit-method" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Method</label>
-              <select id="edit-method" v-model="editingItem.method"
-                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                required>
-                <option value="GET">GET</option>
-                <option value="POST">POST</option>
-                <option value="PUT">PUT</option>
-                <option value="DELETE">DELETE</option>
-              </select>
-            </div>
-            <div class="mb-4">
-              <label for="edit-path" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Path</label>
-              <input type="text" id="edit-path" v-model="editingItem.path"
-                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                required />
-            </div>
-            <div class="mb-4">
-              <label for="edit-result" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Result</label>
-              <input type="number" id="edit-result" v-model="editingItem.result"
-                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                required />
-            </div>
-          </div>
-          <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-            <button type="submit"
-              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-              {{ showAddModal ? 'Add' : 'Update' }}
-            </button>
-            <button @click="closeModal" type="button"
-              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
-              Cancel
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
-  </div>
+</div>
+
 </template>
 
 <script setup>
@@ -159,12 +125,7 @@ const headers = [
 const showAddModal = ref(false)
 const showEditModal = ref(false)
 const editingItem = ref({})
-const isDarkMode = ref(false)
-
 const items = ref([]);
-const selectedMock = ref(null);
-const newMock = ref({ URI: '', description: '' });
-const isCreating = ref(false);
 
 const loadMockDefinitions = async () => {
   try {
@@ -179,10 +140,9 @@ const loadMockDefinitions = async () => {
 const addItem = async () => {
 
   try {
-    await createMockDefinition(newMock.value.URI, newMock.value);
+    await createMockDefinition(editingItem.value.URI, JSON.parse(editingItem.value.definition));
+    editingItem.value = null;
     loadMockDefinitions();
-    newMock.value = { URI: '', description: '' };
-    isCreating.value = false;
   } catch (error) {
     console.error('Failed to create mock definition:', error);
   }
@@ -192,7 +152,11 @@ const addItem = async () => {
 
 const editItem = async (URI) => {
   try {
-    editingItem.value = await getMockDefinition(URI);
+    let mock = await getMockDefinition(URI);
+    editingItem.value.URI = mock.URI
+    editingItem.value.description = mock.description
+    editingItem.value.definition = JSON.stringify(mock)
+
     showEditModal.value = true
   } catch (error) {
     console.error('Failed to fetch mock definition:', error);
@@ -201,7 +165,7 @@ const editItem = async (URI) => {
 
 const updateItem = async () => {
   try {
-    await updateMockDefinition(editingItem.value.URI, editingItem.value);
+    await updateMockDefinition(editingItem.value.URI, JSON.parse(editingItem.value.definition));
     loadMockDefinitions();
     editingItem.value = null;
   } catch (error) {
@@ -222,7 +186,7 @@ const deleteItem = async (URI) => {
 const closeModal = () => {
   showAddModal.value = false
   showEditModal.value = false
-  editingItem.value = { uri: '', description: '', method: '', path: '', result: '' }
+  editingItem.value = { uri: '', description: '', definition: '' }
 }
 
 const getMethodColor = (method) => {

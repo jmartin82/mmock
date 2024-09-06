@@ -24,12 +24,12 @@
 	                  <span>Request Monitor</span>
 	                </a>
 	              </li>
-	              <!--li>
+	              <li>
 	                <a href="/mapping" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
 	                  <List class="h-5 w-5" />
 	                  <span>Mapping</span>
 	                </a>
-	              </li-->
+	              </li>
 	              <li>
 	                <a href="/about" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
 	                  <Settings class="h-5 w-5" />

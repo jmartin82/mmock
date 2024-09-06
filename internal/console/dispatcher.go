@@ -16,6 +16,7 @@ import (
 	"github.com/jmartin82/mmock/v3/pkg/match"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/net/websocket"
 )
 
@@ -70,6 +71,7 @@ func (di *Dispatcher) logFanOut() {
 // Start initiates the http console.
 func (di *Dispatcher) Start() {
 	e := echo.New()
+	e.Use(middleware.CORS())
 	e.HideBanner = true
 	e.HidePort = true
 
