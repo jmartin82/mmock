@@ -1,4 +1,4 @@
-.PHONY: build doc fmt lint dev test vet bindata
+.PHONY: build doc fmt lint dev test vet
 
 PKG_NAME=mmock
 NS = jordimartin
@@ -7,13 +7,9 @@ VERSION ?= latest
 export GO111MODULE=on
 
 
-build: bindata \
-	vet \
+build: vet \
 	test
 	go build  -v -o ./bin/$(PKG_NAME) cmd/mmock/main.go
-
-bindata:
-	go-bindata -pkg console -o internal/console/bindata.go tmpl/*
 
 doc:
 	godoc -http=:6060

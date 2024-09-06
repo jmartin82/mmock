@@ -1,9 +1,9 @@
 package console
 
 import (
+	"embed"
 	"errors"
 	"fmt"
-	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/jmartin82/mmock/v3/internal/config"
 	"github.com/jmartin82/mmock/v3/internal/config/logger"
 	"github.com/jmartin82/mmock/v3/internal/statistics"
@@ -16,6 +16,9 @@ import (
 	"strconv"
 	"strings"
 )
+
+//go:embed tmpl
+var assetFS embed.FS
 
 var log = logger.Log
 
@@ -73,7 +76,7 @@ func (di *Dispatcher) Start() {
 	e.GET("/echo", di.webSocketHandler)
 
 	//HTTP
-	statics := http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "tmpl"})
+	statics := http.FileServer(http.FS(assetFS))
 	e.GET("/js/*", echo.WrapHandler(statics))
 	e.GET("/css/*", echo.WrapHandler(statics))
 	e.GET("/swagger.json", di.swaggerHandler)
