@@ -108,7 +108,9 @@ func (fp ResponseMessageEvaluator) walkAndGetScenario(scenario mock.Scenario) []
 func (fp ResponseMessageEvaluator) walkAndFillScenario(
 	scenario *mock.Scenario,
 	vars map[string][]string) {
+          log.Debugf("scenario.Name before: %v", scenario.Name)
         scenario.Name = fp.replaceVars(scenario.Name, vars)
+          log.Debugf("scenario.Name after: %v", scenario.Name)
 
 	for valueName, value := range scenario.Values {
 		scenario.Values[valueName] = fp.replaceVars(value, vars)
