@@ -87,7 +87,17 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	//set new scenario
 	if mock.Control.Scenario.NewState != "" {
 		statistics.TrackScenarioFeature()
-		di.Scenario.SetState(mock.Control.Scenario.Name, mock.Control.Scenario.NewState)
+
+		di.Scenario.SetState(
+			mock.Control.Scenario.Name,
+			mock.Control.Scenario.NewState)
+
+		if len(mock.Control.Scenario.Values) != 0 {
+			log.Debugf("Setting Scenario values: %v", mock.Control.Scenario.Values)
+			di.Scenario.SetStateValues(
+				mock.Control.Scenario.Name,
+				mock.Control.Scenario.Values)
+		}
 	}
 
 	if mock.Control.WebHookURL != "" {
@@ -148,7 +158,7 @@ func (di *Dispatcher) getMatchingResult(request *mock.Request) (*mock.Definition
 			statistics.TrackProxyFeature()
 			response = getProxyResponse(request, mock)
 		} else {
-			di.Evaluator.Eval(request, mock)
+			di.Evaluator.Eval(request, mock, di.Scenario)
 			response = &mock.Response
 		}
 
