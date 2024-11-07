@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mmock.fullname" . }}
+  labels:
+    {{- include "mmock.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 8082
+      targetPort: ui
+      protocol: TCP
+      name: ui
+    - port: 8083
+      targetPort: api
+      protocol: TCP
+      name: api
+  selector:
+    {{- include "mmock.selectorLabels" . | nindent 4 }}

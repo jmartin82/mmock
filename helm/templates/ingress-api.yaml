@@ -1,0 +1,62 @@
+{{- $ingress := .Values.ingress.api -}}
+{{- if .Values.ingress.api.enabled -}}
+{{- $fullName := include "mmock.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- $apiV1 := false -}}
+{{- $apiVersion := "extensions/v1beta1" -}}
+{{- if and (.Capabilities.APIVersions.Has "networking.k8s.io/v1") (semverCompare ">= v1.19.0-0" .Capabilities.KubeVersion.Version) -}}
+  {{- $apiVersion = "networking.k8s.io/v1" -}}
+  {{- $apiV1 = true -}}
+{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" -}}
+  {{- $apiVersion = "networking.k8s.io/v1beta1" -}}
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+apiVersion: {{ $apiVersion }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-api
+  labels:
+    {{- include "mmock.labels" . | nindent 4 }}
+  {{- with .Values.ingress.api.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+{{- if $ingress.ingressClassName }}
+  ingressClassName: {{ $ingress.ingressClassName }}
+{{- end }}
+{{- if $ingress.tls }}
+  tls:
+    {{- range $ingress.tls }}
+    - hosts:
+      {{- range .hosts }}
+        - {{ tpl . $ | quote }}
+      {{- end }}
+      {{- with .secretName }}
+      secretName: {{ tpl . $ }}
+      {{- end }}
+  {{- end }}
+{{- end }}
+  rules:
+    {{- range .Values.ingress.api.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ tpl .path $ | quote }}
+            {{- if $apiV1 }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: 8083
+              {{- else }}
+            backend:
+              serviceName: {{ $fullName }}
+              servicePort: 8083
+            {{- end }}
+        {{- end }}
+   {{- end }}
+{{- end }}
