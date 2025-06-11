@@ -11,25 +11,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        go-version: [1.21]
-        node: [ 18 ]
     steps:
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: ${{ matrix.go-version }}
-      id: go
-    - name: Setup node
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node }}
-      id: node
-      
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+      id: go
 
     - name: Build
       run: make test
