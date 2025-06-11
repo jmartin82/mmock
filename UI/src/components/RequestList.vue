@@ -1,7 +1,7 @@
 <template>
 <template v-if="data.length > 0">	
 	<ul class="divide-y divide-gray-200 dark:divide-gray-700">
-		<li v-for="item in data" :key="item.id" class="p-4">
+		<li v-for="item in data" :key="item.id" class="p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
 			<div @click="toggleExpand(item.id)" class="flex items-center justify-between cursor-pointer">
 				<div class="flex items-center space-x-2">
 					<span :class="getMethodColor(item.request.method)" class="px-2 py-1 rounded text-xs font-medium">
@@ -36,16 +36,16 @@
 					</div>
 					<div class="mt-4">
 						<pre v-if="activeTab === 'payload'"
-							class="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-x-auto">
-	                            <code class="text-sm"><vue-json-pretty :data="item.request" :deep=2 :theme="dark" :showLine="false"/></code>
+							class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg overflow-x-auto">
+	                            <code class="text-sm"><vue-json-pretty :data="item.request" :deep=2 :showLine="false"/></code>
 	                          </pre>
 						<pre v-if="activeTab === 'response'"
-							class="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-x-auto">
-	                            <code class="text-sm"><vue-json-pretty :data="item.response" :deep=2 :theme='dark':showLine="false"  /></code>
+							class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg overflow-x-auto">
+	                            <code class="text-sm"><vue-json-pretty :data="item.response" :deep=2 :showLine="false"  /></code>
 	                          </pre>
 						<pre v-if="activeTab === 'match'"
-							class="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-x-auto">
-	                            <code class="text-sm"><vue-json-pretty :data="item.result" :deep=3 :theme='light' :showLine="false" /></code>
+							class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg overflow-x-auto">
+	                            <code class="text-sm"><vue-json-pretty :data="item.result" :deep=3 :showLine="false" /></code>
 	                          </pre>
 					</div>
 				</div>

@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'dark': appStatus.isDark }" class="h-screen">
+  <div class="h-screen">
     <div class="flex flex-col h-full bg-gray-100 dark:bg-gray-900">
       <!-- Header -->
       <Header />
@@ -74,24 +74,8 @@ const WSConnect = () => {
 
 onMounted(() => {
   WSConnect();
-  // Check for saved dark mode preference
-  const savedDarkMode = localStorage.getItem('darkMode')
-  if (savedDarkMode !== null) {
-    appStatus.isDark = savedDarkMode === 'true'
-  } else {
-    // If no saved preference, check system preference
-    appStatus.isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  }
 })
 
 
-// Watch for system color scheme changes
-watch(
-  () => window.matchMedia('(prefers-color-scheme: dark)').matches,
-  (isDark) => {
-    if (localStorage.getItem('darkMode') === null) {
-      isDarkMode.value = isDark
-    }
-  }
-)
+
 </script>

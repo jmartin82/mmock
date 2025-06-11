@@ -90,7 +90,7 @@
               </div>
               <div class="mb-4">
                 <label for="edit-mock" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Definition</label>
-                <textarea id="edit-mock" v-model="editingItem.definition" rows="4" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" required></textarea>
+                <textarea id="edit-mock" v-model="editingItem.definition" rows="10" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" required></textarea>
               </div>
             </div>
             <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
