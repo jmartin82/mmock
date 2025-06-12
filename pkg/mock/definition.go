@@ -104,6 +104,9 @@ func (d *Definition) Validate() error {
 	if d.Request.Method == "" {
 		return fmt.Errorf("request method is required")
 	}
+	if d.Request.Path == "" {
+		return fmt.Errorf("request path is required")
+	}
 	if d.Response.StatusCode < 100 || d.Response.StatusCode > 599 {
 		return fmt.Errorf("response status code must be between 100 and 599")
 	}

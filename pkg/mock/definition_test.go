@@ -83,6 +83,7 @@ func TestDefinition_Validate(t *testing.T) {
 				URI: "test-uri",
 				Request: Request{
 					Method: "GET",
+					Path:   "/test-path",
 				},
 				Response: Response{
 					StatusCode: 200,
@@ -95,6 +96,7 @@ func TestDefinition_Validate(t *testing.T) {
 			def: Definition{
 				Request: Request{
 					Method: "GET",
+					Path:   "/test-path",
 				},
 				Response: Response{
 					StatusCode: 200,
@@ -106,6 +108,22 @@ func TestDefinition_Validate(t *testing.T) {
 			name: "missing request method",
 			def: Definition{
 				URI: "test-uri",
+				Request: Request{
+					Path: "/test-path",
+				},
+				Response: Response{
+					StatusCode: 200,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "missing request path",
+			def: Definition{
+				URI: "test-uri",
+				Request: Request{
+					Method: "GET",
+				},
 				Response: Response{
 					StatusCode: 200,
 				},
@@ -118,6 +136,7 @@ func TestDefinition_Validate(t *testing.T) {
 				URI: "test-uri",
 				Request: Request{
 					Method: "GET",
+					Path:   "/test-path",
 				},
 				Response: Response{
 					StatusCode: 99,
@@ -131,6 +150,7 @@ func TestDefinition_Validate(t *testing.T) {
 				URI: "test-uri",
 				Request: Request{
 					Method: "GET",
+					Path:   "/test-path",
 				},
 				Response: Response{
 					StatusCode: 600,
@@ -144,6 +164,7 @@ func TestDefinition_Validate(t *testing.T) {
 				URI: "test-uri",
 				Request: Request{
 					Method: "GET",
+					Path:   "/test-path",
 				},
 				Response: Response{
 					StatusCode: 200,
@@ -160,6 +181,7 @@ func TestDefinition_Validate(t *testing.T) {
 				URI: "test-uri",
 				Request: Request{
 					Method: "GET",
+					Path:   "/test-path",
 				},
 				Response: Response{
 					StatusCode: 200,
@@ -176,6 +198,7 @@ func TestDefinition_Validate(t *testing.T) {
 				URI: "test-uri",
 				Request: Request{
 					Method: "GET",
+					Path:   "/test-path",
 				},
 				Response: Response{
 					StatusCode: 200,
