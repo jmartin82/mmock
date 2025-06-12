@@ -205,9 +205,7 @@ func (di *Dispatcher) mappingCreateHandler(c echo.Context) (err error) {
 		}
 		return c.JSON(http.StatusBadRequest, ar)
 	}
-	mock.URI = URI
-	fmt.Printf("Mock URI: %v\n", mock)
-	// Validate the mock definition
+
 	if err = mock.Validate(); err != nil {
 		ar := &ActionResponse{
 			Result: fmt.Sprintf("invalid_mock_definition: %s", err),
