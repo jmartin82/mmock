@@ -2,14 +2,15 @@ package config
 
 import (
 	"errors"
-	"github.com/jmartin82/mmock/v3/internal/config/logger"
-	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"os"
 	"path"
 	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
+
+	"github.com/jmartin82/mmock/v3/internal/config/logger"
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 var log = logger.Log
@@ -149,6 +150,10 @@ func (fm *ConfigMapping) load(URI string) error {
 	if err != nil {
 		return err
 
+	}
+	if err := mock.Validate(); err != nil {
+		log.Errorf("Invalid mock definition in: %s error: %s\n", fileName, err)
+		return ErrInvalidMockDefinition
 	}
 
 	fm.mapping[URI] = mock

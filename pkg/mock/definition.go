@@ -96,3 +96,22 @@ type Definition struct {
 	Callback    Callback `json:"callback"`
 	Control     Control  `json:"control"`
 }
+
+func (d *Definition) Validate() error {
+	if d.URI == "" {
+		return fmt.Errorf("URI is required")
+	}
+	if d.Request.Method == "" {
+		return fmt.Errorf("request method is required")
+	}
+	if d.Response.StatusCode < 100 || d.Response.StatusCode > 599 {
+		return fmt.Errorf("response status code must be between 100 and 599")
+	}
+	if d.Callback.Method != "" && d.Callback.Url == "" {
+		return fmt.Errorf("callback URL is required when callback method is specified")
+	}
+	if d.Callback.Url != "" && d.Callback.Method == "" {
+		return fmt.Errorf("callback method is required when callback URL is specified")
+	}
+	return nil
+}

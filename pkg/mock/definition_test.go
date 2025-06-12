@@ -71,3 +71,130 @@ func TestJSONParseDelay(t *testing.T) {
 		})
 	}
 }
+func TestDefinition_Validate(t *testing.T) {
+	tests := []struct {
+		name    string
+		def     Definition
+		wantErr bool
+	}{
+		{
+			name: "valid definition",
+			def: Definition{
+				URI: "test-uri",
+				Request: Request{
+					Method: "GET",
+				},
+				Response: Response{
+					StatusCode: 200,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "missing URI",
+			def: Definition{
+				Request: Request{
+					Method: "GET",
+				},
+				Response: Response{
+					StatusCode: 200,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "missing request method",
+			def: Definition{
+				URI: "test-uri",
+				Response: Response{
+					StatusCode: 200,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "status code too low",
+			def: Definition{
+				URI: "test-uri",
+				Request: Request{
+					Method: "GET",
+				},
+				Response: Response{
+					StatusCode: 99,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "status code too high",
+			def: Definition{
+				URI: "test-uri",
+				Request: Request{
+					Method: "GET",
+				},
+				Response: Response{
+					StatusCode: 600,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "callback method without URL",
+			def: Definition{
+				URI: "test-uri",
+				Request: Request{
+					Method: "GET",
+				},
+				Response: Response{
+					StatusCode: 200,
+				},
+				Callback: Callback{
+					Method: "POST",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "callback URL without method",
+			def: Definition{
+				URI: "test-uri",
+				Request: Request{
+					Method: "GET",
+				},
+				Response: Response{
+					StatusCode: 200,
+				},
+				Callback: Callback{
+					Url: "http://example.com",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "valid with callback",
+			def: Definition{
+				URI: "test-uri",
+				Request: Request{
+					Method: "GET",
+				},
+				Response: Response{
+					StatusCode: 200,
+				},
+				Callback: Callback{
+					Method: "POST",
+					Url:    "http://example.com",
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.def.Validate()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Definition.Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

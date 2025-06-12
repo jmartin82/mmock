@@ -1,12 +1,13 @@
 package config
 
 import (
-	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 type DummyReader struct {
@@ -20,7 +21,10 @@ func (jp DummyReader) CanParse(filename string) bool {
 
 // Read Unmarshal a json file to Mock struct
 func (jp DummyReader) Parse(buf []byte) (mock.Definition, error) {
-	return mock.Definition{URI: "test_mapping"}, nil
+	if string(buf) == "INVALID" {
+		return mock.Definition{}, nil
+	}
+	return mock.Definition{URI: "test_mapping", Request: mock.Request{Method: "Post", Path: "/test"}, Response: mock.Response{StatusCode: 200}}, nil
 }
 
 var fsUpdate = make(chan struct{})
@@ -87,7 +91,13 @@ func TestPopulate(t *testing.T) {
 	}
 
 	tmpfn := filepath.Join(dir, "tmpfile_populate")
-	if err := ioutil.WriteFile(tmpfn, []byte("some content"), 0666); err != nil {
+	tmpfnInvalid := filepath.Join(dir, "tmpfile_populate_invalid")
+
+	if err := ioutil.WriteFile(tmpfn, []byte(""), 0666); err != nil {
+		t.Errorf("Error creating temporary file")
+	}
+
+	if err := ioutil.WriteFile(tmpfnInvalid, []byte("INVALID"), 0666); err != nil {
 		t.Errorf("Error creating temporary file")
 	}
 
