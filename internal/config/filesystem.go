@@ -3,17 +3,18 @@ package config
 import (
 	"encoding/json"
 	"errors"
-	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"io/ioutil"
 	"reflect"
 	"strings"
+
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 // ErrNotValidParserFound we don't have any config reader valid for this file
-var ErrNotValidParserFound = errors.New("Not valid config reader found")
+var ErrNotValidParserFound = errors.New("not valid config reader found")
 
 // ErrInvalidMockDefinition the file contains an invalid mock config
-var ErrInvalidMockDefinition = errors.New("Invalid mock config")
+var ErrInvalidMockDefinition = errors.New("invalid mock config")
 
 // Reader interface contains the funtions to obtain the mock defintions.
 type Reader interface {
