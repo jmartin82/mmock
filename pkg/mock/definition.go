@@ -97,7 +97,7 @@ type Definition struct {
 	Control     Control  `json:"control"`
 }
 
-func (d *Definition) Validate() error {
+func (d Definition) Validate() error {
 	if d.URI == "" {
 		return fmt.Errorf("URI is required")
 	}
