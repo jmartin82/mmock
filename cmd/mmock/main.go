@@ -119,18 +119,19 @@ func getVarsProcessor() *vars.ResponseMessageEvaluator {
 	return vars.NewResponseMessageEvaluator(ff)
 }
 
-func startServer(ip string, port, portTLS int, configTLS string, done chan struct{}, router server.RequestResolver, mLog chan match.Transaction, scenario match.ScenearioStorer, varsProcessor vars.Evaluator, spier match.TransactionSpier) {
+func startServer(ip string, port, portTLS int, configTLS, tlsKeyPassword string, done chan struct{}, router server.RequestResolver, mLog chan match.Transaction, scenario match.ScenearioStorer, varsProcessor vars.Evaluator, spier match.TransactionSpier) {
 	dispatcher := server.Dispatcher{
-		IP:         ip,
-		Port:       port,
-		PortTLS:    portTLS,
-		ConfigTLS:  configTLS,
-		Resolver:   router,
-		Translator: mock.HTTP{},
-		Evaluator:  varsProcessor,
-		Scenario:   scenario,
-		Spier:      spier,
-		Mlog:       mLog,
+		IP:            ip,
+		Port:          port,
+		PortTLS:       portTLS,
+		ConfigTLS:     configTLS,
+		TLSKeyPassword: tlsKeyPassword,
+		Resolver:      router,
+		Translator:    mock.HTTP{},
+		Evaluator:     varsProcessor,
+		Scenario:      scenario,
+		Spier:         spier,
+		Mlog:          mLog,
 	}
 	dispatcher.Start()
 	done <- struct{}{}
@@ -167,10 +168,18 @@ func main() {
 	console := flag.Bool("console", true, "Console enabled  (true/false)")
 	cPath := flag.String("config-path", path, "Mocks config folder")
 	cTLS := flag.String("tls-path", TLS, "TLS config folder (server.crt and server.key should be inside)")
+	cTLSPassword := flag.String("tls-key-password", "", "Password for encrypted TLS private key files (can also be set via MMOCK_TLS_KEY_PASSWORD env var)")
 	cStorageCapacity := flag.Int("request-storage-capacity", 100, "Request storage capacity (0 = infinite)")
 	cResultsPerPage := flag.Int("results-per-page", 25, "Number of results per page")
 
 	flag.Parse()
+
+	// Check for TLS key password in environment variable if not provided via flag
+	if *cTLSPassword == "" {
+		if envPassword := os.Getenv("MMOCK_TLS_KEY_PASSWORD"); envPassword != "" {
+			*cTLSPassword = envPassword
+		}
+	}
 
 	//chanels
 	mLog := make(chan match.Transaction)
@@ -197,7 +206,7 @@ func main() {
 
 	defer statistics.Stop()
 
-	go startServer(*sIP, *sPort, *sPortTLS, *cTLS, done, router, mLog, scenario, varsProcessor, spy)
+	go startServer(*sIP, *sPort, *sPortTLS, *cTLS, *cTLSPassword, done, router, mLog, scenario, varsProcessor, spy)
 	log.Infof("HTTP Server running at http://%s:%d\n", *sIP, *sPort)
 	log.Infof("HTTPS Server running at https://%s:%d\n", *sIP, *sPortTLS)
 	if *console {

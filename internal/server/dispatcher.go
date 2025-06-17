@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -28,16 +29,17 @@ var log = logger.Log
 
 // Dispatcher is the mock http server
 type Dispatcher struct {
-	IP         string
-	Port       int
-	PortTLS    int
-	ConfigTLS  string
-	Resolver   RequestResolver
-	Translator mock.MessageTranslator
-	Evaluator  vars.Evaluator
-	Scenario   match.ScenearioStorer
-	Spier      match.TransactionSpier
-	Mlog       chan match.Transaction
+	IP            string
+	Port          int
+	PortTLS       int
+	ConfigTLS     string
+	TLSKeyPassword string
+	Resolver      RequestResolver
+	Translator    mock.MessageTranslator
+	Evaluator     vars.Evaluator
+	Scenario      match.ScenearioStorer
+	Spier         match.TransactionSpier
+	Mlog          chan match.Transaction
 }
 
 func (di Dispatcher) recordMatchData(msg match.Transaction) {
@@ -207,6 +209,66 @@ func (di Dispatcher) Start() {
 
 }
 
+// loadKeyPair loads a certificate and private key pair, supporting encrypted private keys
+func (di Dispatcher) loadKeyPair(certFile, keyFile string) (tls.Certificate, error) {
+	// First try the standard method for unencrypted keys
+	if di.TLSKeyPassword == "" {
+		return tls.LoadX509KeyPair(certFile, keyFile)
+	}
+
+	// Load certificate
+	certPEM, err := ioutil.ReadFile(certFile)
+	if err != nil {
+		return tls.Certificate{}, fmt.Errorf("failed to read certificate file '%s': %v", certFile, err)
+	}
+
+	// Load private key
+	keyPEM, err := ioutil.ReadFile(keyFile)
+	if err != nil {
+		return tls.Certificate{}, fmt.Errorf("failed to read private key file '%s': %v", keyFile, err)
+	}
+
+	// Parse the private key
+	keyBlock, _ := pem.Decode(keyPEM)
+	if keyBlock == nil {
+		return tls.Certificate{}, fmt.Errorf("failed to decode PEM block from private key file '%s'", keyFile)
+	}
+
+	var keyDER []byte
+	var parseErr error
+
+	// Handle encrypted private keys
+	if x509.IsEncryptedPEMBlock(keyBlock) {
+		keyDER, parseErr = x509.DecryptPEMBlock(keyBlock, []byte(di.TLSKeyPassword))
+		if parseErr != nil {
+			return tls.Certificate{}, fmt.Errorf("failed to decrypt private key '%s': %v", keyFile, parseErr)
+		}
+	} else {
+		// Handle unencrypted keys when password is provided (fallback)
+		keyDER = keyBlock.Bytes
+	}
+
+	// Try different private key formats to validate the key
+	if _, parseErr = x509.ParsePKCS1PrivateKey(keyDER); parseErr != nil {
+		if _, parseErr = x509.ParsePKCS8PrivateKey(keyDER); parseErr != nil {
+			if _, parseErr = x509.ParseECPrivateKey(keyDER); parseErr != nil {
+				return tls.Certificate{}, fmt.Errorf("failed to parse private key '%s': %v", keyFile, parseErr)
+			}
+		}
+	}
+
+	// Parse certificate
+	cert, err := tls.X509KeyPair(certPEM, pem.EncodeToMemory(&pem.Block{
+		Type:  "PRIVATE KEY",
+		Bytes: keyDER,
+	}))
+	if err != nil {
+		return tls.Certificate{}, fmt.Errorf("failed to create certificate pair: %v", err)
+	}
+
+	return cert, nil
+}
+
 func (di Dispatcher) listenAndServeTLS(addrTLS string) error {
 	tlsConfig := &tls.Config{}
 	pattern := fmt.Sprintf("%s/*.crt", di.ConfigTLS)
@@ -239,9 +301,9 @@ func (di Dispatcher) listenAndServeTLS(addrTLS string) error {
 
 		key := fmt.Sprint(name, ".key")
 		log.Infof("Loading X509KeyPair (%s/%s)\n", filepath.Base(crt), filepath.Base(key))
-		certificate, err := tls.LoadX509KeyPair(crt, key)
+		certificate, err := di.loadKeyPair(crt, key)
 		if err != nil {
-			return fmt.Errorf("Invalid certificate: %v", crt)
+			return fmt.Errorf("Invalid certificate: %v", err)
 		}
 		tlsConfig.Certificates = append(tlsConfig.Certificates, certificate)
 	}
