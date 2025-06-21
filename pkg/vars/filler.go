@@ -1,6 +1,7 @@
 package vars
 
 import (
+	"github.com/jmartin82/mmock/v3/pkg/match"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"github.com/jmartin82/mmock/v3/pkg/vars/fake"
 )
@@ -13,6 +14,11 @@ type FillerFactory interface {
 	CreateRequestFiller(req *mock.Request, mock *mock.Definition) Filler
 	CreateFakeFiller() Filler
 	CreateStreamFiller() Filler
+	CreateResponseFiller(res *mock.Response) Filler
+	CreateScenarioFiller(
+		scenarioStore match.ScenearioStorer,
+		scenarioName string,
+	) Filler
 }
 
 type MockFillerFactory struct {
@@ -28,10 +34,23 @@ func (mff MockFillerFactory) CreateRequestFiller(req *mock.Request, mock *mock.D
 }
 
 func (mff MockFillerFactory) CreateFakeFiller() Filler {
-
 	return Fake{Fake: mff.FakeDataProvider}
 }
 
 func (mff MockFillerFactory) CreateStreamFiller() Filler {
 	return Stream{}
+}
+
+func (mff MockFillerFactory) CreateResponseFiller(res *mock.Response) Filler {
+	return ResponseFiller{Response: res}
+}
+
+func (mff MockFillerFactory) CreateScenarioFiller(
+	scenarioStore match.ScenearioStorer,
+	scenarioName string) Filler {
+
+	return ScenarioFiller{
+		Name:  scenarioName,
+		Store: scenarioStore,
+	}
 }

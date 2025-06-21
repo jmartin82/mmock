@@ -3,9 +3,12 @@ package parser
 import (
 	"encoding/json"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
+        "github.com/jmartin82/mmock/v3/internal/config/logger"
 	"path/filepath"
 	"strings"
 )
+
+var log = logger.Log
 
 // JSONReader struct created to read json config files
 type JSONReader struct {
@@ -20,8 +23,12 @@ func (jp JSONReader) CanParse(filename string) bool {
 func (jp JSONReader) Parse(buf []byte) (mock.Definition, error) {
 	m := mock.Definition{}
 	err := json.Unmarshal(buf, &m)
+
 	if err != nil {
-		return mock.Definition{}, err
+          log.Errorf("JSONReader Parse error: %v", err)
+          log.Errorf("JSONReader attempted to parse: %v", string(buf))
+          return mock.Definition{}, err
 	}
+
 	return m, nil
 }

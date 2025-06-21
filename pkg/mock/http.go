@@ -6,7 +6,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+        "github.com/jmartin82/mmock/v3/internal/config/logger"
 )
+
+var log = logger.Log
 
 // HTTP is and adaptor beteewn the http and mock config.
 type HTTP struct {
@@ -69,6 +72,8 @@ func getHostAndPort(req *http.Request) (string, string) {
 
 // WriteHTTPResponseFromDefinition read a mock response and write a http response.
 func (t HTTP) WriteHTTPResponseFromDefinition(fr *Response, w http.ResponseWriter) {
+
+        log.Debugf("WriteHTTPResponseFromDefinition fr: %v", fr)
 
 	for header, values := range fr.Headers {
 		for _, value := range values {
