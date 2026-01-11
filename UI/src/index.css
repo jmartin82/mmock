@@ -1,0 +1,240 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@layer base {
+  :root {
+    --background: 220 14% 10%;
+    --foreground: 220 14% 96%;
+
+    --card: 220 14% 12%;
+    --card-foreground: 220 14% 96%;
+
+    --popover: 220 14% 12%;
+    --popover-foreground: 220 14% 96%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 220 14% 4%;
+
+    --secondary: 220 14% 18%;
+    --secondary-foreground: 220 14% 90%;
+
+    --muted: 220 14% 16%;
+    --muted-foreground: 220 14% 60%;
+
+    --accent: 220 14% 20%;
+    --accent-foreground: 220 14% 96%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 14% 20%;
+    --input: 220 14% 18%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.5rem;
+
+    /* HTTP Method Colors */
+    --method-get: 217 91% 60%;
+    --method-post: 142 71% 45%;
+    --method-put: 38 92% 50%;
+    --method-delete: 0 72% 51%;
+    --method-patch: 270 67% 58%;
+    --method-head: 220 14% 50%;
+    --method-options: 220 14% 50%;
+
+    /* Status Code Colors */
+    --status-2xx: 142 71% 45%;
+    --status-3xx: 217 91% 60%;
+    --status-4xx: 38 92% 50%;
+    --status-5xx: 0 72% 51%;
+
+    /* Connection Status */
+    --connection-connected: 142 71% 45%;
+    --connection-disconnected: 0 72% 51%;
+    --connection-connecting: 38 92% 50%;
+
+    /* Syntax Highlighting */
+    --syntax-string: 142 71% 45%;
+    --syntax-number: 38 92% 50%;
+    --syntax-boolean: 270 67% 58%;
+    --syntax-null: 0 72% 51%;
+    --syntax-key: 217 91% 70%;
+    --syntax-bracket: 220 14% 60%;
+
+    /* Sidebar */
+    --sidebar-background: 220 14% 8%;
+    --sidebar-foreground: 220 14% 70%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 220 14% 4%;
+    --sidebar-accent: 220 14% 14%;
+    --sidebar-accent-foreground: 220 14% 96%;
+    --sidebar-border: 220 14% 16%;
+    --sidebar-ring: 217 91% 60%;
+  }
+
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 220 14% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 14% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 14% 10%;
+
+    --primary: 217 91% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 14% 20%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 14% 46%;
+
+    --accent: 220 14% 94%;
+    --accent-foreground: 220 14% 10%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 14% 90%;
+    --input: 220 14% 90%;
+    --ring: 217 91% 50%;
+
+    --sidebar-background: 220 14% 98%;
+    --sidebar-foreground: 220 14% 40%;
+    --sidebar-primary: 217 91% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 94%;
+    --sidebar-accent-foreground: 220 14% 10%;
+    --sidebar-border: 220 14% 90%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  .method-badge {
+    @apply inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-mono font-semibold uppercase;
+  }
+
+  .method-get {
+    @apply bg-[hsl(var(--method-get)/0.15)] text-[hsl(var(--method-get))];
+  }
+
+  .method-post {
+    @apply bg-[hsl(var(--method-post)/0.15)] text-[hsl(var(--method-post))];
+  }
+
+  .method-put {
+    @apply bg-[hsl(var(--method-put)/0.15)] text-[hsl(var(--method-put))];
+  }
+
+  .method-delete {
+    @apply bg-[hsl(var(--method-delete)/0.15)] text-[hsl(var(--method-delete))];
+  }
+
+  .method-patch {
+    @apply bg-[hsl(var(--method-patch)/0.15)] text-[hsl(var(--method-patch))];
+  }
+
+  .method-head, .method-options {
+    @apply bg-[hsl(var(--method-head)/0.15)] text-[hsl(var(--method-head))];
+  }
+
+  .status-2xx {
+    @apply text-[hsl(var(--status-2xx))];
+  }
+
+  .status-3xx {
+    @apply text-[hsl(var(--status-3xx))];
+  }
+
+  .status-4xx {
+    @apply text-[hsl(var(--status-4xx))];
+  }
+
+  .status-5xx {
+    @apply text-[hsl(var(--status-5xx))];
+  }
+
+  .json-string {
+    @apply text-[hsl(var(--syntax-string))];
+  }
+
+  .json-number {
+    @apply text-[hsl(var(--syntax-number))];
+  }
+
+  .json-boolean {
+    @apply text-[hsl(var(--syntax-boolean))];
+  }
+
+  .json-null {
+    @apply text-[hsl(var(--syntax-null))];
+  }
+
+  .json-key {
+    @apply text-[hsl(var(--syntax-key))];
+  }
+
+  .json-bracket {
+    @apply text-[hsl(var(--syntax-bracket))];
+  }
+
+  .connection-dot {
+    @apply w-2 h-2 rounded-full;
+  }
+
+  .connection-connected {
+    @apply bg-[hsl(var(--connection-connected))] shadow-[0_0_8px_hsl(var(--connection-connected)/0.6)];
+  }
+
+  .connection-disconnected {
+    @apply bg-[hsl(var(--connection-disconnected))] shadow-[0_0_8px_hsl(var(--connection-disconnected)/0.6)];
+  }
+
+  .connection-connecting {
+    @apply bg-[hsl(var(--connection-connecting))] shadow-[0_0_8px_hsl(var(--connection-connecting)/0.6)] animate-pulse;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground));
+  }
+}
