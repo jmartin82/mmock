@@ -1,8 +1,12 @@
 # .goreleaser.yml
 # Build customization
+version: 2
+
 project_name: mmock
+
 builds:
-  - main: cmd/mmock/main.go
+  - id: mmock
+    main: cmd/mmock/main.go
     binary: mmock
     goos:
       - windows
@@ -16,6 +20,7 @@ builds:
         goarch: arm64
     ldflags:
      - -X main.VERSION={{.Version}}
+
 archives:
   - id: mmock
     name_template: >-
@@ -26,8 +31,9 @@ archives:
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end -}}
     format_overrides:
-    - goos: windows
-      format: zip
+      - goos: windows
+        format: zip
+
 dockers:
   - dockerfile: Dockerfile
     skip_push: false
@@ -51,6 +57,7 @@ dockers:
       - tls/server.key
     build_flag_templates:
       - "--platform=linux/arm64"
+
 docker_manifests:
   - name_template: "jordimartin/mmock:latest"
     image_templates:
@@ -60,16 +67,19 @@ docker_manifests:
     image_templates:
       - jordimartin/mmock:{{ .Tag }}-amd64
       - jordimartin/mmock:{{ .Tag }}-arm64
+
 release:
   github:
     owner: jmartin82
     name: mmock
   draft: false
+
 changelog:
   filters:
     exclude:
       - '^docs:'
       - typo
       - rollback
+
 env_files:
   github_token: .github/token
