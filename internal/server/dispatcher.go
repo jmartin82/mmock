@@ -97,7 +97,7 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	//translate request
-	di.Translator.WriteHTTPResponseFromDefinition(transaction.Response, w)
+	di.Translator.WriteHTTPResponseFromDefinition(transaction.Response, w, req)
 
 	if mock.Callback.Url != "" {
 		go func() {

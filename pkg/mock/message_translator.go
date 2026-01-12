@@ -11,7 +11,7 @@ type MockRequestBuilder interface {
 
 // MockResponseWriter defines the translator from config.Response to http.ResponseWriter
 type MockResponseWriter interface {
-	WriteHTTPResponseFromDefinition(fr *Response, w http.ResponseWriter)
+	WriteHTTPResponseFromDefinition(fr *Response, w http.ResponseWriter, req *http.Request)
 }
 
 // MessageTranslator defines the translator contract between http and mock and viceversa.

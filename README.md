@@ -33,6 +33,7 @@ Built with Go - Mmock runs without installation on multiple platforms.
 * Public interface auto discover
 * Lightweight and portable
 * No installation required
+* Server Side Events
 
 ### Example
 
@@ -236,7 +237,7 @@ See https://pkg.go.dev/regexp/syntax for regexp syntax
 * *statusCode*: Response status code
 * *headers*: Array of headers. It allows more than one value for the same key and vars.
 * *cookies*: Array of cookies. It allows vars.
-* *body*: Body string. It allows vars.
+* *body*: Body string. It allows vars. For SSE, pass the body in array of JSON format.
 
 #### Callback (Optional)
 
@@ -631,6 +632,8 @@ You can always disable this behavior adding the following flag `-server-statisti
 - Improved logging with levels thanks to [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
 - Support for Regular Expressions for QueryStringParameters [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
 - Support for URI and Description tags [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
+- Support for Server Side Events [@rosspatil](https://github.com/rosspatil)
+
 
 ### Contributing
 
