@@ -30,43 +30,30 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end -}}
-    format_overrides:
-      - goos: windows
-        format: zip
+    formats:
+      - tar.gz
+      - zip
+    files:
+      - LICENSE*
+      - README*
+      - CHANGELOG*
 
 dockers:
-  - dockerfile: Dockerfile
-    skip_push: false
-    goarch: amd64
+  - image_templates:
+      - "jordimartin/mmock:{{ .Tag }}"
+      - "jordimartin/mmock:latest"
+    dockerfile: Dockerfile
     use: buildx
-    image_templates:
-      - "jordimartin/mmock:{{.Tag}}-amd64"
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/amd64,linux/arm64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
     extra_files:
       - tls/server.crt
       - tls/server.key
-    build_flag_templates:
-      - "--platform=linux/amd64"
-  - dockerfile: Dockerfile
-    skip_push: false
-    goarch: arm64
-    use: buildx
-    image_templates:
-      - "jordimartin/mmock:{{.Tag}}-arm64"
-    extra_files:
-      - tls/server.crt
-      - tls/server.key
-    build_flag_templates:
-      - "--platform=linux/arm64"
-
-docker_manifests:
-  - name_template: "jordimartin/mmock:latest"
-    image_templates:
-      - jordimartin/mmock:{{ .Tag }}-amd64
-      - jordimartin/mmock:{{ .Tag }}-arm64
-  - name_template: "jordimartin/mmock:{{.Tag}}"
-    image_templates:
-      - jordimartin/mmock:{{ .Tag }}-amd64
-      - jordimartin/mmock:{{ .Tag }}-arm64
 
 release:
   github:
