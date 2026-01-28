@@ -19,6 +19,7 @@ import (
 
 	"github.com/jmartin82/mmock/v3/internal/config/logger"
 	"github.com/jmartin82/mmock/v3/internal/proxy"
+	"github.com/jmartin82/mmock/v3/internal/server/gzip"
 	"github.com/jmartin82/mmock/v3/internal/statistics"
 	"github.com/jmartin82/mmock/v3/pkg/match"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
@@ -96,8 +97,25 @@ func (di *Dispatcher) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		go di.callWebHook(mock.Control.WebHookURL, transaction)
 	}
 
+	// Wrap ResponseWriter with gzip if appropriate
+	var responseWriter http.ResponseWriter = w
+	var gzipWriter *gzip.ResponseWriter
+
+	if gzip.AcceptsGzip(req) {
+		// Extract content-type from mock response
+		contentType := getContentType(transaction.Response)
+
+		if gzip.ShouldCompress(contentType) {
+			gzipWriter = gzip.NewResponseWriter(w)
+			gzipWriter.Header().Set("Content-Encoding", "gzip")
+			gzipWriter.Header().Del("Content-Length") // Compressed length differs
+			responseWriter = gzipWriter
+			defer gzipWriter.Close()
+		}
+	}
+
 	//translate request
-	di.Translator.WriteHTTPResponseFromDefinition(transaction.Response, w)
+	di.Translator.WriteHTTPResponseFromDefinition(transaction.Response, responseWriter)
 
 	if mock.Callback.Url != "" {
 		go func() {
@@ -180,6 +198,14 @@ func colorTerminalOutput(result *match.Result, mock *mock.Definition) {
 		msg = fmt.Sprintf("%s %s %s %s\n", terminal.Success("Definition match found:"), strconv.FormatBool(result.Found), terminal.Success("Name:"), mock.URI)
 	}
 	log.Info(msg)
+}
+
+// getContentType extracts Content-Type from response headers
+func getContentType(response *mock.Response) string {
+	if ct, exists := response.Headers["Content-Type"]; exists && len(ct) > 0 {
+		return ct[0]
+	}
+	return "text/plain" // Safe default
 }
 
 // Start initialize the HTTP mock server

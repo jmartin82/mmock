@@ -40,20 +40,49 @@ archives:
 
 dockers:
   - image_templates:
-      - "jordimartin/mmock:{{ .Tag }}"
-      - "jordimartin/mmock:latest"
+      - "jordimartin/mmock:{{ .Tag }}-amd64"
+      - "jordimartin/mmock:latest-amd64"
     dockerfile: Dockerfile
     use: buildx
     build_flag_templates:
       - "--pull"
-      - "--platform=linux/amd64,linux/arm64"
+      - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
+    goarch: amd64
+    goos: linux
     extra_files:
       - tls/server.crt
       - tls/server.key
+  - image_templates:
+      - "jordimartin/mmock:{{ .Tag }}-arm64"
+      - "jordimartin/mmock:latest-arm64"
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+    goarch: arm64
+    goos: linux
+    extra_files:
+      - tls/server.crt
+      - tls/server.key
+
+docker_manifests:
+  - name_template: "jordimartin/mmock:{{ .Tag }}"
+    image_templates:
+      - "jordimartin/mmock:{{ .Tag }}-amd64"
+      - "jordimartin/mmock:{{ .Tag }}-arm64"
+  - name_template: "jordimartin/mmock:latest"
+    image_templates:
+      - "jordimartin/mmock:latest-amd64"
+      - "jordimartin/mmock:latest-arm64"
 
 release:
   github:
@@ -67,6 +96,3 @@ changelog:
       - '^docs:'
       - typo
       - rollback
-
-env_files:
-  github_token: .github/token

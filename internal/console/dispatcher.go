@@ -72,6 +72,7 @@ func (di *Dispatcher) logFanOut() {
 func (di *Dispatcher) Start() {
 	e := echo.New()
 	e.Use(middleware.CORS())
+	e.Use(middleware.Gzip())
 	e.HideBanner = true
 	e.HidePort = true
 
