@@ -12,6 +12,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    environment: Build
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
