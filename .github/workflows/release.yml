@@ -65,6 +65,16 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker-container
+          platforms: linux/amd64,linux/arm64
+          install: true
+
+      - name: Verify Docker Buildx
+        run: |
+          docker buildx ls
+          echo "Active builder:"
+          docker buildx inspect --bootstrap
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -80,3 +90,20 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify Docker Images and Attestations
+        run: |
+          echo "=== Verifying Multi-Platform Manifest ==="
+          docker buildx imagetools inspect jordimartin/mmock:${{ steps.version.outputs.new_version }}
+
+          echo ""
+          echo "=== Verifying Latest Tag ==="
+          docker buildx imagetools inspect jordimartin/mmock:latest
+
+          echo ""
+          echo "=== Checking for Attestations ==="
+          if docker buildx imagetools inspect jordimartin/mmock:latest | grep -q "attestation-manifest"; then
+            echo "✅ Attestations found - SBOM and provenance are preserved!"
+          else
+            echo "⚠️  No attestations found"
+          fi
