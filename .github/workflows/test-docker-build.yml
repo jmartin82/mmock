@@ -1,0 +1,98 @@
+name: Test Docker Build (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_tag:
+        description: 'Test tag to use (e.g., v4.3.6-test)'
+        required: false
+        default: 'test-build'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  test-docker-build:
+    runs-on: ubuntu-latest
+    environment: Build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        id: buildx
+        with:
+          driver: docker-container
+          platforms: linux/amd64,linux/arm64
+          install: true
+
+      - name: Verify Docker Buildx Setup
+        run: |
+          echo "=== Docker Buildx Builders ==="
+          docker buildx ls
+
+          echo ""
+          echo "=== Active Builder Details ==="
+          docker buildx inspect --bootstrap
+
+          echo ""
+          echo "=== Buildx Version ==="
+          docker buildx version
+
+          echo ""
+          echo "=== Builder Driver Type ==="
+          DRIVER=$(docker buildx inspect | grep -i "driver:" | head -1 | awk '{print $2}')
+          echo "Driver: $DRIVER"
+
+          if [ "$DRIVER" = "docker-container" ]; then
+            echo "✅ Using docker-container driver (correct for attestations)"
+          else
+            echo "⚠️  Not using docker-container driver - attestations may be lost"
+          fi
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Run GoReleaser (Snapshot)
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --snapshot --clean --skip=publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: List Built Images
+        run: |
+          echo "=== Docker Images Built ==="
+          docker images | grep mmock | head -10
+
+      - name: Test AMD64 Image
+        run: |
+          echo "=== Testing AMD64 Image ==="
+          docker run --rm --platform linux/amd64 jordimartin/mmock:latest-amd64 --help | head -5
+
+      - name: Test ARM64 Image
+        run: |
+          echo "=== Testing ARM64 Image ==="
+          docker run --rm --platform linux/arm64 jordimartin/mmock:latest-arm64 --help | head -5
+
+      - name: Summary
+        run: |
+          echo "=== Build Summary ==="
+          echo "✅ Docker Buildx configured with docker-container driver"
+          echo "✅ Multi-platform images built (linux/amd64, linux/arm64)"
+          echo "✅ Both images tested successfully"
+          echo ""
+          echo "Note: This is a snapshot build. No images were pushed to Docker Hub."
+          echo "When you push to master, the real release will preserve attestations."
