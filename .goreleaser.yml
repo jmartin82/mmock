@@ -1,73 +1,190 @@
-# .goreleaser.yml
-# Build customization
 version: 2
 
 project_name: mmock
 
+# Build configuration
 builds:
   - id: mmock
-    main: cmd/mmock/main.go
+    main: ./cmd/mmock
     binary: mmock
+
+    # Build for multiple platforms
     goos:
-      - windows
-      - darwin
       - linux
+      - darwin
+      - windows
+
     goarch:
       - amd64
       - arm64
+
+    # Windows ARM64 is not commonly used yet
     ignore:
       - goos: windows
         goarch: arm64
-    ldflags:
-     - -X main.VERSION={{.Version}}
 
+    # Inject version at build time
+    ldflags:
+      - -s -w
+      - -X main.VERSION={{.Version}}
+
+    env:
+      - CGO_ENABLED=0
+
+# Archive configuration for GitHub releases
 archives:
   - id: mmock
+    # Custom naming: mmock_Linux_x86_64.tar.gz
     name_template: >-
       {{- .ProjectName }}_
       {{- title .Os }}_
       {{- if eq .Arch "amd64" }}x86_64
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end -}}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+
+    # Use zip for Windows, tar.gz for others
     format_overrides:
       - goos: windows
         formats: [zip]
+
+    # Include additional files in archives
     files:
       - LICENSE*
       - README*
       - CHANGELOG*
-dockers_v2:
-  - id: mmock
+      - tls/server.crt
+      - tls/server.key
+
+# Docker configuration using dockers (not dockers_v2)
+# One entry per platform - GoReleaser automatically provides the correct binary
+dockers:
+  # AMD64 Docker image
+  - id: mmock-amd64
     ids:
       - mmock
     dockerfile: Dockerfile
-    images:
-      - "jordimartin/mmock"
-    tags:
-      - "{{ .Tag }}"
-      - "latest"
-    platforms:
-      - linux/amd64
-      - linux/arm64
-    labels:
-      org.opencontainers.image.created: "{{.Date}}"
-      org.opencontainers.image.title: "{{.ProjectName}}"
-      org.opencontainers.image.revision: "{{.FullCommit}}"
-      org.opencontainers.image.version: "{{.Version}}"
+    use: buildx
+
+    # Specify which binary to use
+    goos: linux
+    goarch: amd64
+
+    # Image tags
+    image_templates:
+      - "jordimartin/mmock:{{ .Tag }}-amd64"
+      - "jordimartin/mmock:latest-amd64"
+
+    # Build flags
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--pull"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.description=HTTP mock server"
+      - "--label=org.opencontainers.image.url=https://github.com/jmartin82/mmock"
+      - "--label=org.opencontainers.image.source=https://github.com/jmartin82/mmock"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.licenses=MIT"
+
+    # Extra files to include in Docker build context
     extra_files:
       - tls/server.crt
       - tls/server.key
 
+  # ARM64 Docker image
+  - id: mmock-arm64
+    ids:
+      - mmock
+    dockerfile: Dockerfile
+    use: buildx
+
+    # Specify which binary to use
+    goos: linux
+    goarch: arm64
+
+    # Image tags
+    image_templates:
+      - "jordimartin/mmock:{{ .Tag }}-arm64"
+      - "jordimartin/mmock:latest-arm64"
+
+    # Build flags
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--pull"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.description=HTTP mock server"
+      - "--label=org.opencontainers.image.url=https://github.com/jmartin82/mmock"
+      - "--label=org.opencontainers.image.source=https://github.com/jmartin82/mmock"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.licenses=MIT"
+
+    # Extra files to include in Docker build context
+    extra_files:
+      - tls/server.crt
+      - tls/server.key
+
+# Docker manifests to combine platform-specific images
+docker_manifests:
+  # Versioned manifest (e.g., jordimartin/mmock:v4.3.8)
+  - name_template: jordimartin/mmock:{{ .Tag }}
+    image_templates:
+      - jordimartin/mmock:{{ .Tag }}-amd64
+      - jordimartin/mmock:{{ .Tag }}-arm64
+
+  # Latest manifest
+  - name_template: jordimartin/mmock:latest
+    image_templates:
+      - jordimartin/mmock:latest-amd64
+      - jordimartin/mmock:latest-arm64
+
+# GitHub release configuration
 release:
   github:
     owner: jmartin82
     name: mmock
+
+  # Auto-publish releases (set to true for draft releases)
   draft: false
 
+  # Include release notes
+  prerelease: auto
+
+  # Release name template
+  name_template: "{{.ProjectName}} {{.Version}}"
+
+# Changelog configuration
 changelog:
+  use: github
+  sort: asc
+
   filters:
     exclude:
       - '^docs:'
+      - '^test:'
+      - '^ci:'
       - typo
       - rollback
+      - Merge pull request
+      - Merge branch
+
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: Bug Fixes
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: Others
+      order: 999
+
+# Checksum configuration
+checksum:
+  name_template: 'checksums.txt'
+
+# Snapshot configuration (for local testing)
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"

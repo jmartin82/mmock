@@ -8,10 +8,9 @@ RUN mkdir /tls
 
 VOLUME /config
 
-ARG TARGETPLATFORM
 COPY tls/server.crt /tls/server.crt
 COPY tls/server.key /tls/server.key
-COPY ${TARGETPLATFORM}/mmock /usr/local/bin/mmock
+COPY mmock /usr/local/bin/mmock
 
 EXPOSE 8082 8083 8084
 
