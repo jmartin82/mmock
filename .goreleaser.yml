@@ -30,29 +30,31 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end -}}
-    formats:
-      - tar.gz
-      - zip
+    format_overrides:
+      - goos: windows
+        formats: [zip]
     files:
       - LICENSE*
       - README*
       - CHANGELOG*
-
-dockers:
-  - image_templates:
-      - "jordimartin/mmock:{{ .Tag }}-amd64"
-      - "jordimartin/mmock:latest-amd64"
+dockers_v2:
+  - id: mmock
+    ids:
+      - mmock
     dockerfile: Dockerfile
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-    goarch: amd64
-    goos: linux
+    images:
+      - "jordimartin/mmock"
+    tags:
+      - "{{ .Tag }}"
+      - "latest"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    labels:
+      org.opencontainers.image.created: "{{.Date}}"
+      org.opencontainers.image.title: "{{.ProjectName}}"
+      org.opencontainers.image.revision: "{{.FullCommit}}"
+      org.opencontainers.image.version: "{{.Version}}"
     extra_files:
       - tls/server.crt
       - tls/server.key
