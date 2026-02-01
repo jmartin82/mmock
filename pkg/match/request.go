@@ -233,9 +233,36 @@ func (mm Request) bodyMatch(mockReq mock.Request, req *mock.Request) bool {
 		return true
 	}
 
-	if value, ok := req.Headers["Content-Type"]; ok && len(value) > 0 {
-		if comparable, ok := mm.comparator.Compare(value[0], mockReq.Body, req.Body); comparable {
+	// Check if we should use a specific comparator based on Content-Type
+	contentType, hasContentType := req.Headers["Content-Type"]
+	useSniffing := !hasContentType || len(contentType) == 0
+
+	if !useSniffing {
+		ct := contentType[0]
+		// If it's a known non-sniffable type, try comparing
+		if comparable, ok := mm.comparator.Compare(ct, mockReq.Body, req.Body); comparable {
 			return ok
+		}
+		// If it's a generic binary type, allow sniffing
+		if strings.HasPrefix(ct, "application/octet-stream") || strings.HasPrefix(ct, "application/binary") {
+			useSniffing = true
+		}
+	}
+
+	if useSniffing {
+		// Content sniffing
+		trimmedBody := strings.TrimLeft(req.Body, " \t\r\n")
+		if len(trimmedBody) > 0 {
+			firstChar := trimmedBody[0]
+			if firstChar == '{' || firstChar == '[' {
+				if comparable, ok := mm.comparator.Compare("application/json", mockReq.Body, trimmedBody); comparable {
+					return ok
+				}
+			} else if firstChar == '<' {
+				if comparable, ok := mm.comparator.Compare("application/xml", mockReq.Body, trimmedBody); comparable {
+					return ok
+				}
+			}
 		}
 	}
 

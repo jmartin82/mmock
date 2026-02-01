@@ -170,15 +170,32 @@ func (rp Request) getHeaderParam(name string) (string, bool) {
 
 func (rp Request) getBodyParam(name string) (string, bool) {
 	contentType, found := rp.Request.Headers["Content-Type"]
-	if !found {
-		return "", false
+	useSniffing := !found || len(contentType) == 0
+
+	if found && len(contentType) > 0 {
+		ct := contentType[0]
+		if strings.HasPrefix(ct, "application/x-www-form-urlencoded") {
+			return rp.getUrlEncodedFormBodyParam(name)
+		} else if strings.HasPrefix(ct, "application/xml") || strings.HasPrefix(ct, "text/xml") {
+			return rp.getXmlBodyParam(rp.Request.Body, name)
+		} else if strings.HasPrefix(ct, "application/") && strings.HasSuffix(ct, "json") {
+			return rp.getJsonBodyParam(rp.Request.Body, name)
+		} else if strings.HasPrefix(ct, "application/octet-stream") || strings.HasPrefix(ct, "application/binary") {
+			useSniffing = true
+		}
 	}
-	if strings.HasPrefix(contentType[0], "application/x-www-form-urlencoded") {
-		return rp.getUrlEncodedFormBodyParam(name)
-	} else if strings.HasPrefix(contentType[0], "application/xml") || strings.HasPrefix(contentType[0], "text/xml") {
-		return rp.getXmlBodyParam(rp.Request.Body, name)
-	} else if strings.HasPrefix(contentType[0], "application/") && strings.HasSuffix(contentType[0], "json") {
-		return rp.getJsonBodyParam(rp.Request.Body, name)
+
+	if useSniffing {
+		// Content sniffing
+		trimmedBody := strings.TrimLeft(rp.Request.Body, " \t\r\n")
+		if len(trimmedBody) > 0 {
+			firstChar := trimmedBody[0]
+			if firstChar == '{' || firstChar == '[' {
+				return rp.getJsonBodyParam(rp.Request.Body, name)
+			} else if firstChar == '<' {
+				return rp.getXmlBodyParam(rp.Request.Body, name)
+			}
+		}
 	}
 
 	return "", false

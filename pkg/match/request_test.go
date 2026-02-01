@@ -1,8 +1,9 @@
 package match
 
 import (
-	"github.com/jmartin82/mmock/v3/pkg/match/payload"
 	"testing"
+
+	"github.com/jmartin82/mmock/v3/pkg/match/payload"
 
 	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
@@ -605,5 +606,69 @@ func TestMatchIgnoreUnexpectedHeadersAndQuery(t *testing.T) {
 
 	if b, _ := mm.Match(&req, &m, true); !b {
 		t.Error("Not expected match")
+	}
+}
+
+func TestMatchBodySniffing(t *testing.T) {
+	// Scenario 1: JSON Object with whitespace and NO Content-Type header
+	req := mock.Request{}
+	req.Body = "  \n  {\"name\":\"bob\",\"age\":30}"
+	// Note: req.Headers is empty (no Content-Type)
+
+	m := mock.Definition{}
+	m.Request.Body = "{\"age\":30,\n\"name\":\"bob\"}" // Same JSON, different format
+
+	comparator := payload.NewDefaultComparator()
+	mm := Request{comparator: comparator}
+
+	if b, err := mm.Match(&req, &m, true); !b {
+		t.Errorf("Expected match for sniffed JSON object. Err: %v", err)
+	}
+
+	// Scenario 2: JSON Array with whitespace and NO Content-Type header
+	// Note: JSONComparator in mmock strictly expects []map[string]interface{}, so we must use objects in the array.
+	reqArr := mock.Request{}
+	reqArr.Body = "\t[{\"id\":1}, {\"id\":2}]"
+
+	mArr := mock.Definition{}
+	mArr.Request.Body = "[\n {\"id\":1},\n {\"id\":2} \n]"
+
+	if b, err := mm.Match(&reqArr, &mArr, true); !b {
+		t.Errorf("Expected match for sniffed JSON array. Err: %v", err)
+	}
+
+	// Scenario 3: Broken JSON - should fail sniffing/parsing and fallback to string match (which fails)
+	reqBroken := mock.Request{}
+	reqBroken.Body = "{broken json"
+
+	mBroken := mock.Definition{}
+	mBroken.Request.Body = "{\"foo\":\"bar\"}"
+
+	if b, _ := mm.Match(&reqBroken, &mBroken, true); b {
+		t.Error("Should NOT match broken JSON against valid mock JSON pattern")
+	}
+
+	// Scenario 4: Broken JSON that coincidentally matches as string (fallback check)
+	reqString := mock.Request{}
+	reqString.Body = "{literal string}"
+
+	mString := mock.Definition{}
+	mString.Request.Body = "{literal string}"
+
+	if b, err := mm.Match(&reqString, &mString, true); !b {
+		t.Errorf("Expected fallback string match to work. Err: %v", err)
+	}
+
+	// Scenario 5: application/octet-stream with JSON content (sniffing extension)
+	reqOctet := mock.Request{}
+	reqOctet.Headers = make(mock.Values)
+	reqOctet.Headers["Content-Type"] = []string{"application/octet-stream"}
+	reqOctet.Body = "{\"foo\":\"bar\"}"
+
+	mOctet := mock.Definition{}
+	mOctet.Request.Body = "{\"foo\" : \"bar\"}" // Note the space to ensure JSON comparison
+
+	if b, err := mm.Match(&reqOctet, &mOctet, true); !b {
+		t.Errorf("Expected match for sniffing with application/octet-stream. Err: %v", err)
 	}
 }

@@ -121,17 +121,17 @@ func getVarsProcessor() *vars.ResponseMessageEvaluator {
 
 func startServer(ip string, port, portTLS int, configTLS, tlsKeyPassword string, done chan struct{}, router server.RequestResolver, mLog chan match.Transaction, scenario match.ScenearioStorer, varsProcessor vars.Evaluator, spier match.TransactionSpier) {
 	dispatcher := server.Dispatcher{
-		IP:            ip,
-		Port:          port,
-		PortTLS:       portTLS,
-		ConfigTLS:     configTLS,
+		IP:             ip,
+		Port:           port,
+		PortTLS:        portTLS,
+		ConfigTLS:      configTLS,
 		TLSKeyPassword: tlsKeyPassword,
-		Resolver:      router,
-		Translator:    mock.HTTP{},
-		Evaluator:     varsProcessor,
-		Scenario:      scenario,
-		Spier:         spier,
-		Mlog:          mLog,
+		Resolver:       router,
+		Translator:     mock.HTTP{},
+		Evaluator:      varsProcessor,
+		Scenario:       scenario,
+		Spier:          spier,
+		Mlog:           mLog,
 	}
 	dispatcher.Start()
 	done <- struct{}{}
