@@ -154,6 +154,9 @@ Mock definition:
 		"cookies": {
 			"name": "value"
 		},
+        "optionalPaths": {
+          ".path.to.optional.field": true
+          },
 		"body": "Expected Body"
 	},
 	"response": {
@@ -204,6 +207,7 @@ A core feature of Mmock is the ability to return canned HTTP responses for reque
 * *queryStringParameters*: Array of query strings. It allows more than one value for the same key.
 * *headers*: Array of headers. It allows more than one value for the same key. **Case sensitive!**
 * *cookies*: Array of cookies.
+* *optionalPaths*: A map of paths within the body that should be considered optional. The value should always be true.
 * *body*: Body string. It allows * pattern. It also supports regular expressions for field values within JSON request bodies.
 
 In case of queryStringParameters, headers and cookies, the request can be matched only if all defined keys in mock will be present with the exact or glob value.
@@ -631,6 +635,7 @@ You can always disable this behavior adding the following flag `-server-statisti
 - Improved logging with levels thanks to [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
 - Support for Regular Expressions for QueryStringParameters [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
 - Support for URI and Description tags [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
+- Support for Optional Paths within the body [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
 
 ### Contributing
 
