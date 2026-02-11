@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	xj "github.com/basgys/goxml2json"
+	"github.com/jmartin82/mmock/v3/pkg/match/payload"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
 	"github.com/jmartin82/mmock/v3/pkg/route"
 	"github.com/tidwall/gjson"
@@ -169,15 +170,13 @@ func (rp Request) getHeaderParam(name string) (string, bool) {
 }
 
 func (rp Request) getBodyParam(name string) (string, bool) {
-	contentType, found := rp.Request.Headers["Content-Type"]
-	if !found {
-		return "", false
-	}
-	if strings.HasPrefix(contentType[0], "application/x-www-form-urlencoded") {
+	sniffer := payload.NewContentTypeSniffer()
+
+	if sniffer.IsFormEncoded(rp.Request.Headers, rp.Request.Body) {
 		return rp.getUrlEncodedFormBodyParam(name)
-	} else if strings.HasPrefix(contentType[0], "application/xml") || strings.HasPrefix(contentType[0], "text/xml") {
+	} else if sniffer.IsXML(rp.Request.Headers, rp.Request.Body) {
 		return rp.getXmlBodyParam(rp.Request.Body, name)
-	} else if strings.HasPrefix(contentType[0], "application/") && strings.HasSuffix(contentType[0], "json") {
+	} else if sniffer.IsJSON(rp.Request.Headers, rp.Request.Body) {
 		return rp.getJsonBodyParam(rp.Request.Body, name)
 	}
 
