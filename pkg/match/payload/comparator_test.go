@@ -49,6 +49,8 @@ func TestComparatorDefaultFactory(t *testing.T) {
 		"application/merge-patch+json",
 		"application/xml",
 		"text/xml",
+		"application/octet-stream",
+		"application/binary",
 	}
 
 	for _, comparer := range comparers {

@@ -30,17 +30,17 @@ var log = logger.Log
 
 // Dispatcher is the mock http server
 type Dispatcher struct {
-	IP            string
-	Port          int
-	PortTLS       int
-	ConfigTLS     string
+	IP             string
+	Port           int
+	PortTLS        int
+	ConfigTLS      string
 	TLSKeyPassword string
-	Resolver      RequestResolver
-	Translator    mock.MessageTranslator
-	Evaluator     vars.Evaluator
-	Scenario      match.ScenearioStorer
-	Spier         match.TransactionSpier
-	Mlog          chan match.Transaction
+	Resolver       RequestResolver
+	Translator     mock.MessageTranslator
+	Evaluator      vars.Evaluator
+	Scenario       match.ScenearioStorer
+	Spier          match.TransactionSpier
+	Mlog           chan match.Transaction
 }
 
 func (di Dispatcher) recordMatchData(msg match.Transaction) {
