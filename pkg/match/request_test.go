@@ -609,6 +609,31 @@ func TestMatchIgnoreUnexpectedHeadersAndQuery(t *testing.T) {
 	}
 }
 
+func TestBodyComparatorSniffFallback(t *testing.T) {
+	// AWS SDK sends application/x-amz-json-1.1 which is not registered in the comparator.
+	// The fallback should sniff the body as application/json and use JSONComparator.
+	req := mock.Request{}
+	req.Body = `{"Database":"mydb","TableName":"events"}`
+	req.Headers = make(mock.Values)
+	req.Headers["Content-Type"] = []string{"application/x-amz-json-1.1"}
+
+	m := mock.Definition{}
+	m.Request.Body = `{"Database": "mydb", "TableName": "events"}`
+
+	comparator := payload.NewDefaultComparator()
+	mm := Request{comparator: comparator}
+
+	if b, err := mm.Match(&req, &m, true); !b {
+		t.Errorf("Expected JSON match via sniff fallback for application/x-amz-json-1.1. Err: %v", err)
+	}
+
+	// Mismatched JSON should not match
+	req.Body = `{"Database":"mydb","TableName":"other_table"}`
+	if b, _ := mm.Match(&req, &m, true); b {
+		t.Error("Should NOT match different JSON payload")
+	}
+}
+
 func TestMatchBodySniffing(t *testing.T) {
 	// Scenario 1: JSON Object with whitespace and NO Content-Type header
 	req := mock.Request{}

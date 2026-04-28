@@ -247,6 +247,14 @@ func (mm Request) bodyMatch(mockReq mock.Request, req *mock.Request) bool {
 		if comparable, ok := mm.comparator.Compare(ct, mockReq.Body, body); comparable {
 			return ok
 		}
+
+		// Fallback: ct came from header but has no registered comparator — try sniffing the body
+		sniffedBody := strings.TrimLeft(req.Body, " \t\r\n")
+		if sniffedCT := payload.SniffContentType(sniffedBody); sniffedCT != "" && sniffedCT != ct {
+			if comparable, ok := mm.comparator.Compare(sniffedCT, mockReq.Body, sniffedBody); comparable {
+				return ok
+			}
+		}
 	}
 
 	return false
