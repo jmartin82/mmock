@@ -87,27 +87,36 @@ func (cts *ContentTypeSniffer) Compare(s1, s2 string) bool {
 	return s1 == s2
 }
 
-// DetectedContentType returns the content type from headers, falling back to body sniffing if missing or generic.
+// isKnownContentType reports whether ct names a payload type mmock can parse directly.
+func isKnownContentType(ct string) bool {
+	return (strings.HasPrefix(ct, "application/") && strings.Contains(ct, "json")) ||
+		strings.HasPrefix(ct, "application/xml") ||
+		strings.HasPrefix(ct, "text/xml") ||
+		strings.HasPrefix(ct, "application/x-www-form-urlencoded")
+}
+
+// DetectedContentType returns the content type from headers, falling back to body
+// sniffing when the header is missing or names a type we cannot parse (e.g.
+// application/octet-stream, or a legacy client reporting a wrong type like application/text).
 func (cts *ContentTypeSniffer) DetectedContentType(headers map[string][]string, body string) string {
+	ct := ""
 	if headers != nil {
-		if ct, found := headers["Content-Type"]; found && len(ct) > 0 {
-			val := ct[0]
-			// For generic binary types, sniff the actual content
-			if strings.HasPrefix(val, "application/octet-stream") || strings.HasPrefix(val, "application/binary") {
-				if sniffed := SniffContentType(body); sniffed != "" {
-					return sniffed
-				}
-			}
-			return val
+		if h, found := headers["Content-Type"]; found && len(h) > 0 {
+			ct = strings.TrimSpace(strings.Split(h[0], ";")[0])
 		}
 	}
-	return SniffContentType(body)
+	if ct == "" || !isKnownContentType(ct) {
+		if sniffed := SniffContentType(body); sniffed != "" {
+			return sniffed
+		}
+	}
+	return ct
 }
 
 // IsJSON returns true if the detected content type is JSON.
 func (cts *ContentTypeSniffer) IsJSON(headers map[string][]string, body string) bool {
 	ct := cts.DetectedContentType(headers, body)
-	return strings.HasPrefix(ct, "application/") && strings.HasSuffix(ct, "json")
+	return strings.HasPrefix(ct, "application/") && strings.Contains(ct, "json")
 }
 
 // IsXML returns true if the detected content type is XML.

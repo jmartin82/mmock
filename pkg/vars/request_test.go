@@ -191,6 +191,45 @@ func TestGetBodyParamWithBinaryContentType(t *testing.T) {
 	}
 }
 
+func TestGetBodyParamWithAwsJsonContentType(t *testing.T) {
+	req := mock.Request{}
+	req.Headers = make(mock.Values)
+	req.Headers["Content-Type"] = []string{"application/x-amz-json-1.1"}
+	req.Body = `{"QueryExecutionContext":{"Database":"operacional_blu"}}`
+	res := mock.Response{}
+	res.Body = `{"QueryExecutionId": "{{request.body.QueryExecutionContext.Database}}"}`
+
+	expected := `{"QueryExecutionId": "operacional_blu"}`
+
+	mock := mock.Definition{Request: req, Response: res}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != expected {
+		t.Errorf("Failed to resolve body vars with application/x-amz-json-1.1. Got: %s, Expected: %s", mock.Response.Body, expected)
+	}
+}
+
+func TestGetBodyParamWithWrongContentType(t *testing.T) {
+	req := mock.Request{}
+	req.Headers = make(mock.Values)
+	// Legacy client reporting the wrong content type for a JSON body
+	req.Headers["Content-Type"] = []string{"application/text"}
+	req.Body = `{"name": "john", "age": 30}`
+	res := mock.Response{}
+	res.Body = `{"name": "{{request.body.name}}", "age": {{request.body.age}}}`
+
+	expected := `{"name": "john", "age": 30}`
+
+	mock := mock.Definition{Request: req, Response: res}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != expected {
+		t.Errorf("Failed to resolve body vars with wrong content-type. Got: %s, Expected: %s", mock.Response.Body, expected)
+	}
+}
+
 func TestURI(t *testing.T) {
 	const MOCK_URI = "Test_URI.yml"
 	const MOCK_HEADER_NAME = "x-test-uri"
