@@ -12,7 +12,7 @@ type Filler interface {
 type FillerFactory interface {
 	CreateRequestFiller(req *mock.Request, mock *mock.Definition) Filler
 	CreateFakeFiller() Filler
-	CreateStreamFiller() Filler
+	CreateStreamFiller(req *mock.Request, mock *mock.Definition) Filler
 }
 
 type MockFillerFactory struct {
@@ -32,6 +32,6 @@ func (mff MockFillerFactory) CreateFakeFiller() Filler {
 	return Fake{Fake: mff.FakeDataProvider}
 }
 
-func (mff MockFillerFactory) CreateStreamFiller() Filler {
-	return Stream{}
+func (mff MockFillerFactory) CreateStreamFiller(req *mock.Request, mock *mock.Definition) Filler {
+	return Stream{Mock: mock, Request: req}
 }

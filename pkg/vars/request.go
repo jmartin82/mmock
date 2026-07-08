@@ -121,6 +121,9 @@ func (rp Request) getPathParam(name string) (string, bool) {
 
 	route := route.NewRoute(rp.Mock.Request.Path)
 	mparm := route.Match(rp.Request.Path)
+	if mparm == nil {
+		return "", false
+	}
 
 	value, f := mparm.Params[name]
 	if !f {
