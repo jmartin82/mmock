@@ -632,3 +632,67 @@ func TestReplaceBigFile(t *testing.T) {
 		t.Error("Replaced tags in a external stream doesn't work.", res.Body, mock.Response.Body)
 	}
 }
+
+func TestEvalFileContentsComposedFromRequest(t *testing.T) {
+	// Headline scenario: compose the file path from a route path param and a JSON body
+	// value nested inside file.contents, end-to-end through Eval.
+	content := []byte("id,name\n1,arquivo")
+	dir, err := ioutil.TempDir("", "mmock")
+	if err != nil {
+		t.Errorf("Error creating temporary folder")
+	}
+	defer os.RemoveAll(dir) // clean up
+
+	if err := os.MkdirAll(filepath.Join(dir, "acme", "exemplos"), 0777); err != nil {
+		t.Errorf("Error creating nested folder")
+	}
+	if err := ioutil.WriteFile(filepath.Join(dir, "acme", "exemplos", "exemplo.csv"), content, 0666); err != nil {
+		t.Errorf("Error updating temporary file")
+	}
+
+	req := mock.Request{Path: "/blu365-athena-results/acme/athena-results/x.csv"}
+	req.Body = `{"name":"exemplo"}`
+	req.Headers = mock.Values{"Content-Type": {"application/json"}}
+
+	res := mock.Response{}
+	res.Body = fmt.Sprintf("{{ file.contents(%s/{{request.path.tenant}}/exemplos/{{request.body.name}}.csv) }}", dir)
+
+	mock := mock.Definition{Request: mock.Request{Path: "/blu365-athena-results/:tenant/athena-results/:filename"}, Response: res}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != "id,name\n1,arquivo" {
+		t.Errorf("Composed file.contents was not resolved. Got: %s", mock.Response.Body)
+	}
+}
+
+func TestEvalStreamTagAlongsideRequestTag(t *testing.T) {
+	// A stream tag and a sibling {{request.*}} tag on the same body must coexist: the
+	// stream scanner resolves the former in phase A, the generic tokenizer the latter.
+	content := []byte("FILE")
+	dir, err := ioutil.TempDir("", "mmock")
+	if err != nil {
+		t.Errorf("Error creating temporary folder")
+	}
+	defer os.RemoveAll(dir) // clean up
+
+	tmpfn := filepath.Join(dir, "data")
+	if err := ioutil.WriteFile(tmpfn, content, 0666); err != nil {
+		t.Errorf("Error updating temporary file")
+	}
+
+	req := mock.Request{Path: "/results"}
+	req.Body = `{"name":"exemplo"}`
+	req.Headers = mock.Values{"Content-Type": {"application/json"}}
+
+	res := mock.Response{}
+	res.Body = fmt.Sprintf("{{ file.contents(%s) }} name={{request.body.name}}", tmpfn)
+
+	mock := mock.Definition{Request: mock.Request{Path: "/results"}, Response: res}
+	varsProcessor := getProcessor()
+	varsProcessor.Eval(&req, &mock)
+
+	if mock.Response.Body != "FILE name=exemplo" {
+		t.Errorf("Stream tag and request tag did not coexist. Got: %s", mock.Response.Body)
+	}
+}

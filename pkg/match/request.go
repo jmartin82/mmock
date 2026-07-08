@@ -233,9 +233,27 @@ func (mm Request) bodyMatch(mockReq mock.Request, req *mock.Request) bool {
 		return true
 	}
 
-	if value, ok := req.Headers["Content-Type"]; ok && len(value) > 0 {
-		if comparable, ok := mm.comparator.Compare(value[0], mockReq.Body, req.Body); comparable {
+	// Check if we should use a specific comparator based on Content-Type
+	if mm.comparator != nil {
+		ct := ""
+		body := req.Body
+		if h, ok := req.Headers["Content-Type"]; ok && len(h) > 0 {
+			ct = h[0]
+		} else {
+			body = strings.TrimLeft(req.Body, " \t\r\n")
+			ct = payload.SniffContentType(body)
+		}
+
+		if comparable, ok := mm.comparator.Compare(ct, mockReq.Body, body); comparable {
 			return ok
+		}
+
+		// Fallback: ct came from header but has no registered comparator — try sniffing the body
+		sniffedBody := strings.TrimLeft(req.Body, " \t\r\n")
+		if sniffedCT := payload.SniffContentType(sniffedBody); sniffedCT != "" && sniffedCT != ct {
+			if comparable, ok := mm.comparator.Compare(sniffedCT, mockReq.Body, sniffedBody); comparable {
+				return ok
+			}
 		}
 	}
 

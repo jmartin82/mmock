@@ -57,14 +57,14 @@ func (mr *mockResolver) Resolve(req *mock.Request) (*mock.Definition, *match.Res
 // mockSpier does nothing for testing
 type mockSpier struct{}
 
-func (ms *mockSpier) Save(t match.Transaction)                           {}
-func (ms *mockSpier) Reset()                                             {}
-func (ms *mockSpier) ResetMatch(r mock.Request)                          {}
-func (ms *mockSpier) GetAll() []match.Transaction                        { return nil }
-func (ms *mockSpier) Get(limit int, offset int) []match.Transaction      { return nil }
-func (ms *mockSpier) Find(r mock.Request) []match.Transaction            { return nil }
-func (ms *mockSpier) GetMatched() []match.Transaction                    { return nil }
-func (ms *mockSpier) GetUnMatched() []match.Transaction                  { return nil }
+func (ms *mockSpier) Save(t match.Transaction)                      {}
+func (ms *mockSpier) Reset()                                        {}
+func (ms *mockSpier) ResetMatch(r mock.Request)                     {}
+func (ms *mockSpier) GetAll() []match.Transaction                   { return nil }
+func (ms *mockSpier) Get(limit int, offset int) []match.Transaction { return nil }
+func (ms *mockSpier) Find(r mock.Request) []match.Transaction       { return nil }
+func (ms *mockSpier) GetMatched() []match.Transaction               { return nil }
+func (ms *mockSpier) GetUnMatched() []match.Transaction             { return nil }
 
 // mockEvaluator does nothing for testing
 type mockEvaluator struct{}
