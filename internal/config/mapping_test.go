@@ -27,6 +27,11 @@ func (jp DummyReader) Parse(buf []byte) (mock.Definition, error) {
 	return mock.Definition{URI: "test_mapping", Request: mock.Request{Method: "Post", Path: "/test"}, Response: mock.Response{StatusCode: 200}}, nil
 }
 
+// Marshal serializes a Mock struct, returning a dummy fixed payload
+func (jp DummyReader) Marshal(m mock.Definition) ([]byte, error) {
+	return []byte("test"), nil
+}
+
 var fsUpdate = make(chan struct{})
 
 func TestMappingCrud(t *testing.T) {

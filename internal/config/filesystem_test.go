@@ -1,12 +1,15 @@
 package config
 
 import (
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/ghodss/yaml"
+	"github.com/jmartin82/mmock/v3/internal/config/parser"
 	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
@@ -30,6 +33,10 @@ func (mr *mockParser) Parse(content []byte) (mock.Definition, error) {
 
 	return mock.Definition{}, errors.New("error reading")
 
+}
+
+func (mr *mockParser) Marshal(m mock.Definition) ([]byte, error) {
+	return []byte("mock"), nil
 }
 
 func TestReadMockDefinition(t *testing.T) {
@@ -78,17 +85,52 @@ func TestWriteMockDefinition(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error creating temporary folder")
 	}
-	tmpfn := filepath.Join(dir, "tmpfile_2")
 	defer os.RemoveAll(dir) // clean up
+
 	mapper := NewFileSystemMapper()
-	err = mapper.Write(tmpfn, mock)
-	if err != nil {
+	mapper.AddParser(parser.JSONReader{})
+	mapper.AddParser(parser.YAMLReader{})
+
+	// Unrecognized extension falls back to JSON.
+	tmpfn := filepath.Join(dir, "tmpfile_2")
+	if err := mapper.Write(tmpfn, mock); err != nil {
 		t.Error("Unexpected error writing the config", err)
 	}
-
 	bytes, erf := ioutil.ReadFile(tmpfn)
 	if erf != nil || len(bytes) == 0 {
 		t.Error("Unexpected error reading the config ", erf)
+	}
+	if err := json.Unmarshal(bytes, &mock); err != nil {
+		t.Error("Expected fallback content to be valid JSON", err)
+	}
+
+	// .json extension writes JSON content.
+	jsonFn := filepath.Join(dir, "tmpfile_2.json")
+	if err := mapper.Write(jsonFn, mock); err != nil {
+		t.Error("Unexpected error writing the config", err)
+	}
+	bytes, erf = ioutil.ReadFile(jsonFn)
+	if erf != nil || len(bytes) == 0 {
+		t.Error("Unexpected error reading the config ", erf)
+	}
+	if err := json.Unmarshal(bytes, &mock); err != nil {
+		t.Error("Expected .json file to contain valid JSON", err)
+	}
+
+	// .yaml extension writes YAML content and must not be overwritten with JSON.
+	yamlFn := filepath.Join(dir, "tmpfile_2.yaml")
+	if err := mapper.Write(yamlFn, mock); err != nil {
+		t.Error("Unexpected error writing the config", err)
+	}
+	bytes, erf = ioutil.ReadFile(yamlFn)
+	if erf != nil || len(bytes) == 0 {
+		t.Error("Unexpected error reading the config ", erf)
+	}
+	if err := yaml.Unmarshal(bytes, &mock); err != nil {
+		t.Error("Expected .yaml file to contain valid YAML", err)
+	}
+	if json.Valid(bytes) {
+		t.Error("Expected .yaml file not to be overwritten with JSON content")
 	}
 
 }

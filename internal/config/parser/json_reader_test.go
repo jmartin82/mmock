@@ -3,6 +3,8 @@ package parser
 import (
 	"testing"
 	"time"
+
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 func TestJSONCanParse(t *testing.T) {
@@ -161,4 +163,40 @@ func TestJSONRead(t *testing.T) {
 		t.Errorf("Missing scenario NewState")
 	}
 
+}
+
+func TestJSONMarshal(t *testing.T) {
+	json := JSONReader{}
+
+	original := mock.Definition{URI: "name", Description: "description"}
+	original.Request.Method = "GET"
+	original.Request.Path = "/your/path/:variable"
+	original.Response.StatusCode = 200
+	original.Response.Body = "Responsebody"
+
+	content, err := json.Marshal(original)
+	if err != nil {
+		t.Fatalf("Unexpected error marshaling: %s", err)
+	}
+
+	roundTripped, err := json.Parse(content)
+	if err != nil {
+		t.Fatalf("Unexpected error parsing marshaled content: %s", err)
+	}
+
+	if roundTripped.URI != original.URI {
+		t.Errorf("Missing name after round trip")
+	}
+
+	if roundTripped.Description != original.Description {
+		t.Errorf("Missing description after round trip")
+	}
+
+	if roundTripped.Request.Method != original.Request.Method {
+		t.Errorf("Missing request method after round trip")
+	}
+
+	if roundTripped.Response.StatusCode != original.Response.StatusCode {
+		t.Errorf("Missing response status code after round trip")
+	}
 }
