@@ -35,7 +35,10 @@ func (s PrioritySort) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 func (s PrioritySort) Less(i, j int) bool {
-	return s[i].Control.Priority > s[j].Control.Priority
+	if s[i].Control.Priority != s[j].Control.Priority {
+		return s[i].Control.Priority > s[j].Control.Priority
+	}
+	return s[i].URI < s[j].URI
 }
 
 type ConfigMapping struct {

@@ -119,6 +119,46 @@ func TestPopulate(t *testing.T) {
 
 }
 
+// TestListOrderIsDeterministic reproduces https://github.com/jmartin82/mmock/issues/192:
+// definitions with equal (default) priority must keep a stable, deterministic order
+// across repeated calls to List(), since Router.Resolve() returns the first match it
+// finds. Without a deterministic order, identical requests can match different
+// definitions on different calls.
+func TestListOrderIsDeterministic(t *testing.T) {
+
+	dir, err := ioutil.TempDir("", "mmock_mapping")
+	if err != nil {
+		t.Errorf("Error creating temporary folder")
+	}
+	defer os.RemoveAll(dir)
+	cm := NewFileSystemMapper()
+	n := NewConfigMapping(dir, cm, fsUpdate)
+
+	for i := 0; i < 20; i++ {
+		uri := "mock_definition_" + string(rune('a'+i))
+		if err := n.Set(uri, mock.Definition{URI: uri}); err != nil {
+			t.Fatalf("Error persisting mapping: %v", err)
+		}
+	}
+
+	first := n.List()
+	var firstOrder []string
+	for _, m := range first {
+		firstOrder = append(firstOrder, m.URI)
+	}
+
+	for i := 0; i < 20; i++ {
+		mocks := n.List()
+		var order []string
+		for _, m := range mocks {
+			order = append(order, m.URI)
+		}
+		if strings.Join(order, ",") != strings.Join(firstOrder, ",") {
+			t.Fatalf("List() order is not deterministic across calls for equal-priority definitions.\nfirst call: %v\nthis call:  %v", firstOrder, order)
+		}
+	}
+}
+
 func TestGetSortedMappingList(t *testing.T) {
 
 	dir, err := ioutil.TempDir("", "mmock_mapping")
