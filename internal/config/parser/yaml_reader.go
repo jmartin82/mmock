@@ -27,3 +27,8 @@ func (jp YAMLReader) Parse(buf []byte) (mock.Definition, error) {
 	}
 	return m, nil
 }
+
+// Marshal serializes a Definition struct to yaml
+func (jp YAMLReader) Marshal(m mock.Definition) ([]byte, error) {
+	return yaml.Marshal(m)
+}

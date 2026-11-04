@@ -25,3 +25,8 @@ func (jp JSONReader) Parse(buf []byte) (mock.Definition, error) {
 	}
 	return m, nil
 }
+
+// Marshal serializes a Definition struct to json
+func (jp JSONReader) Marshal(m mock.Definition) ([]byte, error) {
+	return json.MarshalIndent(m, "", "  ")
+}

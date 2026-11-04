@@ -3,6 +3,8 @@ package parser
 import (
 	"testing"
 	"time"
+
+	"github.com/jmartin82/mmock/v3/pkg/mock"
 )
 
 func TestYamlCanParse(t *testing.T) {
@@ -153,4 +155,40 @@ control:
 		t.Error("Missing scenario NewState")
 	}
 
+}
+
+func TestYamlMarshal(t *testing.T) {
+	yaml := YAMLReader{}
+
+	original := mock.Definition{URI: "name", Description: "description"}
+	original.Request.Method = "GET"
+	original.Request.Path = "/your/path/:variable"
+	original.Response.StatusCode = 200
+	original.Response.Body = "Responsebody"
+
+	content, err := yaml.Marshal(original)
+	if err != nil {
+		t.Fatalf("Unexpected error marshaling: %s", err)
+	}
+
+	roundTripped, err := yaml.Parse(content)
+	if err != nil {
+		t.Fatalf("Unexpected error parsing marshaled content: %s", err)
+	}
+
+	if roundTripped.URI != original.URI {
+		t.Error("Missing name after round trip")
+	}
+
+	if roundTripped.Description != original.Description {
+		t.Error("Missing description after round trip")
+	}
+
+	if roundTripped.Request.Method != original.Request.Method {
+		t.Error("Missing request method after round trip")
+	}
+
+	if roundTripped.Response.StatusCode != original.Response.StatusCode {
+		t.Error("Missing response status code after round trip")
+	}
 }

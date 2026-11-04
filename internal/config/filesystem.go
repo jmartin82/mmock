@@ -30,6 +30,7 @@ type Writer interface {
 type Parser interface {
 	CanParse(filename string) bool
 	Parse(content []byte) (mock.Definition, error)
+	Marshal(mock mock.Definition) ([]byte, error)
 }
 
 // NewFileSystemMapper file config constructor
@@ -51,7 +52,22 @@ func (fd *FSMapper) AddParser(reader Parser) {
 
 func (fd *FSMapper) Write(filename string, mock mock.Definition) error {
 
-	content, err := json.MarshalIndent(mock, "", "  ")
+	var content []byte
+	var err error
+	matched := false
+
+	for _, parser := range fd.parsers {
+		if parser.CanParse(filename) {
+			content, err = parser.Marshal(mock)
+			matched = true
+			break
+		}
+	}
+
+	if !matched {
+		content, err = json.MarshalIndent(mock, "", "  ")
+	}
+
 	if err != nil {
 		return err
 	}
