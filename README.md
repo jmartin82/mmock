@@ -1,63 +1,99 @@
-![Mmock](/docs/logo.png "Mmock logo")
-=========
+<p align="center">
+  <img src="/docs/logo.png" alt="Mmock logo" width="320">
+</p>
 
-Mmock is a testing and fast prototyping tool for developers:
+<h1 align="center">Mmock</h1>
 
-Easy and fast HTTP mock server.
+<p align="center">
+  A fast, lightweight HTTP mock server for testing and prototyping.
+</p>
 
-* Download Mmock
-* Create a mock definition.
-* Configure your application endpoints to use Mmock
-* Receive the expected responses
-* Inspect the requests in the web UI
-* Release it to a real server
+<p align="center">
+  <a href="https://github.com/jmartin82/mmock/actions/workflows/ci.yml"><img src="https://github.com/jmartin82/mmock/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+  <a href="https://hub.docker.com/r/jordimartin/mmock/"><img src="https://img.shields.io/docker/pulls/jordimartin/mmock.svg" alt="Docker pulls"></a>
+  <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+</p>
 
-Built with Go - Mmock runs without installation on multiple platforms.
+Mmock lets you stand up a fake HTTP server in seconds:
 
-### Features
+1. Download Mmock.
+2. Create a mock definition (JSON or YAML).
+3. Point your application at Mmock instead of the real endpoint.
+4. Get back the responses you defined.
+5. Inspect every request that came in, live, from the web UI.
+6. When you're ready, swap Mmock out for the real server.
 
-* Easy mock definition via JSON or YAML
-* Variables in response (fake or request data)
-* Route patterns may include named parameters (/hello/:name)
-* Glob matching ( * hello * )
-* Match request by method, URL params, query string, headers, cookies and bodies.
-* Mock definitions hot replace (edit your mocks without restart)
-* Web interface to view requests data (method,path,headers,cookies,body,etc..)
-* Stateful behaviour with scenarios
-* Verifying
-* Proxy mode
-* Fine grain log info in web interface
-* Real-time updates using WebSockets
-* Priority matching
-* Crazy mode for failure testing
-* Public interface auto discover
-* Lightweight and portable
-* No installation required
+Mmock is written in Go and ships as a single, dependency-free binary — no installation required, runs on Linux, macOS and Windows.
 
-### Example
+## Table of contents
+
+- [Features](#features)
+- [Quick example](#quick-example)
+- [Getting started](#getting-started)
+  - [Run with Docker](#run-with-docker)
+  - [Run locally](#run-locally)
+  - [Command-line flags](#command-line-flags)
+  - [Logging](#logging)
+- [Mock definition](#mock-definition)
+  - [Request](#request)
+  - [Response](#response-optional-on-proxy-calls)
+  - [Callback](#callback-optional)
+  - [Control](#control-optional)
+- [Variable tags](#variable-tags)
+- [Scenarios](#scenarios)
+- [API](#api)
+  - [Verify](#verify)
+  - [Scenario](#scenario)
+  - [Mapping](#mapping)
+  - [Realtime endpoint](#realtime-endpoint)
+  - [Response format](#response-format)
+- [Statistics](#statistics)
+- [Contributors](#contributors)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+- Easy mock definitions in JSON or YAML
+- Dynamic responses with variables (fake data, request data, environment data)
+- Route patterns with named parameters (`/hello/:name`)
+- Glob matching (`*hello*`)
+- Match requests by method, URL params, query string, headers, cookies and body
+- Hot reload — edit your mocks on disk and Mmock picks them up, no restart needed
+- Web console to inspect requests (method, path, headers, cookies, body, etc.)
+- Stateful behavior via scenarios
+- Request verification API
+- Proxy mode
+- Fine-grained logging in the web console
+- Real-time request stream over WebSockets
+- Priority-based matching
+- "Crazy mode" for chaos/failure testing
+- Auto-discovery of the public interface
+- Lightweight, portable, single binary — no installation required
+
+## Quick example
 
 ![Video of Mmock](/docs/example.gif "Mmock example")
 
-Mock definition file example:
+A mock definition in JSON:
 
 ```json
 {
-	"request": {
-		"method": "GET",
-		"path": "/hello/*"
-	},
-	"response": {
-		"statusCode": 200,
-		"headers": {
-			"Content-Type":["application/json"]
-		},
-		"body": "{\"hello\": \"{{request.query.name}}, my name is {{fake.FirstName}}\"}"
-	}
+  "request": {
+    "method": "GET",
+    "path": "/hello/*"
+  },
+  "response": {
+    "statusCode": 200,
+    "headers": {
+      "Content-Type": ["application/json"]
+    },
+    "body": "{\"hello\": \"{{request.query.name}}, my name is {{fake.FirstName}}\"}"
+  }
 }
-
 ```
-Or
 
+The same mock in YAML:
 
 ```yaml
 ---
@@ -68,240 +104,234 @@ response:
   statusCode: 200
   headers:
     Content-Type:
-    - application/json
+      - application/json
   body: '{"hello": "{{request.query.name}}, my name is {{fake.FirstName}}"}'
-
 ```
 
-You can see more complex examples [here](/config).
+More complete examples are available in [`/config`](/config).
 
-### Getting started
+## Getting started
 
-Either:
+### Run with Docker
 
-Run it from Docker using the provided ```Dockerfile``` or [from Docker Hub](https://hub.docker.com/r/jordimartin/mmock/)
+Use the provided `Dockerfile`, or pull the image from [Docker Hub](https://hub.docker.com/r/jordimartin/mmock/):
 
-```
+```bash
 docker image pull jordimartin/mmock
 docker run -v YOUR_ABS_PATH:/config -p 8082:8082 -p 8083:8083 jordimartin/mmock
 ```
 
-Or run mmock locally from the command line. (Requires Go 1.8 at least)
+### Run locally
 
-```
-go get github.com/jmartin82/mmock/...
+Requires Go 1.23 or later (see [`go.mod`](go.mod)):
+
+```bash
+go install github.com/jmartin82/mmock/v3/cmd/mmock@latest
 mmock -h
-
 ```
 
-To configure Mmock, use command line flags described in help.
+### Command-line flags
 
-
+```text
+Usage of ./mmock:
+  -config-path string
+        Mocks config folder (default "execution_path/config")
+  -console
+        Console enabled  (true/false) (default true)
+  -console-ip string
+        Console server IP (default "public_ip")
+  -console-port int
+        Console server Port (default 8082)
+  -request-storage-capacity int
+        Request storage capacity (0 = infinite) (default 100)
+  -results-per-page uint
+        Number of results per page (default 25)
+  -server-ip string
+        Definition server IP (default "public_ip")
+  -server-port int
+        Definition server Port (default 8083)
+  -server-statistics
+        Definition server sends anonymous statistics (default true)
+  -server-tls-port int
+        Definition server TLS Port (default 8084)
+  -tls-key-password string
+        Password for encrypted TLS private key files (can also be set via MMOCK_TLS_KEY_PASSWORD env var)
+  -tls-path string
+        TLS config folder (server.crt and server.key should be inside) (default "execution_path/tls")
 ```
-    Usage of ./mmock:
-	  -config-path string
-		Mocks definition folder (default "execution_pathconfig")
-	  -console
-		Console enabled  (true/false) (default true)
-	  -console-ip string
-		Console server IP (default "public_ip")
-	  -console-port int
-		Console server Port (default 8082)
- 	  -request-storage-capacity int
-		Request storage capacity (0 = infinite) (default 100)
-	  -results-per-page uint
-		Number of results per page (default 25)
-	  -server-ip string
-		Mock server IP (default "public_ip")
-	  -server-port int
-		Mock server Port (default 8083)
-	  -server-statistics
-		Mock server sends anonymous statistics (default true)
-	  -server-tls-port int
-		Mock server TLS Port (default 8084)
-	  -tls-path string
-		TLS config folder (server.crt and server.key should be inside) (default "execution_path/tls")
-```
 
-The default logging level is INFO, but you can change it by setting the
-environment variable LOG_LEVEL to one of the following:
+### Logging
 
-  * CRITICAL
-  * ERROR
-  * WARNING
-  * NOTICE
-  * INFO
-  * DEBUG
+The default logging level is `INFO`. Override it with the `LOG_LEVEL` environment variable, set to one of:
 
-### Mock
+`CRITICAL` · `ERROR` · `WARNING` · `NOTICE` · `INFO` · `DEBUG`
 
-Mock definition:
+## Mock definition
 
 ```json
 {
-	"description": "Some text that describes the intended usage of the current configuration",
-	"request": {
-		"host": "example.com",
-		"method": "GET|POST|PUT|PATCH|...",
-		"path": "/your/path/:variable",
-		"queryStringParameters": {
-			"name": ["value"],
-			"name": ["value", "value"]
-		},
-		"headers": {
-			"name": ["value"]
-		},
-		"cookies": {
-			"name": "value"
-		},
-		"body": "Expected Body"
-	},
-	"response": {
-		"statusCode": "int (2xx,4xx,5xx,xxx)",
-		"headers": {
-			"name": ["value"]
-		},
-		"cookies": {
-			"name": "value"
-		},
-		"body": "Response body"
-	},
-	"callback": {
-		"method": "GET|POST|PUT|PATCH|...",
-		"url": "http://your-callback/",
-		"delay": "string (response delay in s,ms)",
-		"headers": {
-			"name": ["value"]
-		},
-		"body": "Response body"
-	},
-	"control": {
-		"scenario": {
-			"name": "string (scenario name)",
-			"requiredState": [
-				"not_started (default state)",
-				"another_state_name"
-			],
-			"newState": "new_stat_neme"
-		},
-		"proxyBaseURL": "string (original URL endpoint)",
-		"delay": "string (response delay in s,ms)",
-		"crazy": "bool (return random 5xx)",
-		"priority": "int (matching priority)",
-		"webHookURL" : "string (URL endpoint)"
-	}
+  "description": "Some text that describes the intended usage of the current configuration",
+  "request": {
+    "host": "example.com",
+    "method": "GET|POST|PUT|PATCH|...",
+    "path": "/your/path/:variable",
+    "queryStringParameters": {
+      "name": ["value"],
+      "other": ["value1", "value2"]
+    },
+    "headers": {
+      "name": ["value"]
+    },
+    "cookies": {
+      "name": "value"
+    },
+    "body": "Expected Body"
+  },
+  "response": {
+    "statusCode": "int (2xx,4xx,5xx,xxx)",
+    "headers": {
+      "name": ["value"]
+    },
+    "cookies": {
+      "name": "value"
+    },
+    "body": "Response body"
+  },
+  "callback": {
+    "method": "GET|POST|PUT|PATCH|...",
+    "url": "http://your-callback/",
+    "delay": "string (response delay in s,ms)",
+    "headers": {
+      "name": ["value"]
+    },
+    "body": "Response body"
+  },
+  "control": {
+    "scenario": {
+      "name": "string (scenario name)",
+      "requiredState": [
+        "not_started (default state)",
+        "another_state_name"
+      ],
+      "newState": "new_state_name"
+    },
+    "proxyBaseURL": "string (original URL endpoint)",
+    "delay": "string (response delay in s,ms)",
+    "crazy": "bool (return random 5xx)",
+    "priority": "int (matching priority)",
+    "webHookURL": "string (URL endpoint)"
+  }
 }
-
 ```
 
-#### Request
+### Request
 
-A core feature of Mmock is the ability to return canned HTTP responses for requests matching criteria.
+A core feature of Mmock is returning canned HTTP responses for requests that match a set of criteria.
 
-* *host*: Request http host. (without port)
-* *method*: Request http method. It allows more than one separated by pipes "|" **Mandatory**
-* *path*: Resource identifier. It allows :value matching. **Mandatory**
-* *queryStringParameters*: Array of query strings. It allows more than one value for the same key.
-* *headers*: Array of headers. It allows more than one value for the same key. **Case sensitive!**
-* *cookies*: Array of cookies.
-* *body*: Body string. It allows * pattern. It also supports regular expressions for field values within JSON request bodies.
+| Field | Description |
+|---|---|
+| `host` | Request HTTP host (without port). |
+| `method` **(required)** | Request HTTP method. Multiple methods can be separated with `\|`. |
+| `path` **(required)** | Resource identifier. Supports `:value` named parameters. |
+| `queryStringParameters` | Query string values. Multiple values per key are supported. |
+| `headers` | Request headers. Multiple values per key are supported. **Case sensitive.** |
+| `cookies` | Request cookies. |
+| `body` | Body string. Supports `*` glob patterns and regular expressions for field values inside JSON bodies. |
 
-In case of queryStringParameters, headers and cookies, the request can be matched only if all defined keys in mock will be present with the exact or glob value.
+For `queryStringParameters`, `headers` and `cookies`, a request only matches if every key defined in the mock is present with the exact or glob value.
 
-Glob matching is available for:
-* host
-* path
-* headers
-* cookies
-* query strings
-* body
+Glob matching (`*`) is supported for: `host`, `path`, `headers`, `cookies`, query strings and `body`.
 
-Query strings and headers support also global matches (*) in the header/parameter name. For example:
+Query strings and headers also support glob matches in the key name itself, for example:
+
 ```json
-		"headers": {
-			"Custom-Header-*": [
-				"partial val*"
-			]
-		}
+"headers": {
+  "Custom-Header-*": ["partial val*"]
+}
 ```
 
-Regexp matching is available for:
-- body
-- query strings
+Regular-expression matching is supported for `body` and query strings — see the [Go regexp syntax reference](https://pkg.go.dev/regexp/syntax).
 
-See https://pkg.go.dev/regexp/syntax for regexp syntax
+### Response (optional on proxy calls)
 
-#### Response (Optional on proxy call)
+| Field | Description |
+|---|---|
+| `statusCode` | Response status code. |
+| `headers` | Response headers. Multiple values per key and variable tags are supported. |
+| `cookies` | Response cookies. Variable tags are supported. |
+| `body` | Response body. Variable tags are supported. |
 
-* *statusCode*: Response status code
-* *headers*: Array of headers. It allows more than one value for the same key and vars.
-* *cookies*: Array of cookies. It allows vars.
-* *body*: Body string. It allows vars.
+### Callback (optional)
 
-#### Callback (Optional)
+Makes Mmock issue an outgoing API request after it serves the mocked response.
 
-This is used to have mmock make an API request after receiving the mocked request.
+| Field | Description |
+|---|---|
+| `delay` | Delay before making the callback. |
+| `url` | URL to call. |
+| `method` | HTTP method for the callback request. |
+| `headers` | Callback request headers. Multiple values per key are supported. |
+| `body` | Callback body. Variable tags are supported. |
+| `timeout` | How long to wait for the callback to respond (default `10s`). |
 
-* *delay*: Delay before making the callback
-* *url*: URL to make a request to
-* *method*: Request http method
-* *headers*: Array of headers. It allows more than one value for the same key.
-* *body*: Body string. It allows vars.
-* *timeout*: Duration to allow the callback to respond (default 10s)
+### Control (optional)
 
-#### Control (Optional)
+| Field | Description |
+|---|---|
+| `scenario` | A state machine; see [Scenarios](#scenarios). |
+| `proxyBaseURL` | Forwards the request to this base URL and relays the response back to the client. Useful when you don't want to mock an entire service — the `response` field isn't required in this case. |
+| `delay` | Delays the response, to simulate a slow connection or server. |
+| `crazy` | Returns random `5xx` errors on some requests, to simulate server problems. |
+| `priority` | Matching priority. Higher values are matched first, ahead of less specific mocks. |
+| `webHookURL` | If set, notifies this endpoint whenever this mock is matched. |
 
-* *scenario*; A scenario is essentially a state machine whose states can be arbitrarily assigned.
-* *proxyBaseURL*: If this parameter is present, it sends the request data to the BaseURL and resend the response to de client. Useful if you don't want mock a the whole service. NOTE: It's not necessary fill the response field in this case.
-* *delay*: Delay the response. Simulate bad connection or bad server performance.
-* *crazy*: Return random server errors (5xx) in some request. Simulate server problems.
-* *priority*: Set the priority to avoid match in less restrictive mocks. Higher, more priority.
-* *webHookURL*: After any match if this option is defined it will notify the match to the desired endpoint.
+## Variable tags
 
-### Variable tags
+Response bodies, headers and cookies can embed dynamic values as `{{tagName}}` tags.
 
-You can use variable data in response. The variables will be defined as tags like this {{nameVar}}
+**General:**
 
- - URI
- - description
+- `URI`
+- `description`
 
-**Request data:** Use them if you want to add request data in your response.
+**Request data** — pull data from the incoming request into the response:
 
- - request.scheme
- - request.hostname
- - request.port
- - request.path (full path)
- - request.path."*key*"
- - request.query."*key*"
- - request.cookie."*key*"
- - request.fragment
- - request.url (full url with scheme, hostname, port, path and query parameters)
- - request.authority (return scheme, hostname and port (optional))
- - request.body
+- `request.scheme`
+- `request.hostname`
+- `request.port`
+- `request.path` (full path)
+- `request.path."*key*"`
+- `request.query."*key*"`
+- `request.cookie."*key*"`
+- `request.fragment`
+- `request.url` (full URL: scheme, hostname, port, path and query parameters)
+- `request.authority` (scheme, hostname and port, if present)
+- `request.body`
 
-You can extract information from the request body too, using a dot notation path:
- 
- - request.body."*key*" (support for `application/json`, `application/xml` and `application/x-www-form-urlencoded` requests)
- - request.body."*deep*"."*key*" (support for `application/json`, `application/xml` requests)
+You can also pull values out of the request body with a dot-notation path:
 
-Quick overview of the path syntax available to extract values form the request: [https://github.com/tidwall/gjson#path-syntax](https://github.com/tidwall/gjson#path-syntax)
+- `request.body."*key*"` (supports `application/json`, `application/xml` and `application/x-www-form-urlencoded`)
+- `request.body."*deep*"."*key*"` (supports `application/json` and `application/xml`)
 
-You can also use "regex" and "concat" commands to complement GJson query:
+See the [gjson path syntax](https://github.com/tidwall/gjson#path-syntax) for the full extraction syntax. You can also combine `regex()` and `concat()` to post-process the extracted value:
 
-- request.body."*deep*"."*key*".regex() (support for `application/json`, `application/xml` requests)
-- request.body."*deep*"."*key*".concat() (support for `application/json`, `application/xml` requests)
-- request.body."*deep*"."*key*".regex().concat() (support for `application/json`, `application/xml` requests)
+- `request.body."*deep*"."*key*".regex()`
+- `request.body."*deep*"."*key*".concat()`
+- `request.body."*deep*"."*key*".regex().concat()`
 
-**Example request data:**
+**Example — incoming request body:**
+
 ```json
 {
   "email": "hilari@sapo.pt",
   "age": 4,
-  "uuid":"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+  "uuid": "2307-878787-xxxx",
   "discarded": "do not return"
 }
 ```
-**Example config mock data:**
+
+**Example — mock response using variable tags:**
+
 ```json
 {
   "email": "{{request.body.email.regex((\@gmail.com))}}",
@@ -310,7 +340,9 @@ You can also use "regex" and "concat" commands to complement GJson query:
   "discarded": "{{request.body.discarded.concat(, Please!)}}"
 }
 ```
-**Example response data:**
+
+**Resulting response:**
+
 ```json
 {
   "email": "",
@@ -320,253 +352,130 @@ You can also use "regex" and "concat" commands to complement GJson query:
 }
 ```
 
-**External streams:** Perfect for embedding big payloads or getting data from another service.
+**External streams** — handy for embedding large payloads or pulling data from another service:
 
- - file.contents(FILE_PATH)
- - http.contents(URL)
+- `file.contents(FILE_PATH)`
+- `http.contents(URL)`
 
-**[Fake](https://godoc.org/github.com/icrowley/fake) data:** Useful to provide a more rich and random response.
+**[Fake](https://godoc.org/github.com/icrowley/fake) data** — generates rich, randomized values:
 
- - fake.Brand
- - fake.Character
- - fake.Characters
- - fake.CharactersN(n)
- - fake.City
- - fake.Color
- - fake.Company
- - fake.Continent
- - fake.Country
- - fake.CreditCardVisa
- - fake.CreditCardMasterCard
- - fake.CreditCardAmericanExpress
- - fake.Currency
- - fake.CurrencyCode
- - fake.Day
- - fake.Digits
- - fake.DigitsN(n)
- - fake.EmailAddress
- - fake.FirstName
- - fake.FullName
- - fake.LastName
- - fake.Gender
- - fake.Hex(n) - random hexidecimal string n characters in length
- - fake.IPv4
- - fake.Language
- - fake.Model
- - fake.Month
- - fake.MonthShort
- - fake.MonthNum
- - fake.Year
- - fake.Paragraph
- - fake.Paragraphs
- - fake.ParagraphsN(n)
- - fake.Phone
- - fake.Product
- - fake.Sentence
- - fake.Sentences
- - fake.SentencesN(n)
- - fake.SimplePassword
- - fake.State
- - fake.StateAbbrev
- - fake.Street
- - fake.StreetAddress
- - fake.UserName
- - fake.WeekDay
- - fake.Word
- - fake.Words
- - fake.WordsN(n)
- - fake.Zip
- - fake.Int(n) - random positive integer less than or equal to n
- - fake.IntMinMax(min, max) - random positive number greater or equal to min and less than max
- - fake.Float(n) - random positive floating point number less than n
- - fake.UUID - generates a unique id  
+<details>
+<summary>Full list of <code>fake.*</code> tags</summary>
 
-### Scenarios
+| | | |
+|---|---|---|
+| `fake.Brand` | `fake.Character` | `fake.Characters` |
+| `fake.CharactersN(n)` | `fake.City` | `fake.Color` |
+| `fake.Company` | `fake.Continent` | `fake.Country` |
+| `fake.CreditCardVisa` | `fake.CreditCardMasterCard` | `fake.CreditCardAmericanExpress` |
+| `fake.Currency` | `fake.CurrencyCode` | `fake.Day` |
+| `fake.Digits` | `fake.DigitsN(n)` | `fake.EmailAddress` |
+| `fake.FirstName` | `fake.FullName` | `fake.LastName` |
+| `fake.Gender` | `fake.Hex(n)` (random hex string, `n` chars) | `fake.IPv4` |
+| `fake.Language` | `fake.Model` | `fake.Month` |
+| `fake.MonthShort` | `fake.MonthNum` | `fake.Year` |
+| `fake.Paragraph` | `fake.Paragraphs` | `fake.ParagraphsN(n)` |
+| `fake.Phone` | `fake.Product` | `fake.Sentence` |
+| `fake.Sentences` | `fake.SentencesN(n)` | `fake.SimplePassword` |
+| `fake.State` | `fake.StateAbbrev` | `fake.Street` |
+| `fake.StreetAddress` | `fake.UserName` | `fake.WeekDay` |
+| `fake.Word` | `fake.Words` | `fake.WordsN(n)` |
+| `fake.Zip` | `fake.Int(n)` (random positive int `<= n`) | `fake.IntMinMax(min, max)` |
+| `fake.Float(n)` (random positive float `< n`) | `fake.UUID` | |
 
-With the scenarios you can simulate a stateful service. It's useful to create test doubles.
+</details>
 
-A scenario is a state machine and you can assign an arbitrarily state.
+## Scenarios
 
-When mmock recieve a new request and there is an scenario defined in the matching mock, mmock checks if the mock is valid for the current state. Also a new scenario state can be set after the mock match.
+Scenarios let you simulate a stateful service, which makes them handy for building test doubles. A scenario is a state machine that you can move between arbitrary, named states.
 
-By default all scenarios has the state "not_started" until some mock triggers a new one.
+When Mmock receives a request, it checks whether the mock's `requiredState` matches the scenario's current state. If it matches, Mmock serves the mock and — if `newState` is set — advances the scenario to that new state. Every scenario starts in the `not_started` state until a mock transitions it elsewhere.
 
-Example of REST services using scenarios:
+Example: a minimal CRUD flow for `/user`, modeled as a scenario with two states:
 
-```
-+---------------------------------------------------------------------------------------------+
-|                                                                                             |
-|   GET /user                     POST /user                     GET /user                    |
-|   StatusCode: 404               StatusCode: 201                StatusCode: 200              |
-|                                                                                             |
-|  +-------------------------+   +---------------------------+   +-------------------------+  |
-|  |                         |   |                           |   |                         |  |
-|  | requiredState:created   +-> | requiredState:not_started +-> |  requiredState: created |  |
-|  |                         |   | newState: created         |   |                         |  |
-|  |                         |   |                           |   |                         |  |
-|  +-------------------------+   +---------------------------+   +-------------------------+  |
-|                                                                                             |
-+---------------------------------------------------------------------------------------------+
+```mermaid
+stateDiagram-v2
+    [*] --> not_started
+    not_started --> created: POST /user → 201 Created
+    created --> created: GET /user → 200 OK
+    not_started --> not_started: GET /user → 404 Not Found
 ```
 
-Working examples [here](/config/crud)
+In this scenario: while the state is `not_started`, a mock with `requiredState: not_started` answers `GET /user` with `404` (nothing has been created yet). `POST /user` matches a mock with `requiredState: not_started` and `newState: created`, moving the scenario to `created`. From then on, `GET /user` matches a different mock — the one with `requiredState: created` — and returns `200`.
 
-## API Specification
+Working examples are available in [`/config/crud`](/config/crud).
 
-MMock uses the Open API Specification (OAI, formerly known as Swagger) to describe its APIs. Our OAI specification schema is hosted at /swagger.json and serves as the canonical definition and comprehensive declaration of all available endpoints.
+## API
 
-The OAI specification makes writing client applications easier by: auto-generating boilerplate code (like data object classes) and dealing with authentication and error handling.
-
-You can find a comprehensive set of open tools for the OAI specification at: https://github.com/swagger-api.
-
-#### REST Endpoints
+Mmock describes its HTTP API using the OpenAPI Specification (OAS, formerly Swagger). The spec is served at `/swagger.json` and is the canonical reference for every available endpoint — point any [OpenAPI tool](https://github.com/swagger-api) at it to generate clients, docs, or test suites.
 
 ### Verify
 
-The Mmock records the incoming requests in memory (last 100 by default). 
-This makes it possible to verify that a request matching a specific pattern was received, and also to fetch the requests details.
+Mmock keeps the last N requests it has received in memory (100 by default, see `-request-storage-capacity`), so you can verify that a given request was made and inspect its details.
 
-**Title** : Get all requests.<br>
-**URL** : /api/request/all<br>
-**Method** : GET<br>
-**Response Codes**: Success (200 OK)<br>
+| Action | Method | URL | Success |
+|---|---|---|---|
+| Get all requests | `GET` | `/api/request/all` | `200 OK` |
+| Get all matched requests | `GET` | `/api/request/matched` | `200 OK` |
+| Get all unmatched requests | `GET` | `/api/request/unmatched` | `200 OK` |
+| Clear all recorded requests | `GET` | `/api/request/reset` | `200 OK` |
+| Get requests matching a pattern | `POST` | `/api/request/verify` | `200 OK` |
+| Reset requests matching a pattern | `POST` | `/api/request/reset_match` | `200 OK` |
 
-**Title** : Get all matched requests with any mock.<br>
-**URL** : /api/request/matched<br>
-**Method** : GET<br>
-**Response Codes**: Success (200 OK)<br>
-
-**Title** : Clean all recorded request.<br>
-**URL** : /api/request/reset<br>
-**Method** : GET<br>
-**Response Codes**: Success (200 OK)<br>
-
-**Title** : Reset all requests that match with an specific pattern.<br>
-**URL** : /api/request/reset_match<br>
-**Method** : POST<br>
-**Data Params**:  <br>
-
-Like stubbing this call also uses the same DSL to filter and query requests.
+The `verify` and `reset_match` endpoints take a request pattern using the same DSL as a mock's `request` block:
 
 ```json
 {
-	"host": "example.com",
-	"method": "GET|POST|PUT|PATCH|... (Mandatory)", 
-	"path": "/your/path/:variable (Mandatory)",
-	"queryStringParameters": {
-		"name": ["value"],
-		"name": ["value", "value"]
-	},
-	"headers": {
-		"name": ["value"]
-	},
-	"cookies": {
-		"name": "value"
-	},
-	"body": "Expected Body"
+  "host": "example.com",
+  "method": "GET|POST|PUT|PATCH|... (required)",
+  "path": "/your/path/:variable (required)",
+  "queryStringParameters": {
+    "name": ["value"],
+    "other": ["value1", "value2"]
+  },
+  "headers": {
+    "name": ["value"]
+  },
+  "cookies": {
+    "name": "value"
+  },
+  "body": "Expected Body"
 }
 ```
-**Response Codes**: Success (200 OK)<br>
-
-**Title** : Get all non matched requests.<br>
-**URL** : /api/request/unmatched<br>
-**Method** : GET<br>
-**Response Codes**: Success (200 OK)<br>
-
-**Title** : Get all requests that match with an specific pattern.<br>
-**URL** : /api/request/verify<br>
-**Method** : POST<br>
-**Data Params**:  <br>
-
-Like stubbing this call also uses the same DSL to filter and query requests.
-
-```json
-{
-	"host": "example.com",
-	"method": "GET|POST|PUT|PATCH|... (Mandatory)", 
-	"path": "/your/path/:variable (Mandatory)",
-	"queryStringParameters": {
-		"name": ["value"],
-		"name": ["value", "value"]
-	},
-	"headers": {
-		"name": ["value"]
-	},
-	"cookies": {
-		"name": "value"
-	},
-	"body": "Expected Body"
-}
-```
-**Response Codes**: Success (200 OK)<br>
 
 ### Scenario
 
-**Title** : Get all active scenarios.<br>
-**URL** : /api/scenarios<br>
-**Method** : GET<br>
-**Response Codes**: Success (200 OK)<br>
-
-**Title** : Clean all scenarios status and pause state.<br>
-**URL** : /api/scenarios/reset_all<br>
-**Method** : GET<br>
-**Response Codes**: Success (200 OK)<br>
-
-**Title** : Manually progress a scenario state machine to the given state.<br>
-**URL** : /api/scenarios/set/:scenario/:state<br>
-**Method** : PUT<br>
-**Response Codes**: Success (200 OK)<br>
-
-**Title** : Pause prevents all scenarios state machines from progressing to a new state.<br>
-**URL** : /api/scenarios/pause<br>
-**Method** : PUT<br>
-**Response Codes**: Success (200 OK)<br>
-
-**Title** : Allow scenarios state machines to continue.<br>
-**URL** : /api/scenarios/unpause<br>
-**Method** : PUT<br>
-**Response Codes**: Success (200 OK)<br>
+| Action | Method | URL | Success |
+|---|---|---|---|
+| Get all active scenarios | `GET` | `/api/scenarios` | `200 OK` |
+| Reset every scenario's state and pause flag | `GET` | `/api/scenarios/reset_all` | `200 OK` |
+| Manually move a scenario to a given state | `PUT` | `/api/scenarios/set/:scenario/:state` | `200 OK` |
+| Pause all scenario state machines | `PUT` | `/api/scenarios/pause` | `200 OK` |
+| Resume all scenario state machines | `PUT` | `/api/scenarios/unpause` | `200 OK` |
 
 ### Mapping
 
-You can manage remotely your stub mappings whenever you need with this simple API:
+Manage your mock definitions remotely:
 
-**Title** : Get all mock definitions.<br>
-**URL** : /api/mapping <br>
-**Method** : GET<br>
-**Response Codes**: Success (200 OK)<br>
+| Action | Method | URL | Success |
+|---|---|---|---|
+| Get all mock definitions | `GET` | `/api/mapping` | `200 OK` |
+| Create a mock definition | `POST` | `/api/mapping/:uri` | `201 Created` |
+| Get a mock definition | `GET` | `/api/mapping/:uri` | `200 OK` |
+| Update a mock definition | `PUT` | `/api/mapping/:uri` | `200 OK` |
+| Delete a mock definition | `DELETE` | `/api/mapping/:uri` | `200 OK` |
 
-**Title** : Create new mock definition.<br>
-**URL** : /api/mapping/:uri <br>
-**Method** : POST<br>
-**Response Codes**: Success (201 OK)<br>
+### Realtime endpoint
 
-**Title** : Get mock definition.<br>
-**URL** : /api/mapping/:uri <br>
-**Method** : GET<br>
-**Response Codes**: Success (200 OK)<br>
+A WebSocket endpoint broadcasts every request in real time:
 
-**Title** : Update mock definition.<br>
-**URL** : /api/mapping/:uri <br>
-**Method** : PUT<br>
-**Response Codes**: Success (200 OK)<br>
+| Action | URL |
+|---|---|
+| Stream all requests | `/echo` |
 
-**Title** : Delete mock definition.<br>
-**URL** : /api/mapping/:uri <br>
-**Method** : DELETE<br>
-**Response Codes**: Success (200 OK)<br>)
+### Response format
 
-#### Realtime Endpoints
-
-Also there is a real time endpoint available through WebSockets that broadcast all requests.
-
-**Title** : Get all requests.<br>
-**URL** : /echo <br>
-
-
-#### Output
-
-All endpoints have the same output format:
+All of the endpoints above share the same JSON response shape:
 
 ```json
 [
@@ -601,49 +510,49 @@ All endpoints have the same output format:
 ]
 ```
 
-### Statistics
+## Statistics
 
-Mmock is collecting anonymous statistics about the usage of the following actions:
+Mmock collects anonymous usage statistics (see [`internal/statistics/statistics.go`](https://github.com/jmartin82/mmock/blob/master/internal/statistics/statistics.go#L30)):
 
-Source code: [/statistics/statistics.go](https://github.com/jmartin82/mmock/blob/master/internal/statistics/statistics.go#L30)
+- `requests.mock` — mocks served (count)
+- `requests.console` — web console usage (count)
+- `requests.verify` — verify requests (count)
+- `feature.scenario` — mocks served that use the scenario feature (count)
+- `feature.proxy` — mocks served that use the proxy feature (count)
 
-- `requests.mock`: Mocks served (number) 
-- `requests.console`: Web console usage (number)
-- `requests.verify`: Verify requests (number)
-- `feature.scenario`: Mocks with scenario feature served (number)
-- `feature.proxy`: Mocks with proxy feature served (number)
+Disable this entirely with `-server-statistics=false`.
 
-You can always disable this behavior adding the following flag `-server-statistics=false`
+## Contributors
 
-
-### Contributors
-- Amazing request body parsing form [@hmoragrega](https://github.com/hmoragrega)
-- Awesome use statistics from [@alfonsfoubert](https://github.com/alfonsfoubert)
-- More request variables available thanks to [@Bartek-CMP](https://github.com/Bartek-CMP)
+- Amazing request body parsing from [@hmoragrega](https://github.com/hmoragrega)
+- Awesome usage statistics from [@alfonsfoubert](https://github.com/alfonsfoubert)
+- More request variables thanks to [@Bartek-CMP](https://github.com/Bartek-CMP)
 - Scenario pause feature thanks to [@Nekroze](https://github.com/Nekroze)
 - Storage reset feature thanks to [@rubencougil](https://github.com/rubencougil)
-- Improved docker image thanks to [@daroot](https://github.com/daroot)
-- Added the possibility of access to an array index in dynamic responses [@jaimelopez](https://github.com/jaimelopez)
-- Create mapping via console thanks to [@inabajunmr](https://github.com/inabajunmr)
-- Thanks to [@joel-44](https://github.com/joel-44) for bug fixing 
-- Enviroment variables as mock variables thanks to [@marcoreni](https://github.com/marcoreni)
-- Support Regular Expressions for Field Values in JSON Request Body thanks to [@rosspatil](https://github.com/rosspatil)
-- Improved logging with levels thanks to [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
-- Support for Regular Expressions for QueryStringParameters [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
-- Support for URI and Description tags [@jcdietrich](https://github.com/jcdietrich) [@jdietrich-tc](https://github.com/jdietrich-tc)
+- Improved Docker image thanks to [@daroot](https://github.com/daroot)
+- Array index access in dynamic responses thanks to [@jaimelopez](https://github.com/jaimelopez)
+- Mapping creation via the console thanks to [@inabajunmr](https://github.com/inabajunmr)
+- Bug fixes thanks to [@joel-44](https://github.com/joel-44)
+- Environment variables as mock variables thanks to [@marcoreni](https://github.com/marcoreni)
+- Regular expression support for JSON request body fields thanks to [@rosspatil](https://github.com/rosspatil)
+- Improved logging with levels thanks to [@jcdietrich](https://github.com/jcdietrich) and [@jdietrich-tc](https://github.com/jdietrich-tc)
+- Regular expression support for query string parameters thanks to [@jcdietrich](https://github.com/jcdietrich) and [@jdietrich-tc](https://github.com/jdietrich-tc)
+- URI and description tag support thanks to [@jcdietrich](https://github.com/jcdietrich) and [@jdietrich-tc](https://github.com/jdietrich-tc)
 
-### Contributing
+## Contributing
 
-As of version 3.0.0, Mmock is available as a Go module. Therefore a Go version capable of understanding /vN suffixed imports is required:
+Mmock is distributed as a Go module and targets the Go version declared in [`go.mod`](go.mod) (currently Go 1.23+).
 
-1.9.7+
-1.10.3+
-1.11+
+Before submitting a pull request:
 
-If you make any changes, please run ```go fmt ./...``` before submitting a pull request.
+```bash
+go fmt ./...
+go vet ./...
+go test ./...
+```
 
-### Licence
+## License
 
-Copyright © 2016 - 2020, Jordi Martín (http://jordi.io)
+Copyright © 2016–2020, Jordi Martín ([jordi.io](http://jordi.io))
 
-Released under MIT license, see [LICENSE](LICENSE.md) for details.
+Released under the MIT license — see [LICENSE](LICENSE.md) for details.
